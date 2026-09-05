@@ -1,0 +1,16 @@
+:root {
+  --nbr-bg: #0d0d0d;
+  --nbr-bg-raised: #161616;
+  --nbr-fg: #d7fbd9;
+  --nbr-accent: #39ff88;
+  --nbr-danger: #ff4d4d;
+  --nbr-muted: #6b6b6b;
+  --nbr-border: #2a2a2a;
+
+  --nbr-font-mono: "IBM Plex Mono", "Courier New", monospace;
+
+  --nbr-space-1: 0.25rem;
+  --nbr-space-2: 0.5rem;
+  --nbr-space-3: 1rem;
+  --nbr-space-4: 2rem;
+}

@@ -1,0 +1,47 @@
+@import "./tokens.css";
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#app {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--nbr-bg);
+  color: var(--nbr-fg);
+  font-family: var(--nbr-font-mono);
+  line-height: 1.5;
+}
+
+a {
+  color: var(--nbr-accent);
+}
+
+button {
+  font-family: inherit;
+  background: var(--nbr-bg-raised);
+  color: var(--nbr-fg);
+  border: 1px solid var(--nbr-border);
+  padding: var(--nbr-space-2) var(--nbr-space-3);
+  cursor: pointer;
+}
+
+button:hover {
+  border-color: var(--nbr-accent);
+}
+
+.screen {
+  min-height: 100%;
+  padding: var(--nbr-space-4);
+}
+
+.screen h1 {
+  color: var(--nbr-accent);
+}

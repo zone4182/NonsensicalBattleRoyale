@@ -1,0 +1,11 @@
+# Supabase
+.branches
+.temp
+
+# dotenvx
+.env.keys
+.env.local
+.env.*.local
+
+# Local Edge Function secrets (SETUP_SECRET, CRON_SECRET) -- see functions/.env.example
+functions/.env

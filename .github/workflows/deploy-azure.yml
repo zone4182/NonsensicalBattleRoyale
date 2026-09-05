@@ -1,0 +1,42 @@
+name: Deploy Frontend to Azure
+
+# Builds the Vue PWA and deploys it to the free-tier Azure Static Web App
+# (nonsensical-battle-royale, resource group nonsensical-battle-royale-rg).
+on:
+  push:
+    branches: [main]
+    paths:
+      - "web/**"
+  workflow_dispatch:
+
+jobs:
+  build_and_deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        working-directory: web
+        run: npm ci
+
+      - name: Build
+        working-directory: web
+        run: npm run build
+        env:
+          # Production Supabase Edge Functions base URL -- baked into the client build,
+          # same shape as the local VITE_FUNCTIONS_URL used in dev.
+          VITE_FUNCTIONS_URL: https://zmwsmxulcbhwjvnyvihb.supabase.co/functions/v1
+
+      - name: Deploy to Azure Static Web Apps
+        uses: Azure/static-web-apps-deploy@v1
+        with:
+          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          action: upload
+          app_location: web/dist
+          output_location: ""
+          skip_app_build: true
