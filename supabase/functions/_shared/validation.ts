@@ -42,6 +42,24 @@ export function optionalIntInRange(body: Record<string, unknown>, field: string,
   return value;
 }
 
+export function optionalOneOf<T extends string>(body: Record<string, unknown>, field: string, options: readonly T[]): T | undefined {
+  const value = body[field];
+  if (value === undefined || value === null) return undefined;
+  if (typeof value !== "string" || !options.includes(value as T)) {
+    throw new HttpError(400, "invalid_field", `'${field}' must be one of: ${options.join(", ")}.`);
+  }
+  return value as T;
+}
+
+export function optionalBoolean(body: Record<string, unknown>, field: string): boolean | undefined {
+  const value = body[field];
+  if (value === undefined || value === null) return undefined;
+  if (typeof value !== "boolean") {
+    throw new HttpError(400, "invalid_field", `'${field}' must be a boolean.`);
+  }
+  return value;
+}
+
 export function optionalString(body: Record<string, unknown>, field: string): string | undefined {
   const value = body[field];
   if (value === undefined || value === null) return undefined;

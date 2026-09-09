@@ -1,6 +1,6 @@
 import { errorResponse, HttpError, jsonResponse, preflightResponse, readJsonBody } from "../_shared/http.ts";
 import { authenticate, requireAlive, requireRole } from "../_shared/auth.ts";
-import { castVote, countActiveVotesForVoter, sql } from "../_shared/db.ts";
+import { castVote, countActiveVotesForVoter, revokeOldestActiveVotesForVoter, sql } from "../_shared/db.ts";
 import { requireUuid } from "../_shared/validation.ts";
 import type { Player, Round } from "../_shared/types.ts";
 
@@ -50,9 +50,16 @@ Deno.serve(async (req) => {
 
     const isDoubleVoteHolder = round.double_vote_player_id === ctx.player.id;
     const entitlement = isDoubleVoteHolder ? 2 : 1;
-    const alreadyCast = await countActiveVotesForVoter(round.id, ctx.player.id);
+    let alreadyCast = await countActiveVotesForVoter(round.id, ctx.player.id);
     if (alreadyCast >= entitlement) {
-      throw new HttpError(409, "vote_entitlement_exhausted", "You have already cast all votes you're entitled to this round.");
+      if (!ctx.game.allow_vote_change) {
+        throw new HttpError(409, "vote_entitlement_exhausted", "You have already cast all votes you're entitled to this round.");
+      }
+      // Vote change is on: make room by revoking the voter's own oldest cast(s) rather
+      // than rejecting -- a vote is only final once the deadline (or an early GM
+      // resolve) actually locks the round.
+      await revokeOldestActiveVotesForVoter(db, round.id, ctx.player.id, alreadyCast - entitlement + 1);
+      alreadyCast = await countActiveVotesForVoter(round.id, ctx.player.id);
     }
 
     await castVote(db, {

@@ -6,6 +6,7 @@ import { callFunction } from "../lib/api";
 // so later milestones can populate real data without renaming.
 export type GamePhase = "setup" | "active" | "three_doors" | "ended";
 export type PlayerStatus = "alive" | "ghost";
+export type RoundResolutionMode = "automatic" | "manual";
 
 export type RosterPlayerRole = "player" | "gm";
 
@@ -43,6 +44,8 @@ interface GetGameStateResponse {
   game_id: string;
   game_name: string;
   phase: GamePhase;
+  round_resolution_mode: RoundResolutionMode;
+  allow_vote_change: boolean;
   current_round: { round_number: number; voting_deadline_at: string | null } | null;
   players: { id: string; display_name: string; status: PlayerStatus; role: RosterPlayerRole }[];
   your_status: {
@@ -57,6 +60,8 @@ export const useGameStore = defineStore("game", () => {
   const gameId = ref<string | null>(null);
   const gameName = ref<string | null>(null);
   const phase = ref<GamePhase | null>(null);
+  const roundResolutionMode = ref<RoundResolutionMode | null>(null);
+  const allowVoteChange = ref(false);
   const currentRound = ref<CurrentRound | null>(null);
   const players = ref<RosterPlayer[]>([]);
   const yourStatus = ref<YourStatus | null>(null);
@@ -70,6 +75,8 @@ export const useGameStore = defineStore("game", () => {
     gameId.value = raw.game_id;
     gameName.value = raw.game_name;
     phase.value = raw.phase;
+    roundResolutionMode.value = raw.round_resolution_mode;
+    allowVoteChange.value = raw.allow_vote_change;
     currentRound.value = raw.current_round
       ? { roundNumber: raw.current_round.round_number, votingDeadlineAt: raw.current_round.voting_deadline_at }
       : null;
@@ -86,5 +93,16 @@ export const useGameStore = defineStore("game", () => {
     narrationEntries.value = raw.narration_entries.map((n) => ({ id: n.id, text: n.text, createdAt: n.created_at }));
   }
 
-  return { gameId, gameName, phase, currentRound, players, yourStatus, narrationEntries, refresh };
+  return {
+    gameId,
+    gameName,
+    phase,
+    roundResolutionMode,
+    allowVoteChange,
+    currentRound,
+    players,
+    yourStatus,
+    narrationEntries,
+    refresh,
+  };
 });

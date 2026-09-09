@@ -1,13 +1,21 @@
 import { errorResponse, jsonResponse, preflightResponse, readJsonBody } from "../_shared/http.ts";
 import { requireSetupSecret } from "../_shared/auth.ts";
 import { sql } from "../_shared/db.ts";
-import { optionalIntInRange, requireOneOf, requirePositiveInt, requireString } from "../_shared/validation.ts";
+import {
+  optionalBoolean,
+  optionalIntInRange,
+  optionalOneOf,
+  requireOneOf,
+  requirePositiveInt,
+  requireString,
+} from "../_shared/validation.ts";
 import { generateInviteToken } from "../_shared/tokens.ts";
 import { createBotPlayers } from "../_shared/bots.ts";
-import type { MissedDeadlineMode, Round1StartMode } from "../_shared/types.ts";
+import type { MissedDeadlineMode, Round1StartMode, RoundResolutionMode } from "../_shared/types.ts";
 
 const MISSED_DEADLINE_MODES: readonly MissedDeadlineMode[] = ["forfeit_fatal", "no_consequence", "one_round_penalty"];
 const ROUND1_START_MODES: readonly Round1StartMode[] = ["wait_for_all", "gm_manual", "scheduled"];
+const ROUND_RESOLUTION_MODES: readonly RoundResolutionMode[] = ["automatic", "manual"];
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return preflightResponse();
@@ -24,13 +32,19 @@ Deno.serve(async (req) => {
     const round1StartMode = requireOneOf(body, "round1_start_mode", ROUND1_START_MODES);
     // Bot Mode (concept/bot-mode/BOT-MODE.md) -- optional, defaults to no bots.
     const botCount = optionalIntInRange(body, "bot_count", 1, 19) ?? 0;
+    const roundResolutionMode = optionalOneOf(body, "round_resolution_mode", ROUND_RESOLUTION_MODES) ?? "manual";
+    const allowVoteChange = optionalBoolean(body, "allow_vote_change") ?? false;
 
     const db = sql();
 
     const result = await db.begin(async (tx) => {
       const [game] = await tx`
-        insert into battle_royale.games (name, round_interval_minutes, missed_deadline_mode, round1_start_mode)
-        values (${name}, ${roundIntervalMinutes}, ${missedDeadlineMode}, ${round1StartMode})
+        insert into battle_royale.games
+          (name, round_interval_minutes, missed_deadline_mode, round1_start_mode, round_resolution_mode, allow_vote_change)
+        values (
+          ${name}, ${roundIntervalMinutes}, ${missedDeadlineMode}, ${round1StartMode},
+          ${roundResolutionMode}, ${allowVoteChange}
+        )
         returning id
       `;
 

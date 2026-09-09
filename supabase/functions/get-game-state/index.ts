@@ -56,6 +56,8 @@ Deno.serve(async (req) => {
       game_id: ctx.game.id,
       game_name: ctx.game.name,
       phase: ctx.game.phase,
+      round_resolution_mode: ctx.game.round_resolution_mode,
+      allow_vote_change: ctx.game.allow_vote_change,
       current_round: openRound
         ? { round_number: openRound.round_number, voting_deadline_at: openRound.voting_deadline_at }
         : null,

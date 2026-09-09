@@ -39,6 +39,28 @@ export async function castVote(
   `;
 }
 
+// Vote-change support (games.allow_vote_change): revokes a voter's own oldest active
+// vote(s) in this round to make room for a fresh cast within their entitlement. Scoped
+// to voter_player_id -- this is a voter replacing their own vote, not the anonymity-
+// sensitive "which of MY votes got redirected/nulled by a power" cases above.
+export async function revokeOldestActiveVotesForVoter(
+  exec: ReturnType<typeof sql>,
+  roundId: string,
+  voterPlayerId: string,
+  count: number,
+): Promise<void> {
+  await exec`
+    update battle_royale.votes
+    set revoked_at = now()
+    where id in (
+      select id from battle_royale.votes
+      where round_id = ${roundId} and voter_player_id = ${voterPlayerId} and revoked_at is null
+      order by cast_at asc
+      limit ${count}
+    )
+  `;
+}
+
 export async function countActiveVotesForVoter(roundId: string, voterPlayerId: string): Promise<number> {
   const rows = await sql()<{ count: number }[]>`
     select count(*)::int as count

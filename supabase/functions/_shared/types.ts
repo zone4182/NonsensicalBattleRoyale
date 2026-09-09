@@ -5,6 +5,7 @@
 export type GamePhase = "setup" | "active" | "three_doors" | "ended";
 export type MissedDeadlineMode = "forfeit_fatal" | "no_consequence" | "one_round_penalty";
 export type Round1StartMode = "wait_for_all" | "gm_manual" | "scheduled";
+export type RoundResolutionMode = "automatic" | "manual";
 export type PlayerRole = "player" | "gm";
 export type PlayerStatus = "alive" | "ghost";
 export type PowerAcquisitionMethod = "random" | "earned" | "gm_grant";
@@ -21,6 +22,8 @@ export interface Game {
   double_vote_cadence_formula: string;
   double_vote_floor_rounds: number;
   survival_streak_threshold: number;
+  round_resolution_mode: RoundResolutionMode;
+  allow_vote_change: boolean;
   gm_player_id: string | null;
   created_at: string;
 }

@@ -18,7 +18,11 @@ const candidates = computed(() => game.players.filter((p) => p.role === "player"
 // as votable so the guard below doesn't bounce someone out before their real status has
 // even loaded. It only ever comes from get-game-state as an explicit number once loaded.
 const votesRemaining = computed(() => game.yourStatus?.votesRemainingThisRound ?? null);
-const canVote = computed(() => votesRemaining.value === null || votesRemaining.value > 0);
+// Entitlement exhausted (0, not null/unknown) is still votable when the game allows
+// changing a vote -- submit-vote replaces the existing cast instead of rejecting it.
+const canVote = computed(
+  () => votesRemaining.value === null || votesRemaining.value > 0 || (votesRemaining.value === 0 && game.allowVoteChange),
+);
 
 const selectedId = ref<string | null>(null);
 const pending = ref(false);

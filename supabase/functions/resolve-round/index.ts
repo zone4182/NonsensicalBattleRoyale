@@ -1,6 +1,7 @@
 import { errorResponse, jsonResponse, preflightResponse, readJsonBody } from "../_shared/http.ts";
 import { requireCronOrGmForGame } from "../_shared/auth.ts";
 import {
+  countActiveVotesForVoter,
   pickDoubleVoteHolder,
   playersWithNoVoteInRound,
   redirectOneVoteAgainstTarget,
@@ -20,10 +21,46 @@ interface Resolution {
   new_phase: Game["phase"];
 }
 
+// A round is "due" once its deadline passes, or -- only for a scoped call (a GM's own
+// "Resolve now" click, hard-scoped to their game; a scoped cron call is theoretically
+// possible via body.game_id but nothing currently sends one) -- as soon as every alive
+// player has used their full vote entitlement. There's nothing left to wait for once
+// that's true, so a GM shouldn't have to sit out the rest of the deadline.
+async function getDueRoundsForGame(db: ReturnType<typeof sql>, gameId: string): Promise<Round[]> {
+  const openRounds = await db<Round[]>`
+    select * from battle_royale.rounds where resolved_at is null and game_id = ${gameId}
+  `;
+
+  const due: Round[] = [];
+  for (const round of openRounds) {
+    if (new Date(round.voting_deadline_at) <= new Date()) {
+      due.push(round);
+      continue;
+    }
+
+    const aliveRoster = await db<{ id: string }[]>`
+      select id from battle_royale.players where game_id = ${gameId} and status = 'alive' and role = 'player'
+    `;
+    if (aliveRoster.length === 0) continue;
+
+    let allVoted = true;
+    for (const player of aliveRoster) {
+      const entitlement = round.double_vote_player_id === player.id ? 2 : 1;
+      const cast = await countActiveVotesForVoter(round.id, player.id);
+      if (cast < entitlement) {
+        allVoted = false;
+        break;
+      }
+    }
+    if (allVoted) due.push(round);
+  }
+  return due;
+}
+
 // Invoked either by cron (x-cron-secret, unscoped or scoped by body.game_id) or by a
-// GM's "Resolve now" button (bearer token, hard-scoped to their own game). Still only
-// acts on rounds whose deadline has actually passed -- an early GM click just gets
-// resolved_count: 0 back, not an error.
+// GM's "Resolve now" button (bearer token, hard-scoped to their own game). The unscoped
+// cron sweep (games.round_resolution_mode "automatic") is the only path that never
+// early-resolves -- it only ever acts once a deadline has actually passed.
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return preflightResponse();
   try {
@@ -33,13 +70,11 @@ Deno.serve(async (req) => {
 
     const db = sql();
     const dueRounds = scopedGameId
-      ? await db<Round[]>`
-          select * from battle_royale.rounds
-          where resolved_at is null and voting_deadline_at <= now() and game_id = ${scopedGameId}
-        `
+      ? await getDueRoundsForGame(db, scopedGameId)
       : await db<Round[]>`
-          select * from battle_royale.rounds
-          where resolved_at is null and voting_deadline_at <= now()
+          select r.* from battle_royale.rounds r
+          join battle_royale.games g on g.id = r.game_id
+          where r.resolved_at is null and r.voting_deadline_at <= now() and g.round_resolution_mode = 'automatic'
         `;
 
     const resolutions: Resolution[] = [];

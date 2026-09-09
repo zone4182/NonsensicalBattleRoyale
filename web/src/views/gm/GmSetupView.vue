@@ -16,6 +16,14 @@ const setupSecret = ref("");
 const botMode = ref(false);
 const botCount = ref(1);
 const botCountOptions = Array.from({ length: 19 }, (_, i) => i + 1);
+const roundResolutionMode = ref<"manual" | "automatic">("manual");
+const allowVoteChange = ref(false);
+
+const roundResolutionModeHints: Record<typeof roundResolutionMode.value, string> = {
+  manual: "Rounds only resolve when you click \"Resolve now\" yourself, even after the deadline passes.",
+  automatic: "Rounds resolve on their own the moment the deadline passes -- no need to have the app open.",
+};
+const roundResolutionModeHint = computed(() => roundResolutionModeHints[roundResolutionMode.value]);
 
 const missedDeadlineModeHints: Record<typeof missedDeadlineMode.value, string> = {
   forfeit_fatal: "Missing the vote deadline eliminates that player, same as being voted out.",
@@ -49,6 +57,8 @@ async function createGame() {
         missed_deadline_mode: missedDeadlineMode.value,
         round1_start_mode: round1StartMode.value,
         bot_count: botMode.value ? botCount.value : undefined,
+        round_resolution_mode: roundResolutionMode.value,
+        allow_vote_change: allowVoteChange.value,
       },
       { extraHeaders: { "x-setup-secret": setupSecret.value } },
     );
@@ -71,6 +81,9 @@ async function copyToken() {
     <p>Create the game, then invite players using their own invite links (not built yet in this milestone).</p>
     <p class="field-hint">
       Round 1 can't start until at least 5 players have accepted their invite, whichever start mode you pick below.
+    </p>
+    <p class="field-hint">
+      Regardless of resolution mode, you can always resolve a round early yourself once every alive player has voted.
     </p>
     <form
       class="setup-form"
@@ -122,6 +135,24 @@ async function copyToken() {
         </select>
         <span class="field-hint">How and when round 1 begins. {{ round1StartModeHint }}</span>
       </label>
+      <label>
+        Round resolution mode
+        <select v-model="roundResolutionMode">
+          <option value="manual">Always manually resolve</option>
+          <option value="automatic">Automatic, once the deadline passes</option>
+        </select>
+        <span class="field-hint">How every round after the first one ends. {{ roundResolutionModeHint }}</span>
+      </label>
+      <label class="checkbox-label">
+        <input
+          v-model="allowVoteChange"
+          type="checkbox"
+        >
+        Allow players to change their vote
+      </label>
+      <span class="field-hint">
+        If off (default), a vote is final the moment it's cast. If on, a player can re-vote as many times as they want before the round resolves -- only their latest vote(s) count.
+      </span>
       <label class="checkbox-label">
         <input
           v-model="botMode"
