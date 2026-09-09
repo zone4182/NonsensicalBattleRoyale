@@ -143,8 +143,35 @@ async function resolveNow() {
   }
 }
 
+// --- Resolve doors (Three Doors) ---
+// resolve-round and resolve-doors are entirely separate endpoints (Three Doors has no
+// `rounds` row at all) -- "Resolve now" calling resolve-round during three_doors was
+// always a no-op (resolved_count: 0, read as "not ready yet"), not an actual attempt.
+const resolveDoorsPending = ref(false);
+const resolveDoorsMessage = ref<string | null>(null);
+
+async function resolveDoors() {
+  if (!session.token) return;
+  resolveDoorsPending.value = true;
+  resolveDoorsMessage.value = null;
+  try {
+    const res = await callFunction<{ resolved_count: number }>("resolve-doors", {}, { token: session.token });
+    resolveDoorsMessage.value =
+      res.resolved_count === 0
+        ? "Not ready yet -- not every alive player has picked a door."
+        : "Doors resolved -- game over.";
+    await game.refresh(session.token);
+    await loadOverview();
+  } catch (err) {
+    resolveDoorsMessage.value = err instanceof ApiCallError ? err.message : "Something went wrong.";
+  } finally {
+    resolveDoorsPending.value = false;
+  }
+}
+
 const showStartButton = computed(() => game.phase === "setup" || game.phase === null);
-const showResolveButton = computed(() => game.phase === "active" || game.phase === "three_doors");
+const showResolveButton = computed(() => game.phase === "active");
+const showResolveDoorsButton = computed(() => game.phase === "three_doors");
 
 // --- Existing GM action log form ---
 const actionType = ref(ACTION_TYPES[0]);
@@ -323,6 +350,20 @@ async function submit() {
       </button>
       <p v-if="resolveMessage">
         {{ resolveMessage }}
+      </p>
+    </section>
+
+    <section class="round-controls">
+      <button
+        v-if="showResolveDoorsButton"
+        type="button"
+        :disabled="resolveDoorsPending"
+        @click="resolveDoors"
+      >
+        {{ resolveDoorsPending ? "Resolving..." : "Resolve doors" }}
+      </button>
+      <p v-if="resolveDoorsMessage">
+        {{ resolveDoorsMessage }}
       </p>
     </section>
 
