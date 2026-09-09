@@ -4,11 +4,16 @@ import { useSessionStore } from "../stores/session";
 const router = createRouter({
   history: createWebHistory(),
   routes: [
-    { path: "/", redirect: "/invite" },
+    {
+      path: "/",
+      name: "home",
+      component: () => import("../views/HomeView.vue"),
+      meta: { auth: "public" },
+    },
     {
       path: "/invite/:token?",
-      name: "landing",
-      component: () => import("../views/LandingView.vue"),
+      name: "join",
+      component: () => import("../views/JoinGameView.vue"),
       meta: { auth: "public" },
     },
     {
@@ -58,7 +63,15 @@ const router = createRouter({
       component: () => import("../layouts/GmLayout.vue"),
       meta: { auth: "gm" },
       children: [
-        { path: "setup", name: "gm-setup", component: () => import("../views/gm/GmSetupView.vue"), meta: { auth: "gm" } },
+        {
+          path: "setup",
+          name: "gm-setup",
+          component: () => import("../views/gm/GmSetupView.vue"),
+          // Creating a game happens before any invite token exists (gated server-side by the
+          // setup secret instead, see create-game/index.ts), so this one screen must be
+          // reachable without a session -- unlike the rest of the /gm nav.
+          meta: { auth: "public" },
+        },
         { path: "play", name: "gm-in-play", component: () => import("../views/gm/GmInPlayView.vue"), meta: { auth: "gm" } },
         {
           path: "invites",
@@ -89,12 +102,12 @@ router.beforeEach((to) => {
   if (to.meta.auth === "public") return true;
 
   if (to.meta.auth === "player") {
-    if (!session.token) return { name: "landing" };
+    if (!session.token) return { name: "home" };
     return true;
   }
 
   if (to.meta.auth === "gm") {
-    if (!session.token) return { name: "landing" };
+    if (!session.token) return { name: "home" };
     if (session.role !== "gm") return { name: "main-round" };
     return true;
   }

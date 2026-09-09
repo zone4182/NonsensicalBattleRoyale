@@ -4,7 +4,7 @@ import { ApiCallError } from "../lib/api";
 
 // Generic wrapper for screens that only need a loading flag + a toast on failure.
 // Screens that need to branch on specific ApiCallError codes (e.g. PrivateVoteModal,
-// LandingView) should call `callFunction` directly in their own try/catch instead of
+// JoinGameView) should call `callFunction` directly in their own try/catch instead of
 // going through `run`, so they can map codes to specific messages.
 export function useApiCall() {
   const ui = useUiStore();

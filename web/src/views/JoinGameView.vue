@@ -78,6 +78,11 @@ async function redeem() {
     >
       {{ errorMessage }}
     </p>
+    <p class="back-link">
+      <RouterLink :to="{ name: 'home' }">
+        ← back
+      </RouterLink>
+    </p>
   </FullscreenLayout>
 </template>
 
@@ -98,5 +103,9 @@ async function redeem() {
 
 .error {
   color: var(--nbr-danger);
+}
+
+.back-link {
+  margin-top: var(--nbr-space-3);
 }
 </style>
