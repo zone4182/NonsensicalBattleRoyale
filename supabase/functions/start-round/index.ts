@@ -2,6 +2,7 @@ import { errorResponse, HttpError, jsonResponse, preflightResponse } from "../_s
 import { authenticate, requireRole } from "../_shared/auth.ts";
 import { pickDoubleVoteHolder, sql } from "../_shared/db.ts";
 import { grantRandomDrop } from "../_shared/powers.ts";
+import { MIN_PLAYERS_TO_START } from "../_shared/constants.ts";
 import type { Game } from "../_shared/types.ts";
 
 // GM-only. Creates round 1 for a game still in setup -- used for gm_manual (GM clicks
@@ -24,6 +25,18 @@ Deno.serve(async (req) => {
       const existing = await tx`select id from battle_royale.rounds where game_id = ${game.id} limit 1`;
       if (existing.length > 0) {
         throw new HttpError(409, "round_already_exists", "Round 1 has already been started for this game.");
+      }
+
+      const [{ player_count }] = await tx<{ player_count: number }[]>`
+        select count(*)::int as player_count from battle_royale.players
+        where game_id = ${game.id} and role = 'player'
+      `;
+      if (player_count < MIN_PLAYERS_TO_START) {
+        throw new HttpError(
+          409,
+          "not_enough_players",
+          `At least ${MIN_PLAYERS_TO_START} players must have accepted their invite before round 1 can start (currently ${player_count}).`,
+        );
       }
 
       const doubleVotePlayerId = await pickDoubleVoteHolder(tx, game.id, game.double_vote_floor_rounds);

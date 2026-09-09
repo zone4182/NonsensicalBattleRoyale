@@ -29,7 +29,11 @@ Be the last player standing, or one of the survivors who wins the endgame ("Thre
 
 ## Scale
 
-Must support **3 to 20+ players** per game instance. This affects: the End-of-Game Vote Tree UI (needs to scale/collapse, not just render flat), setup/invite flows, and power/pacing balance at both small and large counts.
+**Minimum 5 players** (excluding the GM) — enforced: round 1 cannot start below this floor. Below 5, there isn't enough room for a real elimination loop before Three Doors triggers (at exactly 3 remaining), and anonymity stops holding up in practice with so few voters.
+
+**Maximum 20 players** (excluding the GM) for the current version. Not yet a hard restriction in code — a design ceiling to build toward, not an enforced cap.
+
+This affects: the End-of-Game Vote Tree UI (needs to scale/collapse, not just render flat), setup/invite flows, and power/pacing balance across the 5–20 range.
 
 ## Onboarding & Invite Flow
 

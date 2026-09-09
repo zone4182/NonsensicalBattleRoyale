@@ -2,6 +2,7 @@ import { errorResponse, HttpError, jsonResponse, preflightResponse, readJsonBody
 import { pickDoubleVoteHolder, sql } from "../_shared/db.ts";
 import { grantRandomDrop } from "../_shared/powers.ts";
 import { requireString } from "../_shared/validation.ts";
+import { MIN_PLAYERS_TO_START } from "../_shared/constants.ts";
 import type { Game, Invite } from "../_shared/types.ts";
 
 // Not authenticated via authenticate() -- the invite isn't redeemed yet, so there's no
@@ -42,13 +43,20 @@ Deno.serve(async (req) => {
       let gamePhase: string = game.phase;
 
       // wait_for_all: round 1 starts automatically the moment the last invited player
-      // redeems -- event-driven off this write, needs no cron.
+      // redeems -- event-driven off this write, needs no cron. Still subject to the
+      // GAME-DESIGN.md "Scale" minimum -- a fully-redeemed roster under that floor just
+      // stays in setup until the GM invites enough people (or overrides via start-round,
+      // which enforces the same minimum).
       if (game.round1_start_mode === "wait_for_all" && game.phase === "setup") {
         const [{ unredeemed_count }] = await tx<{ unredeemed_count: number }[]>`
           select count(*)::int as unredeemed_count from battle_royale.invites
           where game_id = ${game.id} and redeemed_at is null
         `;
-        if (unredeemed_count === 0) {
+        const [{ player_count }] = await tx<{ player_count: number }[]>`
+          select count(*)::int as player_count from battle_royale.players
+          where game_id = ${game.id} and role = 'player'
+        `;
+        if (unredeemed_count === 0 && player_count >= MIN_PLAYERS_TO_START) {
           const doubleVotePlayerId = await pickDoubleVoteHolder(tx, game.id, game.double_vote_floor_rounds);
           const [round] = await tx`
             insert into battle_royale.rounds (game_id, round_number, opens_at, voting_deadline_at, double_vote_player_id)
