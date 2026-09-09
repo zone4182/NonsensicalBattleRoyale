@@ -31,7 +31,7 @@ Deno.serve(async (req) => {
     // "Critical architectural rule" is about *who voted for whom*, not a player knowing
     // their own remaining vote count).
     let votesRemainingThisRound: number | null = null;
-    if (openRound && ctx.role === "player") {
+    if (openRound && ctx.role === "player" && ctx.player.status === "alive") {
       const entitlement = openRound.double_vote_player_id === ctx.player.id ? 2 : 1;
       const alreadyCast = await countActiveVotesForVoter(openRound.id, ctx.player.id);
       votesRemainingThisRound = Math.max(0, entitlement - alreadyCast);

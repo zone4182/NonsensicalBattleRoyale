@@ -8,8 +8,10 @@ import { useGameStore } from "../../stores/game";
 const router = useRouter();
 const game = useGameStore();
 
-// null (no open round, e.g. still in setup) reads as "nothing to vote on yet", not
-// "unlimited votes" -- only a positive remaining count opens the modal.
+const isGhost = computed(() => game.yourStatus?.status === "ghost");
+// null (no open round, e.g. still in setup, or -- since get-game-state never computes
+// this for a ghost -- exactly the isGhost case above) reads as "nothing to vote on
+// yet," not "unlimited votes" -- only a positive remaining count opens the modal.
 const votesRemaining = computed(() => game.yourStatus?.votesRemainingThisRound ?? 0);
 const canVote = computed(() => votesRemaining.value > 0);
 
@@ -20,7 +22,10 @@ function openVoteModal() {
 </script>
 
 <template>
-  <div class="vote-action-panel">
+  <div
+    v-if="!isGhost"
+    class="vote-action-panel"
+  >
     <button
       type="button"
       :disabled="!canVote"
