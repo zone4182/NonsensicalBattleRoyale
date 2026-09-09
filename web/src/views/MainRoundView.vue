@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { onMounted } from "vue";
+import { onMounted, watch } from "vue";
+import { useRouter } from "vue-router";
 import RoundHeader from "../components/round/RoundHeader.vue";
 import CinematicViewport from "../components/round/CinematicViewport.vue";
 import PlayerRoster from "../components/round/PlayerRoster.vue";
@@ -9,7 +10,14 @@ import VoteActionPanel from "../components/round/VoteActionPanel.vue";
 import { useGameStore } from "../stores/game";
 import { useSessionStore } from "../stores/session";
 import { useApiCall } from "../composables/useApiCall";
+import { usePoll } from "../composables/usePoll";
 
+// 15s keeps a fast-round game feeling responsive without hammering get-game-state; a
+// background poll never shows the loading spinner (only the initial mount fetch does,
+// via `run`).
+const POLL_INTERVAL_MS = 15_000;
+
+const router = useRouter();
 const game = useGameStore();
 const session = useSessionStore();
 const { pending, run } = useApiCall();
@@ -17,6 +25,24 @@ const { pending, run } = useApiCall();
 onMounted(() => {
   if (session.token) run(() => game.refresh(session.token as string));
 });
+
+usePoll(() => {
+  if (session.token) game.refresh(session.token);
+}, POLL_INTERVAL_MS);
+
+// Nothing else in the app currently reacts to a phase change at all -- without this, a
+// player sits on this screen forever once the game moves past 'active', even though the
+// poll above is quietly fetching the new phase the whole time.
+watch(
+  () => game.phase,
+  (phase) => {
+    if (phase === "ended") {
+      router.push({ name: "end-game-reveal" });
+    } else if (phase === "three_doors" && game.yourStatus?.status === "alive") {
+      router.push({ name: "three-doors" });
+    }
+  },
+);
 </script>
 
 <template>

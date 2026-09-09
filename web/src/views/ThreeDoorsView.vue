@@ -1,11 +1,16 @@
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
+import { onMounted, ref, watch } from "vue";
+import { useRouter } from "vue-router";
 import { useGameStore } from "../stores/game";
 import { useSessionStore } from "../stores/session";
 import { useApiCall } from "../composables/useApiCall";
+import { usePoll } from "../composables/usePoll";
 import { callFunction, ApiCallError } from "../lib/api";
 import FullscreenLayout from "../layouts/FullscreenLayout.vue";
 
+const POLL_INTERVAL_MS = 15_000;
+
+const router = useRouter();
 const game = useGameStore();
 const session = useSessionStore();
 const { run } = useApiCall();
@@ -21,6 +26,19 @@ const DOOR_ERROR_MESSAGES: Record<string, string> = {
 onMounted(() => {
   if (session.token) run(() => game.refresh(session.token as string));
 });
+
+usePoll(() => {
+  if (session.token) game.refresh(session.token);
+}, POLL_INTERVAL_MS);
+
+// The reveal (collision vs. unique picks) happens server-side once every remaining
+// player has picked -- this is what notices that happened and moves on.
+watch(
+  () => game.phase,
+  (phase) => {
+    if (phase === "ended") router.push({ name: "end-game-reveal" });
+  },
+);
 
 async function pick(doorNumber: number) {
   if (!session.token || pending.value) return;
