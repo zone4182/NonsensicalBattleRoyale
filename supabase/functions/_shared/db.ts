@@ -19,13 +19,21 @@ export function sql() {
 // directly from function code, but `battle_royale.votes` must only ever be touched
 // through these two functions -- never add a generic "select from votes" helper here.
 
-export async function castVote(params: {
-  roundId: string;
-  voterPlayerId: string;
-  targetPlayerId: string;
-  isDoubleVote: boolean;
-}): Promise<void> {
-  await sql()`
+// Takes the query executor explicitly (a transaction or the module client), same as
+// every other helper below -- a caller inside db.begin() that instead reached for the
+// module client here would insert against a connection that can't see this
+// transaction's own uncommitted rows yet (e.g. a round it just created), and the
+// insert's FK checks would fail.
+export async function castVote(
+  exec: ReturnType<typeof sql>,
+  params: {
+    roundId: string;
+    voterPlayerId: string;
+    targetPlayerId: string;
+    isDoubleVote: boolean;
+  },
+): Promise<void> {
+  await exec`
     insert into battle_royale.votes (round_id, voter_player_id, target_player_id, is_double_vote)
     values (${params.roundId}, ${params.voterPlayerId}, ${params.targetPlayerId}, ${params.isDoubleVote})
   `;

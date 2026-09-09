@@ -50,7 +50,7 @@ export async function castBotVotes(
     const entitlement = bot.id === doubleVotePlayerId ? 2 : 1;
     for (let castIndex = 0; castIndex < entitlement; castIndex++) {
       const target = candidates[Math.floor(Math.random() * candidates.length)];
-      await castVote({
+      await castVote(exec, {
         roundId,
         voterPlayerId: bot.id,
         targetPlayerId: target.id,

@@ -52,7 +52,7 @@ Deno.serve(async (req) => {
       throw new HttpError(409, "vote_entitlement_exhausted", "You have already cast all votes you're entitled to this round.");
     }
 
-    await castVote({
+    await castVote(db, {
       roundId: round.id,
       voterPlayerId: ctx.player.id,
       targetPlayerId: target.id,
