@@ -57,6 +57,7 @@ Deno.serve(async (req) => {
         double_vote_floor_rounds: ctx.game.double_vote_floor_rounds,
         survival_streak_threshold: ctx.game.survival_streak_threshold,
         created_at: ctx.game.created_at,
+        finished_at: ctx.game.finished_at,
       },
       rounds: rounds.map((r) => {
         const roundVotes = votesByRoundId.get(r.id) ?? [];

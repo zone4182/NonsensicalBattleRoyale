@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from "vue";
+import { useRouter } from "vue-router";
 import { useSessionStore } from "../../stores/session";
 import { useGameStore } from "../../stores/game";
 import { callFunction, ApiCallError } from "../../lib/api";
@@ -39,6 +40,7 @@ interface GmGameOverview {
     double_vote_floor_rounds: number;
     survival_streak_threshold: number;
     created_at: string;
+    finished_at: string | null;
   };
   rounds: {
     round_number: number;
@@ -77,6 +79,7 @@ const POWER_KEYS = [
   "false_flag",
 ];
 
+const router = useRouter();
 const session = useSessionStore();
 const game = useGameStore();
 
@@ -180,6 +183,31 @@ async function resolveDoors() {
 const showStartButton = computed(() => game.phase === "setup" || game.phase === null);
 const showResolveButton = computed(() => game.phase === "active");
 const showResolveDoorsButton = computed(() => game.phase === "three_doors");
+
+// --- Finish game ---
+// Administrative closure, separate from phase 'ended' (see finish-game/index.ts) --
+// available regardless of phase, since the GM might also be abandoning a game early.
+// No revisiting a finished game yet (deliberately deferred), so this clears the
+// session and sends the GM back to the landing page rather than leaving them logged
+// into a game they just closed.
+const finishPending = ref(false);
+const finishMessage = ref<string | null>(null);
+
+async function finishGame() {
+  if (!session.token) return;
+  if (!window.confirm("Finish this game? You won't be able to revisit it (not built yet) -- this just closes it out.")) return;
+  finishPending.value = true;
+  finishMessage.value = null;
+  try {
+    await callFunction("finish-game", {}, { token: session.token });
+    session.clearSession();
+    router.push({ name: "home" });
+  } catch (err) {
+    finishMessage.value = err instanceof ApiCallError ? err.message : "Something went wrong.";
+  } finally {
+    finishPending.value = false;
+  }
+}
 
 // --- Existing GM action log form ---
 const actionType = ref(ACTION_TYPES[0]);
@@ -404,6 +432,27 @@ async function submit() {
       </p>
     </section>
 
+    <section class="round-controls">
+      <button
+        type="button"
+        class="finish-button"
+        :disabled="finishPending"
+        @click="finishGame"
+      >
+        {{ finishPending ? "Finishing..." : "Finish game" }}
+      </button>
+      <p class="field-hint">
+        Closes this game out and sends you back to the landing page. Revisiting a
+        finished game isn't built yet -- planned for a later version.
+      </p>
+      <p
+        v-if="finishMessage"
+        class="error"
+      >
+        {{ finishMessage }}
+      </p>
+    </section>
+
     <hr>
 
     <p>Log a GM action (tie-break, power grant, narration edit, or twist). Every call is logged and auditable.</p>
@@ -536,6 +585,11 @@ async function submit() {
 
 .round-controls {
   margin-bottom: var(--nbr-space-3);
+}
+
+.finish-button {
+  border-color: var(--nbr-danger);
+  color: var(--nbr-danger);
 }
 
 .action-form {

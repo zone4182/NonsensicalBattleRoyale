@@ -18,8 +18,8 @@ Deno.serve(async (req) => {
 
     const db = sql();
     const activeDoorGames = scopedGameId
-      ? await db<Game[]>`select * from battle_royale.games where phase = 'three_doors' and id = ${scopedGameId}`
-      : await db<Game[]>`select * from battle_royale.games where phase = 'three_doors'`;
+      ? await db<Game[]>`select * from battle_royale.games where phase = 'three_doors' and finished_at is null and id = ${scopedGameId}`
+      : await db<Game[]>`select * from battle_royale.games where phase = 'three_doors' and finished_at is null`;
 
     let resolvedCount = 0;
 

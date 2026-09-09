@@ -381,6 +381,8 @@ verify_jwt = false
 verify_jwt = false
 [functions.gm-game-overview]
 verify_jwt = false
+[functions.finish-game]
+verify_jwt = false
 [functions.get-game-state]
 verify_jwt = false
 [functions.redeem-invite]

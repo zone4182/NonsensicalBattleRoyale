@@ -26,6 +26,7 @@ export interface Game {
   round_resolution_mode: RoundResolutionMode;
   allow_vote_change: boolean;
   gm_player_id: string | null;
+  finished_at: string | null;
   created_at: string;
 }
 

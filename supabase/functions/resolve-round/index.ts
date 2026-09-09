@@ -74,7 +74,8 @@ Deno.serve(async (req) => {
       : await db<Round[]>`
           select r.* from battle_royale.rounds r
           join battle_royale.games g on g.id = r.game_id
-          where r.resolved_at is null and r.voting_deadline_at <= now() and g.round_resolution_mode = 'automatic'
+          where r.resolved_at is null and r.voting_deadline_at <= now()
+            and g.round_resolution_mode = 'automatic' and g.finished_at is null
         `;
 
     const resolutions: Resolution[] = [];
