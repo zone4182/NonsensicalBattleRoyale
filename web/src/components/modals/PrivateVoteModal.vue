@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 import { useRouter } from "vue-router";
 import { useGameStore } from "../../stores/game";
 import { useSessionStore } from "../../stores/session";
@@ -13,6 +13,12 @@ const game = useGameStore();
 const session = useSessionStore();
 
 const candidates = computed(() => game.players.filter((p) => p.role === "player"));
+// null (roster/status not loaded yet, e.g. a direct/bookmarked navigation here before
+// this component's own onMounted refresh resolves) reads as "not yet known" -- treated
+// as votable so the guard below doesn't bounce someone out before their real status has
+// even loaded. It only ever comes from get-game-state as an explicit number once loaded.
+const votesRemaining = computed(() => game.yourStatus?.votesRemainingThisRound ?? null);
+const canVote = computed(() => votesRemaining.value === null || votesRemaining.value > 0);
 
 const selectedId = ref<string | null>(null);
 const pending = ref(false);
@@ -29,6 +35,18 @@ onMounted(() => {
     game.refresh(session.token);
   }
 });
+
+// Defense in depth against reaching this route with nothing left to spend (e.g. the
+// browser back/forward button after already voting) -- VoteActionPanel is the normal
+// gate, submit-vote is the real enforcement, this just avoids showing a live-looking
+// ballot the submit would immediately reject.
+watch(
+  canVote,
+  (value) => {
+    if (!value) router.push({ name: "main-round" });
+  },
+  { immediate: true },
+);
 
 async function confirmVote() {
   const token = session.token;
@@ -89,7 +107,7 @@ function close() {
     <div class="actions">
       <button
         type="button"
-        :disabled="!selectedId || pending"
+        :disabled="!selectedId || pending || !canVote"
         @click="confirmVote"
       >
         {{ pending ? "Casting..." : "Confirm vote" }}

@@ -1,6 +1,6 @@
 import { errorResponse, jsonResponse, preflightResponse } from "../_shared/http.ts";
 import { authenticate } from "../_shared/auth.ts";
-import { sql } from "../_shared/db.ts";
+import { countActiveVotesForVoter, sql } from "../_shared/db.ts";
 import type { Player, Round } from "../_shared/types.ts";
 
 // Read-only. Queries only players/rounds/power_grants/narration_log -- never votes,
@@ -19,11 +19,23 @@ Deno.serve(async (req) => {
     `;
 
     const rounds = await db<Round[]>`
-      select round_number, voting_deadline_at from battle_royale.rounds
+      select id, round_number, voting_deadline_at, double_vote_player_id from battle_royale.rounds
       where game_id = ${ctx.game.id} and resolved_at is null
       order by round_number desc
       limit 1
     `;
+    const openRound = rounds[0];
+
+    // Never queries votes.target_player_id or joins to another player's identity --
+    // just this voter's own cast count against their own entitlement (ARCHITECTURE.md
+    // "Critical architectural rule" is about *who voted for whom*, not a player knowing
+    // their own remaining vote count).
+    let votesRemainingThisRound: number | null = null;
+    if (openRound && ctx.role === "player") {
+      const entitlement = openRound.double_vote_player_id === ctx.player.id ? 2 : 1;
+      const alreadyCast = await countActiveVotesForVoter(openRound.id, ctx.player.id);
+      votesRemainingThisRound = Math.max(0, entitlement - alreadyCast);
+    }
 
     const grants = await db<{ power_key: string; category: string; count: number }[]>`
       select pg.power_key, pc.category, count(*)::int as count
@@ -42,13 +54,14 @@ Deno.serve(async (req) => {
 
     return jsonResponse({
       phase: ctx.game.phase,
-      current_round: rounds[0]
-        ? { round_number: rounds[0].round_number, voting_deadline_at: rounds[0].voting_deadline_at }
+      current_round: openRound
+        ? { round_number: openRound.round_number, voting_deadline_at: openRound.voting_deadline_at }
         : null,
       players: roster.map((p) => ({ id: p.id, display_name: p.display_name, status: p.status, role: p.role })),
       your_status: {
         status: ctx.player.status,
         held_powers: grants.map((g) => ({ power_key: g.power_key, category: g.category, count: g.count })),
+        votes_remaining_this_round: votesRemainingThisRound,
       },
       narration_entries: narration.reverse().map((n) => ({ id: n.id, text: n.body, created_at: n.created_at })),
     });

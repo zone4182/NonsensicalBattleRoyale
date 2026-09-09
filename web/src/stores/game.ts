@@ -36,6 +36,7 @@ export interface HeldPower {
 export interface YourStatus {
   status: PlayerStatus;
   heldPowers: HeldPower[];
+  votesRemainingThisRound: number | null;
 }
 
 interface GetGameStateResponse {
@@ -45,6 +46,7 @@ interface GetGameStateResponse {
   your_status: {
     status: PlayerStatus;
     held_powers: { power_key: string; category: string; count: number }[];
+    votes_remaining_this_round: number | null;
   };
   narration_entries: { id: string; text: string; created_at: string }[];
 }
@@ -73,6 +75,7 @@ export const useGameStore = defineStore("game", () => {
         category: p.category,
         count: p.count,
       })),
+      votesRemainingThisRound: raw.your_status.votes_remaining_this_round,
     };
     narrationEntries.value = raw.narration_entries.map((n) => ({ id: n.id, text: n.text, createdAt: n.created_at }));
   }
