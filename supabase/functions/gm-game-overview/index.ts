@@ -48,18 +48,29 @@ Deno.serve(async (req) => {
         survival_streak_threshold: ctx.game.survival_streak_threshold,
         created_at: ctx.game.created_at,
       },
-      rounds: rounds.map((r) => ({
-        round_number: r.round_number,
-        eliminated_player_display_name: r.eliminated_player_id ? (nameById.get(r.eliminated_player_id) ?? null) : null,
-        tie_break_method: r.tie_break_method,
-        resolved_at: r.resolved_at,
-        votes: (votesByRoundId.get(r.id) ?? []).map((v) => ({
-          voter_display_name: v.voter_display_name,
-          target_display_name: v.target_display_name,
-          is_double_vote: v.is_double_vote,
-          cast_at: v.cast_at,
-        })),
-      })),
+      rounds: rounds.map((r) => {
+        const roundVotes = votesByRoundId.get(r.id) ?? [];
+        // Per-target tally within this round -- redundant across rows sharing a
+        // target, but that's exactly what "add a column" to this flat table means.
+        const countByTarget = new Map<string, number>();
+        for (const v of roundVotes) {
+          countByTarget.set(v.target_player_id, (countByTarget.get(v.target_player_id) ?? 0) + 1);
+        }
+
+        return {
+          round_number: r.round_number,
+          eliminated_player_display_name: r.eliminated_player_id ? (nameById.get(r.eliminated_player_id) ?? null) : null,
+          tie_break_method: r.tie_break_method,
+          resolved_at: r.resolved_at,
+          votes: roundVotes.map((v) => ({
+            voter_display_name: v.voter_display_name,
+            target_display_name: v.target_display_name,
+            target_vote_count: countByTarget.get(v.target_player_id) ?? 0,
+            is_double_vote: v.is_double_vote,
+            cast_at: v.cast_at,
+          })),
+        };
+      }),
     });
   } catch (err) {
     return errorResponse(err);

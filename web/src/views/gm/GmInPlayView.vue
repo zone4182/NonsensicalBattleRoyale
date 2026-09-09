@@ -44,7 +44,13 @@ interface GmGameOverview {
     eliminated_player_display_name: string | null;
     tie_break_method: string | null;
     resolved_at: string;
-    votes: { voter_display_name: string; target_display_name: string; is_double_vote: boolean; cast_at: string }[];
+    votes: {
+      voter_display_name: string;
+      target_display_name: string;
+      target_vote_count: number;
+      is_double_vote: boolean;
+      cast_at: string;
+    }[];
   }[];
 }
 
@@ -268,6 +274,7 @@ async function submit() {
           <tr>
             <th>Voter</th>
             <th>Target</th>
+            <th>Votes received</th>
             <th>Double vote</th>
           </tr>
         </thead>
@@ -275,9 +282,11 @@ async function submit() {
           <tr
             v-for="(vote, i) in round.votes"
             :key="i"
+            :class="{ 'eliminated-row': vote.target_display_name === round.eliminated_player_display_name }"
           >
             <td>{{ vote.voter_display_name }}</td>
             <td>{{ vote.target_display_name }}</td>
+            <td>{{ vote.target_vote_count }}</td>
             <td>{{ vote.is_double_vote ? "Yes" : "" }}</td>
           </tr>
         </tbody>
@@ -427,6 +436,14 @@ async function submit() {
 
 .votes-table th {
   color: var(--nbr-accent);
+}
+
+.eliminated-row {
+  background: color-mix(in srgb, var(--nbr-danger) 20%, transparent);
+}
+
+.eliminated-row td {
+  color: var(--nbr-danger);
 }
 
 .round-votes-block {
