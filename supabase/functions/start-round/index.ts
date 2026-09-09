@@ -2,6 +2,7 @@ import { errorResponse, HttpError, jsonResponse, preflightResponse } from "../_s
 import { authenticate, requireRole } from "../_shared/auth.ts";
 import { pickDoubleVoteHolder, sql } from "../_shared/db.ts";
 import { grantRandomDrop } from "../_shared/powers.ts";
+import { castBotVotes } from "../_shared/bots.ts";
 import { MIN_PLAYERS_TO_START } from "../_shared/constants.ts";
 import type { Game } from "../_shared/types.ts";
 
@@ -63,6 +64,7 @@ Deno.serve(async (req) => {
         round.id,
         aliveRoster.map((p) => p.id),
       );
+      await castBotVotes(tx, game.id, round.id, doubleVotePlayerId);
 
       return { roundId: round.id, roundNumber: round.round_number, votingDeadlineAt: round.voting_deadline_at };
     });

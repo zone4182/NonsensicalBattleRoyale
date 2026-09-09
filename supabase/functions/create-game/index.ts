@@ -1,8 +1,9 @@
 import { errorResponse, jsonResponse, preflightResponse, readJsonBody } from "../_shared/http.ts";
 import { requireSetupSecret } from "../_shared/auth.ts";
 import { sql } from "../_shared/db.ts";
-import { requireOneOf, requirePositiveInt, requireString } from "../_shared/validation.ts";
+import { optionalIntInRange, requireOneOf, requirePositiveInt, requireString } from "../_shared/validation.ts";
 import { generateInviteToken } from "../_shared/tokens.ts";
+import { createBotPlayers } from "../_shared/bots.ts";
 import type { MissedDeadlineMode, Round1StartMode } from "../_shared/types.ts";
 
 const MISSED_DEADLINE_MODES: readonly MissedDeadlineMode[] = ["forfeit_fatal", "no_consequence", "one_round_penalty"];
@@ -21,6 +22,8 @@ Deno.serve(async (req) => {
     const roundIntervalMinutes = requirePositiveInt(body, "round_interval_minutes");
     const missedDeadlineMode = requireOneOf(body, "missed_deadline_mode", MISSED_DEADLINE_MODES);
     const round1StartMode = requireOneOf(body, "round1_start_mode", ROUND1_START_MODES);
+    // Bot Mode (concept/bot-mode/BOT-MODE.md) -- optional, defaults to no bots.
+    const botCount = optionalIntInRange(body, "bot_count", 1, 19) ?? 0;
 
     const db = sql();
 
@@ -42,6 +45,10 @@ Deno.serve(async (req) => {
         insert into battle_royale.game_power_settings (game_id, power_key, enabled)
         select ${game.id}, key, default_enabled from battle_royale.powers_catalogue
       `;
+
+      if (botCount > 0) {
+        await createBotPlayers(tx, game.id, botCount);
+      }
 
       return { gameId: game.id as string, gmToken: gmInvite.token as string };
     });

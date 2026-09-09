@@ -33,6 +33,15 @@ export function requireOneOf<T extends string>(body: Record<string, unknown>, fi
   return value as T;
 }
 
+export function optionalIntInRange(body: Record<string, unknown>, field: string, min: number, max: number): number | undefined {
+  const value = body[field];
+  if (value === undefined || value === null) return undefined;
+  if (typeof value !== "number" || !Number.isInteger(value) || value < min || value > max) {
+    throw new HttpError(400, "invalid_field", `'${field}' must be an integer between ${min} and ${max}.`);
+  }
+  return value;
+}
+
 export function optionalString(body: Record<string, unknown>, field: string): string | undefined {
   const value = body[field];
   if (value === undefined || value === null) return undefined;

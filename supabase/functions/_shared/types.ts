@@ -45,6 +45,7 @@ export interface Player {
   joined_at: string;
   eliminated_in_round_id: string | null;
   vote_suspended_through_round_number: number | null;
+  is_bot: boolean;
 }
 
 export interface Round {

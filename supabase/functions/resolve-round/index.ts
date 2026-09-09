@@ -9,6 +9,7 @@ import {
   tallyVotesForRound,
 } from "../_shared/db.ts";
 import { evaluateEarnTriggers, grantRandomDrop } from "../_shared/powers.ts";
+import { castBotDoorPicks, castBotVotes } from "../_shared/bots.ts";
 import type { Game, Player, PowerGrant, Round } from "../_shared/types.ts";
 
 interface Resolution {
@@ -208,6 +209,8 @@ Deno.serve(async (req) => {
         } else if (aliveCountAfter === 3) {
           newPhase = "three_doors";
           await tx`update battle_royale.games set phase = 'three_doors' where id = ${game.id}`;
+          const aliveBotIdsAfter = aliveRoster.filter((p) => p.is_bot && aliveIdsAfter.includes(p.id)).map((p) => p.id);
+          await castBotDoorPicks(tx, game.id, aliveBotIdsAfter);
         } else {
           const doubleVotePlayerId = await pickDoubleVoteHolder(tx, game.id, game.double_vote_floor_rounds);
           const [newRound] = await tx`
@@ -222,6 +225,7 @@ Deno.serve(async (req) => {
             returning id
           `;
           await grantRandomDrop(tx, game.id, newRound.id, aliveIdsAfter);
+          await castBotVotes(tx, game.id, newRound.id, doubleVotePlayerId);
         }
 
         // Earn triggers: only when there's still a game left to play for.

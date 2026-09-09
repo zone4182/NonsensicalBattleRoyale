@@ -13,6 +13,9 @@ const roundIntervalMinutes = ref(60);
 const missedDeadlineMode = ref<"forfeit_fatal" | "no_consequence" | "one_round_penalty">("no_consequence");
 const round1StartMode = ref<"wait_for_all" | "gm_manual" | "scheduled">("gm_manual");
 const setupSecret = ref("");
+const botMode = ref(false);
+const botCount = ref(1);
+const botCountOptions = Array.from({ length: 19 }, (_, i) => i + 1);
 
 const missedDeadlineModeHints: Record<typeof missedDeadlineMode.value, string> = {
   forfeit_fatal: "Missing the vote deadline eliminates that player, same as being voted out.",
@@ -45,6 +48,7 @@ async function createGame() {
         round_interval_minutes: roundIntervalMinutes.value,
         missed_deadline_mode: missedDeadlineMode.value,
         round1_start_mode: round1StartMode.value,
+        bot_count: botMode.value ? botCount.value : undefined,
       },
       { extraHeaders: { "x-setup-secret": setupSecret.value } },
     );
@@ -118,6 +122,29 @@ async function copyToken() {
         </select>
         <span class="field-hint">How and when round 1 begins. {{ round1StartModeHint }}</span>
       </label>
+      <label class="checkbox-label">
+        <input
+          v-model="botMode"
+          type="checkbox"
+        >
+        Bot mode
+      </label>
+      <span class="field-hint">
+        Fills the game with algorithm-controlled players (random moves for now) so you can test a full game solo. You still need at least one real player besides yourself -- bots supplement a game, they don't replace it.
+      </span>
+      <label v-if="botMode">
+        Number of bots
+        <select v-model.number="botCount">
+          <option
+            v-for="n in botCountOptions"
+            :key="n"
+            :value="n"
+          >
+            {{ n }}
+          </option>
+        </select>
+        <span class="field-hint">How many bots to add alongside the real players you invite (max 19, and bots + real players together should stay within the 20-player ceiling).</span>
+      </label>
       <label>
         Setup secret
         <input
@@ -172,6 +199,17 @@ async function copyToken() {
   padding: var(--nbr-space-2);
   font-family: inherit;
   width: 100%;
+}
+
+.checkbox-label {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: var(--nbr-space-2);
+}
+
+.checkbox-label input {
+  width: auto;
 }
 
 .field-hint {
