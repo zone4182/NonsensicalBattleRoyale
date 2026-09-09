@@ -13,7 +13,7 @@ Deno.serve(async (req) => {
     const db = sql();
 
     const roster = await db<Player[]>`
-      select id, display_name, status from battle_royale.players
+      select id, display_name, status, role from battle_royale.players
       where game_id = ${ctx.game.id}
       order by joined_at asc
     `;
@@ -45,7 +45,7 @@ Deno.serve(async (req) => {
       current_round: rounds[0]
         ? { round_number: rounds[0].round_number, voting_deadline_at: rounds[0].voting_deadline_at }
         : null,
-      players: roster.map((p) => ({ id: p.id, display_name: p.display_name, status: p.status })),
+      players: roster.map((p) => ({ id: p.id, display_name: p.display_name, status: p.status, role: p.role })),
       your_status: {
         status: ctx.player.status,
         held_powers: grants.map((g) => ({ power_key: g.power_key, category: g.category, count: g.count })),

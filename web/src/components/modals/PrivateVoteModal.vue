@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
 import { useGameStore } from "../../stores/game";
 import { useSessionStore } from "../../stores/session";
@@ -11,6 +11,8 @@ import { callFunction, ApiCallError } from "../../lib/api";
 const router = useRouter();
 const game = useGameStore();
 const session = useSessionStore();
+
+const candidates = computed(() => game.players.filter((p) => p.role === "player"));
 
 const selectedId = ref<string | null>(null);
 const pending = ref(false);
@@ -54,11 +56,11 @@ function close() {
     <h1>Cast your vote</h1>
     <p>Private and anonymous -- no attribution, ever, until the end-of-game reveal.</p>
     <ul
-      v-if="game.players.length"
+      v-if="candidates.length"
       class="candidate-list"
     >
       <li
-        v-for="player in game.players"
+        v-for="player in candidates"
         :key="player.id"
       >
         <label>

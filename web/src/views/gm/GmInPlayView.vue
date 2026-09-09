@@ -227,7 +227,7 @@ async function submit() {
               disabled
             >Select a player</option>
             <option
-              v-for="p in game.players.filter((pl) => pl.status === 'alive')"
+              v-for="p in game.players.filter((pl) => pl.status === 'alive' && pl.role === 'player')"
               :key="p.id"
               :value="p.id"
             >

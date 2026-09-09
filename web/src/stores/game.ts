@@ -7,10 +7,13 @@ import { callFunction } from "../lib/api";
 export type GamePhase = "setup" | "active" | "three_doors" | "ended";
 export type PlayerStatus = "alive" | "ghost";
 
+export type RosterPlayerRole = "player" | "gm";
+
 export interface RosterPlayer {
   id: string;
   displayName: string;
   status: PlayerStatus;
+  role: RosterPlayerRole;
 }
 
 export interface NarrationEntry {
@@ -38,7 +41,7 @@ export interface YourStatus {
 interface GetGameStateResponse {
   phase: GamePhase;
   current_round: { round_number: number; voting_deadline_at: string | null } | null;
-  players: { id: string; display_name: string; status: PlayerStatus }[];
+  players: { id: string; display_name: string; status: PlayerStatus; role: RosterPlayerRole }[];
   your_status: {
     status: PlayerStatus;
     held_powers: { power_key: string; category: string; count: number }[];
@@ -62,7 +65,7 @@ export const useGameStore = defineStore("game", () => {
     currentRound.value = raw.current_round
       ? { roundNumber: raw.current_round.round_number, votingDeadlineAt: raw.current_round.voting_deadline_at }
       : null;
-    players.value = raw.players.map((p) => ({ id: p.id, displayName: p.display_name, status: p.status }));
+    players.value = raw.players.map((p) => ({ id: p.id, displayName: p.display_name, status: p.status, role: p.role }));
     yourStatus.value = {
       status: raw.your_status.status,
       heldPowers: raw.your_status.held_powers.map((p) => ({

@@ -41,6 +41,9 @@ Deno.serve(async (req) => {
     if (!target) {
       throw new HttpError(400, "invalid_target", "Target player does not exist in this game.");
     }
+    if (target.role !== "player") {
+      throw new HttpError(400, "invalid_target", "The Game Master is not a votable player.");
+    }
     if (target.status !== "alive") {
       throw new HttpError(400, "invalid_target", "Target player is not alive.");
     }

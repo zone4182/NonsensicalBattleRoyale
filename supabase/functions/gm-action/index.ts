@@ -39,7 +39,7 @@ Deno.serve(async (req) => {
 
         const [target] = await tx`
           select id from battle_royale.players
-          where id = ${targetPlayerId} and game_id = ${ctx.game.id} and status = 'alive'
+          where id = ${targetPlayerId} and game_id = ${ctx.game.id} and status = 'alive' and role = 'player'
         `;
         if (!target) {
           throw new HttpError(400, "invalid_target", "Target must be an alive player in this game.");
