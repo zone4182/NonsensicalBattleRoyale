@@ -5,12 +5,13 @@ import {
   optionalBoolean,
   optionalIntInRange,
   optionalOneOf,
+  requireIntAtLeast,
   requireOneOf,
-  requirePositiveInt,
   requireString,
 } from "../_shared/validation.ts";
 import { generateInviteToken } from "../_shared/tokens.ts";
 import { createBotPlayers } from "../_shared/bots.ts";
+import { MIN_ROUND_INTERVAL_MINUTES } from "../_shared/constants.ts";
 import type { MissedDeadlineMode, Round1StartMode, RoundResolutionMode } from "../_shared/types.ts";
 
 const MISSED_DEADLINE_MODES: readonly MissedDeadlineMode[] = ["forfeit_fatal", "no_consequence", "one_round_penalty"];
@@ -27,7 +28,7 @@ Deno.serve(async (req) => {
     const body = await readJsonBody<Record<string, unknown>>(req);
     const name = requireString(body, "name");
     const gmDisplayName = requireString(body, "gm_display_name");
-    const roundIntervalMinutes = requirePositiveInt(body, "round_interval_minutes");
+    const roundIntervalMinutes = requireIntAtLeast(body, "round_interval_minutes", MIN_ROUND_INTERVAL_MINUTES);
     const missedDeadlineMode = requireOneOf(body, "missed_deadline_mode", MISSED_DEADLINE_MODES);
     const round1StartMode = requireOneOf(body, "round1_start_mode", ROUND1_START_MODES);
     // Bot Mode (concept/bot-mode/BOT-MODE.md) -- optional, defaults to no bots.

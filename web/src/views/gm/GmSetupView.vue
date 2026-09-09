@@ -112,10 +112,10 @@ async function copyToken() {
         <input
           v-model.number="roundIntervalMinutes"
           type="number"
-          min="1"
+          min="10"
           required
         >
-        <span class="field-hint">How long each round's voting window stays open before it resolves. Use a small number for a fast game played in one sitting, or a large one (e.g. 1440 for a full day) for an async game spread over days.</span>
+        <span class="field-hint">How long each round's voting window stays open before it resolves. 10 minutes minimum -- shorter than that can miss the automatic-resolve check, which runs every 5 minutes. Use a large number (e.g. 1440 for a full day) for an async game spread over days.</span>
       </label>
       <label>
         Missed-deadline mode

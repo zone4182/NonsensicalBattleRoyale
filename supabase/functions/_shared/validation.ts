@@ -25,6 +25,14 @@ export function requirePositiveInt(body: Record<string, unknown>, field: string)
   return value;
 }
 
+export function requireIntAtLeast(body: Record<string, unknown>, field: string, min: number): number {
+  const value = body[field];
+  if (typeof value !== "number" || !Number.isInteger(value) || value < min) {
+    throw new HttpError(400, "invalid_field", `'${field}' must be an integer of at least ${min}.`);
+  }
+  return value;
+}
+
 export function requireOneOf<T extends string>(body: Record<string, unknown>, field: string, options: readonly T[]): T {
   const value = body[field];
   if (typeof value !== "string" || !options.includes(value as T)) {

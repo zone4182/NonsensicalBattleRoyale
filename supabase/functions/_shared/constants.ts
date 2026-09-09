@@ -5,3 +5,8 @@
 // isn't enough room for a real elimination loop before endgame kicks in, and with so
 // few voters anonymity stops holding up in practice.
 export const MIN_PLAYERS_TO_START = 5;
+
+// Keeps round_interval_minutes above the resolve-round automatic-mode cron's own
+// polling interval (every 5 minutes, see the schedule_resolve_round_cron migrations) --
+// a shorter round than that would routinely miss its own deadline check.
+export const MIN_ROUND_INTERVAL_MINUTES = 10;
