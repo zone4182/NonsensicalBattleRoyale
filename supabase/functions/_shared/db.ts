@@ -70,11 +70,27 @@ export async function countActiveVotesForVoter(roundId: string, voterPlayerId: s
   return rows[0]?.count ?? 0;
 }
 
-// Only the end-of-game reveal path may call this -- callers MUST check
-// `game.phase === 'ended'` before calling. Joins vote rows to player identity, which is
-// exactly the join the rest of the system must never perform.
-export async function revealVotesForGame(gameId: string) {
-  return await sql()`
+// Joins vote rows to player identity, which is exactly the join the rest of the system
+// must never perform -- only two sanctioned callers exist:
+//   1. The end-of-game reveal path, once `game.phase === 'ended'` -- for every player.
+//   2. gm-game-overview, GM-role-gated, anytime -- per the user's explicit decision that
+//      "votes stay private until the end" was only ever a promise made to players, not a
+//      restriction on the GM. Never expose this to a non-GM caller before game end.
+// Only ever resolved rounds -- the live/open round's votes stay unrevealed even to the
+// GM until it resolves, matching "no public vote reveal during play."
+export interface VoteAttribution {
+  round_id: string;
+  round_number: number;
+  voter_player_id: string;
+  voter_display_name: string;
+  target_player_id: string;
+  target_display_name: string;
+  is_double_vote: boolean;
+  cast_at: string;
+}
+
+export async function revealVotesForGame(gameId: string): Promise<VoteAttribution[]> {
+  return await sql()<VoteAttribution[]>`
     select
       v.round_id,
       r.round_number,
@@ -88,7 +104,7 @@ export async function revealVotesForGame(gameId: string) {
     join battle_royale.rounds r on r.id = v.round_id
     join battle_royale.players voter on voter.id = v.voter_player_id
     join battle_royale.players target on target.id = v.target_player_id
-    where r.game_id = ${gameId} and v.revoked_at is null
+    where r.game_id = ${gameId} and v.revoked_at is null and r.resolved_at is not null
     order by r.round_number asc, v.cast_at asc
   `;
 }

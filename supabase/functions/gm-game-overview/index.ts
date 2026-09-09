@@ -1,0 +1,67 @@
+import { errorResponse, jsonResponse, preflightResponse } from "../_shared/http.ts";
+import { authenticate, requireRole } from "../_shared/auth.ts";
+import { revealVotesForGame, sql, type VoteAttribution } from "../_shared/db.ts";
+import type { Round } from "../_shared/types.ts";
+
+// GM-only. Two things live here that never appear anywhere else:
+//   1. The game's own settings (round timing, missed-deadline/round1-start/resolution
+//      modes, vote-change) -- ctx.game already has the full row, no extra query needed.
+//   2. Full vote attribution (who voted for whom) per resolved round -- see
+//      revealVotesForGame's own comment in db.ts for why this is sanctioned for the GM
+//      specifically, live, unlike the player-facing end-of-game-only reveal.
+Deno.serve(async (req) => {
+  if (req.method === "OPTIONS") return preflightResponse();
+  try {
+    const ctx = await authenticate(req);
+    requireRole(ctx, "gm");
+
+    const db = sql();
+
+    const rounds = await db<Round[]>`
+      select id, round_number, eliminated_player_id, tie_break_method, voting_deadline_at, resolved_at
+      from battle_royale.rounds
+      where game_id = ${ctx.game.id} and resolved_at is not null
+      order by round_number asc
+    `;
+
+    const players = await db<{ id: string; display_name: string }[]>`
+      select id, display_name from battle_royale.players where game_id = ${ctx.game.id}
+    `;
+    const nameById = new Map(players.map((p) => [p.id, p.display_name]));
+
+    const votes = await revealVotesForGame(ctx.game.id);
+    const votesByRoundId = new Map<string, VoteAttribution[]>();
+    for (const vote of votes) {
+      const list = votesByRoundId.get(vote.round_id) ?? [];
+      list.push(vote);
+      votesByRoundId.set(vote.round_id, list);
+    }
+
+    return jsonResponse({
+      game: {
+        round_interval_minutes: ctx.game.round_interval_minutes,
+        missed_deadline_mode: ctx.game.missed_deadline_mode,
+        round1_start_mode: ctx.game.round1_start_mode,
+        round_resolution_mode: ctx.game.round_resolution_mode,
+        allow_vote_change: ctx.game.allow_vote_change,
+        double_vote_floor_rounds: ctx.game.double_vote_floor_rounds,
+        survival_streak_threshold: ctx.game.survival_streak_threshold,
+        created_at: ctx.game.created_at,
+      },
+      rounds: rounds.map((r) => ({
+        round_number: r.round_number,
+        eliminated_player_display_name: r.eliminated_player_id ? (nameById.get(r.eliminated_player_id) ?? null) : null,
+        tie_break_method: r.tie_break_method,
+        resolved_at: r.resolved_at,
+        votes: (votesByRoundId.get(r.id) ?? []).map((v) => ({
+          voter_display_name: v.voter_display_name,
+          target_display_name: v.target_display_name,
+          is_double_vote: v.is_double_vote,
+          cast_at: v.cast_at,
+        })),
+      })),
+    });
+  } catch (err) {
+    return errorResponse(err);
+  }
+});

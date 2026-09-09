@@ -28,6 +28,26 @@ interface ResolveRoundResponse {
   resolutions: Resolution[];
 }
 
+interface GmGameOverview {
+  game: {
+    round_interval_minutes: number;
+    missed_deadline_mode: string;
+    round1_start_mode: string;
+    round_resolution_mode: string;
+    allow_vote_change: boolean;
+    double_vote_floor_rounds: number;
+    survival_streak_threshold: number;
+    created_at: string;
+  };
+  rounds: {
+    round_number: number;
+    eliminated_player_display_name: string | null;
+    tie_break_method: string | null;
+    resolved_at: string;
+    votes: { voter_display_name: string; target_display_name: string; is_double_vote: boolean; cast_at: string }[];
+  }[];
+}
+
 const ACTION_TYPES = ["tie_break", "grant_power", "narration_edit", "twist"];
 const POWER_KEYS = [
   "rewind",
@@ -46,8 +66,24 @@ const POWER_KEYS = [
 const session = useSessionStore();
 const game = useGameStore();
 
+// Settings summary + per-resolved-round vote attribution -- GM-only (gm-game-overview),
+// deliberately separate from game.refresh()'s poll-friendly 15s cadence since full vote
+// history is heavier and only needs to change right after a resolve, not continuously.
+const overview = ref<GmGameOverview | null>(null);
+
+async function loadOverview() {
+  if (!session.token) return;
+  try {
+    overview.value = await callFunction<GmGameOverview>("gm-game-overview", {}, { token: session.token });
+  } catch {
+    // Best-effort/passive panel -- the rest of the screen doesn't depend on this
+    // loading, so no dedicated error UI for it.
+  }
+}
+
 onMounted(() => {
   if (session.token) game.refresh(session.token);
+  loadOverview();
 });
 
 // --- Start Round 1 ---
@@ -90,6 +126,7 @@ async function resolveNow() {
       });
       resolveMessage.value = summaries.join(" | ");
       await game.refresh(session.token);
+      await loadOverview();
     }
   } catch (err) {
     resolveMessage.value = err instanceof ApiCallError ? err.message : "Something went wrong.";
@@ -157,6 +194,89 @@ async function submit() {
       {{ game.gameName ?? "Unnamed game" }}
       <span class="game-id">({{ game.gameId ?? "-" }})</span>
     </p>
+    <h2>Settings</h2>
+    <table
+      v-if="overview"
+      class="settings-table"
+    >
+      <tbody>
+        <tr>
+          <th>Round interval</th>
+          <td>{{ overview.game.round_interval_minutes }} min</td>
+        </tr>
+        <tr>
+          <th>Missed-deadline mode</th>
+          <td>{{ overview.game.missed_deadline_mode }}</td>
+        </tr>
+        <tr>
+          <th>Round 1 start mode</th>
+          <td>{{ overview.game.round1_start_mode }}</td>
+        </tr>
+        <tr>
+          <th>Round resolution mode</th>
+          <td>{{ overview.game.round_resolution_mode }}</td>
+        </tr>
+        <tr>
+          <th>Players can change their vote</th>
+          <td>{{ overview.game.allow_vote_change ? "Yes" : "No" }}</td>
+        </tr>
+        <tr>
+          <th>Double-vote floor (rounds)</th>
+          <td>{{ overview.game.double_vote_floor_rounds }}</td>
+        </tr>
+        <tr>
+          <th>Survival streak threshold</th>
+          <td>{{ overview.game.survival_streak_threshold }}</td>
+        </tr>
+        <tr>
+          <th>Created</th>
+          <td>{{ overview.game.created_at }}</td>
+        </tr>
+      </tbody>
+    </table>
+    <p v-else>
+      Loading settings...
+    </p>
+
+    <h2>Resolved rounds -- full vote breakdown</h2>
+    <p class="field-hint">
+      GM-only. Players never see who voted for whom until the game ends -- this view is
+      an exception made specifically for you, not a change to what players are shown.
+    </p>
+    <p v-if="overview && overview.rounds.length === 0">
+      No rounds resolved yet.
+    </p>
+    <section
+      v-for="round in overview?.rounds ?? []"
+      :key="round.round_number"
+      class="round-votes-block"
+    >
+      <h3>Round {{ round.round_number }}</h3>
+      <p>
+        Eliminated: {{ round.eliminated_player_display_name ?? "no one" }}
+        <span v-if="round.tie_break_method === 'random'">(random tie-break)</span>
+      </p>
+      <table class="votes-table">
+        <thead>
+          <tr>
+            <th>Voter</th>
+            <th>Target</th>
+            <th>Double vote</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            v-for="(vote, i) in round.votes"
+            :key="i"
+          >
+            <td>{{ vote.voter_display_name }}</td>
+            <td>{{ vote.target_display_name }}</td>
+            <td>{{ vote.is_double_vote ? "Yes" : "" }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
     <p>Game phase: {{ game.phase ?? "unknown" }}</p>
 
     <RoundHeader v-if="game.currentRound" />
@@ -275,6 +395,39 @@ async function submit() {
 }
 
 .game-id {
+  font-size: 0.85em;
+}
+
+.settings-table,
+.votes-table {
+  border-collapse: collapse;
+  margin-bottom: var(--nbr-space-3);
+}
+
+.settings-table th,
+.settings-table td,
+.votes-table th,
+.votes-table td {
+  border: 1px solid var(--nbr-border);
+  padding: var(--nbr-space-1) var(--nbr-space-2);
+  text-align: left;
+}
+
+.settings-table th {
+  color: var(--nbr-muted);
+  font-weight: normal;
+}
+
+.votes-table th {
+  color: var(--nbr-accent);
+}
+
+.round-votes-block {
+  margin-bottom: var(--nbr-space-4);
+}
+
+.field-hint {
+  color: var(--nbr-muted);
   font-size: 0.85em;
 }
 
