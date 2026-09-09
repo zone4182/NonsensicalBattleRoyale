@@ -49,6 +49,7 @@ interface GmGameOverview {
       target_display_name: string;
       target_vote_count: number;
       is_double_vote: boolean;
+      reason: string | null;
       cast_at: string;
     }[];
   }[];
@@ -310,6 +311,7 @@ async function submit() {
             <th>Target</th>
             <th>Votes received</th>
             <th>Double vote</th>
+            <th>Reason</th>
           </tr>
         </thead>
         <tbody>
@@ -322,6 +324,7 @@ async function submit() {
             <td>{{ vote.target_display_name }}</td>
             <td>{{ vote.target_vote_count }}</td>
             <td>{{ vote.is_double_vote ? "Yes" : "" }}</td>
+            <td>{{ vote.reason ?? "" }}</td>
           </tr>
         </tbody>
       </table>

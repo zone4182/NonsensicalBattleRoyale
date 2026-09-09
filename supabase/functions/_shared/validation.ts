@@ -76,3 +76,16 @@ export function optionalString(body: Record<string, unknown>, field: string): st
   }
   return value;
 }
+
+// Trims and treats an empty/whitespace-only value as "not given" -- undefined, not an
+// empty string, so callers can `?? null` it straight into a nullable column.
+export function optionalStringMaxLength(body: Record<string, unknown>, field: string, maxLength: number): string | undefined {
+  const value = optionalString(body, field);
+  if (value === undefined) return undefined;
+  const trimmed = value.trim();
+  if (trimmed.length === 0) return undefined;
+  if (trimmed.length > maxLength) {
+    throw new HttpError(400, "invalid_field", `'${field}' must be at most ${maxLength} characters.`);
+  }
+  return trimmed;
+}

@@ -76,6 +76,7 @@ Deno.serve(async (req) => {
             target_display_name: v.target_display_name,
             target_vote_count: countByTarget.get(v.target_player_id) ?? 0,
             is_double_vote: v.is_double_vote,
+            reason: v.reason,
             cast_at: v.cast_at,
           })),
         };

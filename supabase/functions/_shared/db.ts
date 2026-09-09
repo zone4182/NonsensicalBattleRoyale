@@ -31,11 +31,12 @@ export async function castVote(
     voterPlayerId: string;
     targetPlayerId: string;
     isDoubleVote: boolean;
+    reason?: string | null;
   },
 ): Promise<void> {
   await exec`
-    insert into battle_royale.votes (round_id, voter_player_id, target_player_id, is_double_vote)
-    values (${params.roundId}, ${params.voterPlayerId}, ${params.targetPlayerId}, ${params.isDoubleVote})
+    insert into battle_royale.votes (round_id, voter_player_id, target_player_id, is_double_vote, reason)
+    values (${params.roundId}, ${params.voterPlayerId}, ${params.targetPlayerId}, ${params.isDoubleVote}, ${params.reason ?? null})
   `;
 }
 
@@ -86,6 +87,7 @@ export interface VoteAttribution {
   target_player_id: string;
   target_display_name: string;
   is_double_vote: boolean;
+  reason: string | null;
   cast_at: string;
 }
 
@@ -99,6 +101,7 @@ export async function revealVotesForGame(gameId: string): Promise<VoteAttributio
       target.id as target_player_id,
       target.display_name as target_display_name,
       v.is_double_vote,
+      v.reason,
       v.cast_at
     from battle_royale.votes v
     join battle_royale.rounds r on r.id = v.round_id

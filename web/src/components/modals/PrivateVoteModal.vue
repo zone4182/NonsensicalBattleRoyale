@@ -24,7 +24,10 @@ const canVote = computed(
   () => votesRemaining.value === null || votesRemaining.value > 0 || (votesRemaining.value === 0 && game.allowVoteChange),
 );
 
+const REASON_MAX_LENGTH = 100;
+
 const selectedId = ref<string | null>(null);
+const reason = ref("");
 const pending = ref(false);
 const errorMessage = ref<string | null>(null);
 
@@ -58,7 +61,7 @@ async function confirmVote() {
   pending.value = true;
   errorMessage.value = null;
   try {
-    await callFunction("submit-vote", { target_player_id: selectedId.value }, { token });
+    await callFunction("submit-vote", { target_player_id: selectedId.value, reason: reason.value.trim() || undefined }, { token });
     await game.refresh(token);
     router.push({ name: "main-round" });
   } catch (err) {
@@ -102,6 +105,16 @@ function close() {
     <p v-else>
       No player roster loaded yet.
     </p>
+    <label class="reason-label">
+      Reason (optional, only the GM ever sees this)
+      <textarea
+        v-model="reason"
+        :maxlength="REASON_MAX_LENGTH"
+        rows="2"
+        placeholder="Why this vote?"
+      />
+      <span class="reason-count">{{ reason.length }}/{{ REASON_MAX_LENGTH }}</span>
+    </label>
     <p
       v-if="errorMessage"
       class="error"
@@ -130,6 +143,30 @@ function close() {
 .candidate-list {
   list-style: none;
   padding: 0;
+}
+
+.reason-label {
+  display: block;
+  margin-top: var(--nbr-space-3);
+}
+
+.reason-label textarea {
+  display: block;
+  width: 100%;
+  margin-top: var(--nbr-space-1);
+  background: var(--nbr-bg-raised);
+  color: var(--nbr-fg);
+  border: 1px solid var(--nbr-border);
+  padding: var(--nbr-space-2);
+  font-family: inherit;
+  resize: vertical;
+}
+
+.reason-count {
+  display: block;
+  text-align: right;
+  color: var(--nbr-muted);
+  font-size: 0.85em;
 }
 
 .error {

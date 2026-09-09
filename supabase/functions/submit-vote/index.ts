@@ -1,7 +1,7 @@
 import { errorResponse, HttpError, jsonResponse, preflightResponse, readJsonBody } from "../_shared/http.ts";
 import { authenticate, requireAlive, requireRole } from "../_shared/auth.ts";
 import { castVote, countActiveVotesForVoter, revokeOldestActiveVotesForVoter, sql } from "../_shared/db.ts";
-import { requireUuid } from "../_shared/validation.ts";
+import { optionalStringMaxLength, requireUuid } from "../_shared/validation.ts";
 import type { Player, Round } from "../_shared/types.ts";
 
 Deno.serve(async (req) => {
@@ -13,6 +13,7 @@ Deno.serve(async (req) => {
 
     const body = await readJsonBody<Record<string, unknown>>(req);
     const targetPlayerId = requireUuid(body, "target_player_id");
+    const reason = optionalStringMaxLength(body, "reason", 100);
 
     const db = sql();
 
@@ -67,6 +68,7 @@ Deno.serve(async (req) => {
       voterPlayerId: ctx.player.id,
       targetPlayerId: target.id,
       isDoubleVote: isDoubleVoteHolder && alreadyCast === 1,
+      reason: reason ?? null,
     });
 
     // Never echo vote contents back, even to the voter themself.
