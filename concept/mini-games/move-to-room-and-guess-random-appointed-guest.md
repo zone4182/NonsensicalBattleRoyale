@@ -15,5 +15,6 @@ Players will have the option to move to a different room, adjacent to the room t
 They can only move 1 space vertically or horizontally, not diagonally.
 The result all player move will be revealed in the next round, in the updated heatmap grid.
 
-After a player has moved, they will be prompted a random player, that is still alive and in the game, and will need to guess which room that player is currently occupying.
-If they guess correctly, they will earn a point.
+After a player has moved, they will be prompted a question <Where do you think <RandomStillAlivePlayerName> is?>. This player is still alive and in the game, and will need to guess which room that player is currently occupying.
+If they guess correctly, they will earn a point. 
+This way players stay engaged because they want to keep track of where other players are moving and try to guess their locations.

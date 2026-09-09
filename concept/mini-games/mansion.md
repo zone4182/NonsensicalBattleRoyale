@@ -1,5 +1,5 @@
 The house is an old English mansion with 3 floors, an attic, and a basement.
-The mansion is known for its mysterious history and the rumors of hidden treasures.
+The mansion is known for its mysterious history and the rumors of hidden treasures — and now, for the murder that just happened inside its walls. The Game Master was found stabbed to death in the ground-floor toilet the morning after everyone arrived (see concept/story/the-story-2.0.md, Phase 4). The body has been discovered, but the killer is still loose somewhere in the house, and no one has any way to leave.
 The players are tasked with moving to different rooms in the mansion and guessing which random guest is currently occupying that room.
 Each room has its own unique characteristics and clues that can help players make their guesses.
 The game is designed to be both challenging and entertaining,
@@ -12,6 +12,7 @@ Currently for version 1.0, the game includes the following floors and rooms:
     - Dining Room: A formal dining area with a long table, ornate chairs.
     - Kitchen: A spacious kitchen with vintage appliances, a large island, and a pantry stocked with ingredients.
     - Living Room: A comfortable space with plush sofas, a fireplace, and a collection of paintings on the walls.
+    - Toilet (Dark red scale color): The scene of the crime. A cramped downstairs toilet, the tiles still stained with a wide, dark pool of dried blood that's soaked into the grout and up the walls. The mirror above the sink has a single bloody handprint on it. No one lingers here longer than they have to.
 - First Floor:
     - Master Bedroom (Green scale color): A luxurious bedroom with a king-sized bed, a walk-in closet, and an en-suite bathroom.
     - Guest Bedroom 1: A cozy bedroom with a queen-sized bed, a dresser, and a small desk.
