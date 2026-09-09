@@ -70,14 +70,15 @@ const game = useGameStore();
 // deliberately separate from game.refresh()'s poll-friendly 15s cadence since full vote
 // history is heavier and only needs to change right after a resolve, not continuously.
 const overview = ref<GmGameOverview | null>(null);
+const overviewError = ref<string | null>(null);
 
 async function loadOverview() {
   if (!session.token) return;
+  overviewError.value = null;
   try {
     overview.value = await callFunction<GmGameOverview>("gm-game-overview", {}, { token: session.token });
-  } catch {
-    // Best-effort/passive panel -- the rest of the screen doesn't depend on this
-    // loading, so no dedicated error UI for it.
+  } catch (err) {
+    overviewError.value = err instanceof ApiCallError ? err.message : "Something went wrong.";
   }
 }
 
@@ -234,6 +235,12 @@ async function submit() {
         </tr>
       </tbody>
     </table>
+    <p
+      v-else-if="overviewError"
+      class="error"
+    >
+      Couldn't load settings: {{ overviewError }}
+    </p>
     <p v-else>
       Loading settings...
     </p>
