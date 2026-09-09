@@ -22,23 +22,28 @@ function openVoteModal() {
 </script>
 
 <template>
-  <div
-    v-if="!isGhost"
-    class="vote-action-panel"
-  >
-    <button
-      type="button"
-      :disabled="!canVote"
-      @click="openVoteModal"
-    >
-      {{ canVote ? "Vote" : "Vote cast" }}
-    </button>
-    <p
-      v-if="!canVote"
-      class="vote-status"
-    >
-      You've cast your vote this round -- it's final.
-    </p>
+  <div class="vote-action-panel">
+    <template v-if="isGhost">
+      <p class="vote-status">
+        You're a ghost -- spectating only. (Seance, GAME-DESIGN.md's ghost-only vote on
+        this round's narration flavor, isn't wired up yet.)
+      </p>
+    </template>
+    <template v-else>
+      <button
+        type="button"
+        :disabled="!canVote"
+        @click="openVoteModal"
+      >
+        {{ canVote ? "Vote" : "Vote cast" }}
+      </button>
+      <p
+        v-if="!canVote"
+        class="vote-status"
+      >
+        You've cast your vote this round -- it's final.
+      </p>
+    </template>
   </div>
 </template>
 
