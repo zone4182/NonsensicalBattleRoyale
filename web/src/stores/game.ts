@@ -40,6 +40,8 @@ export interface YourStatus {
 }
 
 interface GetGameStateResponse {
+  game_id: string;
+  game_name: string;
   phase: GamePhase;
   current_round: { round_number: number; voting_deadline_at: string | null } | null;
   players: { id: string; display_name: string; status: PlayerStatus; role: RosterPlayerRole }[];
@@ -52,6 +54,8 @@ interface GetGameStateResponse {
 }
 
 export const useGameStore = defineStore("game", () => {
+  const gameId = ref<string | null>(null);
+  const gameName = ref<string | null>(null);
   const phase = ref<GamePhase | null>(null);
   const currentRound = ref<CurrentRound | null>(null);
   const players = ref<RosterPlayer[]>([]);
@@ -63,6 +67,8 @@ export const useGameStore = defineStore("game", () => {
   // duplicating the fetch/mapping logic in each one.
   async function refresh(token: string) {
     const raw = await callFunction<GetGameStateResponse>("get-game-state", {}, { token });
+    gameId.value = raw.game_id;
+    gameName.value = raw.game_name;
     phase.value = raw.phase;
     currentRound.value = raw.current_round
       ? { roundNumber: raw.current_round.round_number, votingDeadlineAt: raw.current_round.voting_deadline_at }
@@ -80,5 +86,5 @@ export const useGameStore = defineStore("game", () => {
     narrationEntries.value = raw.narration_entries.map((n) => ({ id: n.id, text: n.text, createdAt: n.created_at }));
   }
 
-  return { phase, currentRound, players, yourStatus, narrationEntries, refresh };
+  return { gameId, gameName, phase, currentRound, players, yourStatus, narrationEntries, refresh };
 });

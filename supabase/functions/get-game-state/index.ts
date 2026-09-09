@@ -53,6 +53,8 @@ Deno.serve(async (req) => {
     `;
 
     return jsonResponse({
+      game_id: ctx.game.id,
+      game_name: ctx.game.name,
       phase: ctx.game.phase,
       current_round: openRound
         ? { round_number: openRound.round_number, voting_deadline_at: openRound.voting_deadline_at }

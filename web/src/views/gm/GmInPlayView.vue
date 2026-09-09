@@ -3,6 +3,7 @@ import { computed, onMounted, ref } from "vue";
 import { useSessionStore } from "../../stores/session";
 import { useGameStore } from "../../stores/game";
 import { callFunction, ApiCallError } from "../../lib/api";
+import RoundHeader from "../../components/round/RoundHeader.vue";
 
 interface GmActionResponse {
   gm_action_id: string;
@@ -152,7 +153,13 @@ async function submit() {
 <template>
   <div>
     <h1>GM: In Play</h1>
+    <p class="game-identity">
+      {{ game.gameName ?? "Unnamed game" }}
+      <span class="game-id">({{ game.gameId ?? "-" }})</span>
+    </p>
     <p>Game phase: {{ game.phase ?? "unknown" }}</p>
+
+    <RoundHeader v-if="game.currentRound" />
 
     <section class="round-controls">
       <button
@@ -263,6 +270,14 @@ async function submit() {
 </template>
 
 <style scoped>
+.game-identity {
+  color: var(--nbr-muted);
+}
+
+.game-id {
+  font-size: 0.85em;
+}
+
 .round-controls {
   margin-bottom: var(--nbr-space-3);
 }
