@@ -20,6 +20,7 @@ export interface Game {
   round1_start_mode: Round1StartMode;
   round1_scheduled_at: string | null;
   double_vote_cadence_formula: string;
+  double_vote_enabled: boolean;
   double_vote_floor_rounds: number;
   survival_streak_threshold: number;
   round_resolution_mode: RoundResolutionMode;

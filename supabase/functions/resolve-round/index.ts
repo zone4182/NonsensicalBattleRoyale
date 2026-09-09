@@ -247,7 +247,9 @@ Deno.serve(async (req) => {
           const aliveBotIdsAfter = aliveRoster.filter((p) => p.is_bot && aliveIdsAfter.includes(p.id)).map((p) => p.id);
           await castBotDoorPicks(tx, game.id, aliveBotIdsAfter);
         } else {
-          const doubleVotePlayerId = await pickDoubleVoteHolder(tx, game.id, game.double_vote_floor_rounds);
+          const doubleVotePlayerId = game.double_vote_enabled
+            ? await pickDoubleVoteHolder(tx, game.id, game.double_vote_floor_rounds)
+            : null;
           const [newRound] = await tx`
             insert into battle_royale.rounds (game_id, round_number, opens_at, voting_deadline_at, double_vote_player_id)
             values (

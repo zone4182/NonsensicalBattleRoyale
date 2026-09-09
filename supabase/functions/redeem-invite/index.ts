@@ -58,7 +58,9 @@ Deno.serve(async (req) => {
           where game_id = ${game.id} and role = 'player'
         `;
         if (unredeemed_count === 0 && player_count >= MIN_PLAYERS_TO_START) {
-          const doubleVotePlayerId = await pickDoubleVoteHolder(tx, game.id, game.double_vote_floor_rounds);
+          const doubleVotePlayerId = game.double_vote_enabled
+            ? await pickDoubleVoteHolder(tx, game.id, game.double_vote_floor_rounds)
+            : null;
           const [round] = await tx`
             insert into battle_royale.rounds (game_id, round_number, opens_at, voting_deadline_at, double_vote_player_id)
             values (

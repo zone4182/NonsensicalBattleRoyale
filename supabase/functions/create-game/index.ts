@@ -35,16 +35,19 @@ Deno.serve(async (req) => {
     const botCount = optionalIntInRange(body, "bot_count", 1, 19) ?? 0;
     const roundResolutionMode = optionalOneOf(body, "round_resolution_mode", ROUND_RESOLUTION_MODES) ?? "manual";
     const allowVoteChange = optionalBoolean(body, "allow_vote_change") ?? false;
+    const doubleVoteEnabled = optionalBoolean(body, "double_vote_enabled") ?? true;
+    const doubleVoteFloorRounds = optionalIntInRange(body, "double_vote_floor_rounds", 1, 20) ?? 2;
 
     const db = sql();
 
     const result = await db.begin(async (tx) => {
       const [game] = await tx`
         insert into battle_royale.games
-          (name, round_interval_minutes, missed_deadline_mode, round1_start_mode, round_resolution_mode, allow_vote_change)
+          (name, round_interval_minutes, missed_deadline_mode, round1_start_mode, round_resolution_mode,
+           allow_vote_change, double_vote_enabled, double_vote_floor_rounds)
         values (
           ${name}, ${roundIntervalMinutes}, ${missedDeadlineMode}, ${round1StartMode},
-          ${roundResolutionMode}, ${allowVoteChange}
+          ${roundResolutionMode}, ${allowVoteChange}, ${doubleVoteEnabled}, ${doubleVoteFloorRounds}
         )
         returning id
       `;

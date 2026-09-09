@@ -18,6 +18,8 @@ const botCount = ref(1);
 const botCountOptions = Array.from({ length: 19 }, (_, i) => i + 1);
 const roundResolutionMode = ref<"manual" | "automatic">("manual");
 const allowVoteChange = ref(false);
+const doubleVoteEnabled = ref(true);
+const doubleVoteFloorRounds = ref(2);
 
 const roundResolutionModeHints: Record<typeof roundResolutionMode.value, string> = {
   manual: "Rounds only resolve when you click \"Resolve now\" yourself, even after the deadline passes.",
@@ -59,6 +61,8 @@ async function createGame() {
         bot_count: botMode.value ? botCount.value : undefined,
         round_resolution_mode: roundResolutionMode.value,
         allow_vote_change: allowVoteChange.value,
+        double_vote_enabled: doubleVoteEnabled.value,
+        double_vote_floor_rounds: doubleVoteEnabled.value ? doubleVoteFloorRounds.value : undefined,
       },
       { extraHeaders: { "x-setup-secret": setupSecret.value } },
     );
@@ -153,6 +157,26 @@ async function copyToken() {
       <span class="field-hint">
         If off (default), a vote is final the moment it's cast. If on, a player can re-vote as many times as they want before the round resolves -- only their latest vote(s) count.
       </span>
+      <label class="checkbox-label">
+        <input
+          v-model="doubleVoteEnabled"
+          type="checkbox"
+        >
+        Random double vote
+      </label>
+      <span class="field-hint">
+        On by default. Each round, one random alive player is secretly given a second vote -- they're told privately and never have to disclose it. This is part of the game's hidden powers system: players are never told it exists, they only discover it by experiencing it.
+      </span>
+      <label v-if="doubleVoteEnabled">
+        Double-vote cooldown (rounds)
+        <input
+          v-model.number="doubleVoteFloorRounds"
+          type="number"
+          min="1"
+          required
+        >
+        <span class="field-hint">How many recent rounds' holders are excluded when picking who gets it next, so the same player isn't re-picked too soon. Falls back to picking from everyone alive if excluding recent holders would leave no one eligible (e.g. a very small player count). Default 2.</span>
+      </label>
       <label class="checkbox-label">
         <input
           v-model="botMode"

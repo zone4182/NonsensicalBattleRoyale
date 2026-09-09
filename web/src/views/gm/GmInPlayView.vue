@@ -35,6 +35,7 @@ interface GmGameOverview {
     round1_start_mode: string;
     round_resolution_mode: string;
     allow_vote_change: boolean;
+    double_vote_enabled: boolean;
     double_vote_floor_rounds: number;
     survival_streak_threshold: number;
     created_at: string;
@@ -263,7 +264,11 @@ async function submit() {
           <td>{{ overview.game.allow_vote_change ? "Yes" : "No" }}</td>
         </tr>
         <tr>
-          <th>Double-vote floor (rounds)</th>
+          <th>Random double vote</th>
+          <td>{{ overview.game.double_vote_enabled ? "Enabled" : "Disabled" }}</td>
+        </tr>
+        <tr v-if="overview.game.double_vote_enabled">
+          <th>Double-vote cooldown (rounds)</th>
           <td>{{ overview.game.double_vote_floor_rounds }}</td>
         </tr>
         <tr>
