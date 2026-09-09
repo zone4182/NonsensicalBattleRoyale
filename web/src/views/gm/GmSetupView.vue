@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import { callFunction, ApiCallError } from "../../lib/api";
 
 interface CreateGameResponse {
@@ -13,6 +13,20 @@ const roundIntervalMinutes = ref(60);
 const missedDeadlineMode = ref<"forfeit_fatal" | "no_consequence" | "one_round_penalty">("no_consequence");
 const round1StartMode = ref<"wait_for_all" | "gm_manual" | "scheduled">("gm_manual");
 const setupSecret = ref("");
+
+const missedDeadlineModeHints: Record<typeof missedDeadlineMode.value, string> = {
+  forfeit_fatal: "Missing the vote deadline eliminates that player, same as being voted out.",
+  no_consequence: "Missing the deadline does nothing beyond that player not casting a vote this round.",
+  one_round_penalty: "Missing the deadline excludes the player from voting and using powers next round only -- not eliminated.",
+};
+const missedDeadlineModeHint = computed(() => missedDeadlineModeHints[missedDeadlineMode.value]);
+
+const round1StartModeHints: Record<typeof round1StartMode.value, string> = {
+  wait_for_all: "Round 1 starts automatically the moment every invited player has redeemed their invite.",
+  gm_manual: "Round 1 only starts when you click \"Start Round 1\" yourself, whenever you're ready.",
+  scheduled: "Round 1 starts automatically at a time you set, regardless of who has accepted. Anyone who hasn't redeemed their invite by then is excluded from the game entirely.",
+};
+const round1StartModeHint = computed(() => round1StartModeHints[round1StartMode.value]);
 
 const pending = ref(false);
 const errorMessage = ref<string | null>(null);
@@ -51,6 +65,9 @@ async function copyToken() {
   <div>
     <h1>GM Setup</h1>
     <p>Create the game, then invite players using their own invite links (not built yet in this milestone).</p>
+    <p class="field-hint">
+      Round 1 can't start until at least 5 players have accepted their invite, whichever start mode you pick below.
+    </p>
     <form
       class="setup-form"
       @submit.prevent="createGame"
@@ -62,6 +79,7 @@ async function copyToken() {
           type="text"
           required
         >
+        <span class="field-hint">Identifies this game instance to you in the GM panel -- players never see it.</span>
       </label>
       <label>
         Your display name
@@ -70,6 +88,7 @@ async function copyToken() {
           type="text"
           required
         >
+        <span class="field-hint">How you appear as the Game Master in narration and the end-of-game reveal -- doesn't have to be your real name.</span>
       </label>
       <label>
         Round interval (minutes)
@@ -79,6 +98,7 @@ async function copyToken() {
           min="1"
           required
         >
+        <span class="field-hint">How long each round's voting window stays open before it resolves. Use a small number for a fast game played in one sitting, or a large one (e.g. 1440 for a full day) for an async game spread over days.</span>
       </label>
       <label>
         Missed-deadline mode
@@ -87,6 +107,7 @@ async function copyToken() {
           <option value="no_consequence">No consequence</option>
           <option value="one_round_penalty">One-round penalty</option>
         </select>
+        <span class="field-hint">What happens to a player who doesn't vote before the deadline. {{ missedDeadlineModeHint }}</span>
       </label>
       <label>
         Round 1 start mode
@@ -95,6 +116,7 @@ async function copyToken() {
           <option value="gm_manual">GM starts manually</option>
           <option value="scheduled">Auto-start at a scheduled time</option>
         </select>
+        <span class="field-hint">How and when round 1 begins. {{ round1StartModeHint }}</span>
       </label>
       <label>
         Setup secret
@@ -103,6 +125,7 @@ async function copyToken() {
           type="password"
           required
         >
+        <span class="field-hint">A shared secret that proves you're allowed to create a game -- separate from the invite links you'll send players.</span>
       </label>
       <button
         type="submit"
@@ -149,6 +172,14 @@ async function copyToken() {
   padding: var(--nbr-space-2);
   font-family: inherit;
   width: 100%;
+}
+
+.field-hint {
+  display: block;
+  color: var(--nbr-muted);
+  font-size: 0.85em;
+  font-weight: normal;
+  margin-top: var(--nbr-space-1);
 }
 
 .error {
