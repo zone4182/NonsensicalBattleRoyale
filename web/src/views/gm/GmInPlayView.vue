@@ -123,7 +123,8 @@ async function resolveNow() {
   try {
     const res = await callFunction<ResolveRoundResponse>("resolve-round", {}, { token: session.token });
     if (res.resolved_count === 0) {
-      resolveMessage.value = "Not ready yet -- the current round's deadline hasn't passed.";
+      resolveMessage.value =
+        "Not ready yet -- the deadline hasn't passed and not every alive player has cast their full vote(s) yet.";
     } else {
       const summaries = res.resolutions.map((r) => {
         const names = r.eliminated_player_ids
