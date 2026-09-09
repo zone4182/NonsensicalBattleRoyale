@@ -52,6 +52,12 @@ interface GmGameOverview {
       cast_at: string;
     }[];
   }[];
+  door_picks: {
+    player_display_name: string;
+    door_number: number;
+    resolved_outcome: "win" | "lose_all" | null;
+    picked_at: string;
+  }[];
 }
 
 const ACTION_TYPES = ["tie_break", "grant_power", "narration_edit", "twist"];
@@ -320,6 +326,29 @@ async function submit() {
         </tbody>
       </table>
     </section>
+
+    <template v-if="overview && overview.door_picks.length > 0">
+      <h2>Three Doors</h2>
+      <table class="votes-table">
+        <thead>
+          <tr>
+            <th>Player</th>
+            <th>Door</th>
+            <th>Outcome</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            v-for="pick in overview.door_picks"
+            :key="pick.player_display_name"
+          >
+            <td>{{ pick.player_display_name }}</td>
+            <td>{{ pick.door_number }}</td>
+            <td>{{ pick.resolved_outcome ?? "pending" }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </template>
 
     <p>Game phase: {{ game.phase ?? "unknown" }}</p>
 

@@ -3,12 +3,14 @@ import { authenticate, requireRole } from "../_shared/auth.ts";
 import { revealVotesForGame, sql, type VoteAttribution } from "../_shared/db.ts";
 import type { Round } from "../_shared/types.ts";
 
-// GM-only. Two things live here that never appear anywhere else:
+// GM-only. Three things live here that never appear anywhere else:
 //   1. The game's own settings (round timing, missed-deadline/round1-start/resolution
 //      modes, vote-change) -- ctx.game already has the full row, no extra query needed.
 //   2. Full vote attribution (who voted for whom) per resolved round -- see
 //      revealVotesForGame's own comment in db.ts for why this is sanctioned for the GM
 //      specifically, live, unlike the player-facing end-of-game-only reveal.
+//   3. Three Doors picks, live -- door_picks was never anonymity-gated the way votes
+//      is (no "only the reveal function" rule for this table), so this is a plain read.
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return preflightResponse();
   try {
@@ -36,6 +38,13 @@ Deno.serve(async (req) => {
       list.push(vote);
       votesByRoundId.set(vote.round_id, list);
     }
+
+    const doorPicks = await db<{ player_id: string; door_number: number; resolved_outcome: string | null; picked_at: string }[]>`
+      select player_id, door_number, resolved_outcome, picked_at
+      from battle_royale.door_picks
+      where game_id = ${ctx.game.id}
+      order by picked_at asc
+    `;
 
     return jsonResponse({
       game: {
@@ -71,6 +80,12 @@ Deno.serve(async (req) => {
           })),
         };
       }),
+      door_picks: doorPicks.map((p) => ({
+        player_display_name: nameById.get(p.player_id) ?? "unknown",
+        door_number: p.door_number,
+        resolved_outcome: p.resolved_outcome,
+        picked_at: p.picked_at,
+      })),
     });
   } catch (err) {
     return errorResponse(err);
