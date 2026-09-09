@@ -1,0 +1,2 @@
+Points earned in mini-games can be used to secretly buy items or advantages for the next round. 
+The possible items or advantages that can be purchased will be determined in a next version of the game.
