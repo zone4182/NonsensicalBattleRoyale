@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref } from "vue";
+import { useI18n } from "vue-i18n";
 import { useSessionStore } from "../../stores/session";
 import { callFunction, ApiCallError } from "../../lib/api";
 
@@ -13,6 +14,7 @@ const ARM_FOR_ROUND_POWERS = new Set(["ward", "deflect", "null"]);
 const ASK_POWERS = new Set(["whisper", "watcher"]);
 const IN_SCOPE_POWERS = new Set(["rewind", "whisper", "watcher", "ward", "deflect", "null"]);
 
+const { t } = useI18n();
 const session = useSessionStore();
 const pending = ref(false);
 const message = ref<string | null>(null);
@@ -37,19 +39,19 @@ async function use() {
     const res = await callFunction<UsePowerResponse>("use-power", body, { token: session.token });
 
     if (props.powerKey === "whisper") {
-      message.value = res.were_you_top_target ? "Yes -- you were the top target last round." : "No.";
+      message.value = res.were_you_top_target ? t("powerUse.whisperYes") : t("powerUse.whisperNo");
     } else if (props.powerKey === "watcher") {
       message.value = res.double_vote_player_id
-        ? `Double vote holder: ${res.double_vote_player_id}`
-        : "No one holds the double vote right now.";
+        ? t("powerUse.doubleVoteHolder", { playerId: res.double_vote_player_id })
+        : t("powerUse.noDoubleVoteHolder");
     } else if (props.powerKey === "rewind") {
-      const lines = (res.tally ?? []).map((t) => `${t.target_player_id}: ${t.vote_count}`).join(", ") || "No votes cast.";
+      const lines = (res.tally ?? []).map((tally) => `${tally.target_player_id}: ${tally.vote_count}`).join(", ") || t("powerUse.noVotesCast");
       message.value = lines;
     } else {
-      message.value = `Armed for round ${res.round_number}.`;
+      message.value = t("powerUse.armed", { roundNumber: res.round_number });
     }
   } catch (err) {
-    message.value = err instanceof ApiCallError ? err.message : "Something went wrong.";
+    message.value = err instanceof ApiCallError ? err.message : t("common.somethingWentWrong");
   } finally {
     pending.value = false;
   }
@@ -61,7 +63,7 @@ async function use() {
     <span class="power-name">{{ powerKey }}<template v-if="count > 1"> x{{ count }}</template></span>
 
     <template v-if="!IN_SCOPE_POWERS.has(powerKey)">
-      <span class="not-implemented">Not usable yet</span>
+      <span class="not-implemented">{{ t("powerUse.notUsable") }}</span>
     </template>
     <template v-else-if="ARM_FOR_ROUND_POWERS.has(powerKey)">
       <button
@@ -69,7 +71,7 @@ async function use() {
         :disabled="pending"
         @click="use"
       >
-        {{ pending ? "Arming..." : "Arm for this round" }}
+        {{ pending ? t("powerUse.arming") : t("powerUse.armForRound") }}
       </button>
     </template>
     <template v-else-if="ASK_POWERS.has(powerKey)">
@@ -78,7 +80,7 @@ async function use() {
         :disabled="pending"
         @click="use"
       >
-        {{ pending ? "Asking..." : "Ask" }}
+        {{ pending ? t("powerUse.asking") : t("powerUse.ask") }}
       </button>
     </template>
     <template v-else-if="powerKey === 'rewind'">
@@ -86,14 +88,14 @@ async function use() {
         v-model.number="roundNumber"
         type="number"
         min="1"
-        placeholder="round #"
+        :placeholder="t('powerUse.roundPlaceholder')"
       >
       <button
         type="button"
         :disabled="pending || !roundNumber"
         @click="use"
       >
-        {{ pending ? "Viewing..." : "View" }}
+        {{ pending ? t("powerUse.viewing") : t("powerUse.view") }}
       </button>
     </template>
 

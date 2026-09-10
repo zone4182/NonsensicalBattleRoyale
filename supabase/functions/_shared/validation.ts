@@ -50,6 +50,28 @@ export function optionalIntInRange(body: Record<string, unknown>, field: string,
   return value;
 }
 
+// Like optionalIntInRange, but also accepts a single sentinel value (e.g. -1) outside
+// the normal range -- for a field where one specific out-of-range number means
+// something different, not just "a bigger/smaller version of the same setting".
+export function optionalIntInRangeOrSentinel(
+  body: Record<string, unknown>,
+  field: string,
+  min: number,
+  max: number,
+  sentinel: number,
+): number | undefined {
+  const value = body[field];
+  if (value === undefined || value === null) return undefined;
+  if (typeof value !== "number" || !Number.isInteger(value)) {
+    throw new HttpError(400, "invalid_field", `'${field}' must be an integer.`);
+  }
+  if (value === sentinel) return value;
+  if (value < min || value > max) {
+    throw new HttpError(400, "invalid_field", `'${field}' must be ${sentinel} or an integer between ${min} and ${max}.`);
+  }
+  return value;
+}
+
 export function optionalOneOf<T extends string>(body: Record<string, unknown>, field: string, options: readonly T[]): T | undefined {
   const value = body[field];
   if (value === undefined || value === null) return undefined;

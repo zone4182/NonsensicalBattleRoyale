@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { onMounted, ref, watch } from "vue";
+import { useI18n } from "vue-i18n";
 import { useRouter } from "vue-router";
 import { useGameStore } from "../stores/game";
 import { useSessionStore } from "../stores/session";
@@ -10,6 +11,7 @@ import FullscreenLayout from "../layouts/FullscreenLayout.vue";
 
 const POLL_INTERVAL_MS = 15_000;
 
+const { t } = useI18n();
 const router = useRouter();
 const game = useGameStore();
 const session = useSessionStore();
@@ -19,8 +21,8 @@ const pending = ref(false);
 const errorMessage = ref<string | null>(null);
 
 const DOOR_ERROR_MESSAGES: Record<string, string> = {
-  not_three_doors_phase: "The Three Doors endgame is not currently active.",
-  invalid_door_number: "Pick a door numbered 1, 2, or 3.",
+  not_three_doors_phase: t("threeDoors.errors.notThreeDoorsPhase"),
+  invalid_door_number: t("threeDoors.errors.invalidDoorNumber"),
 };
 
 onMounted(() => {
@@ -48,7 +50,7 @@ async function pick(doorNumber: number) {
     await callFunction("submit-door-pick", { door_number: doorNumber }, { token: session.token });
     picked.value = doorNumber;
   } catch (err) {
-    errorMessage.value = err instanceof ApiCallError ? (DOOR_ERROR_MESSAGES[err.code] ?? err.message) : "Something went wrong.";
+    errorMessage.value = err instanceof ApiCallError ? (DOOR_ERROR_MESSAGES[err.code] ?? err.message) : t("common.somethingWentWrong");
   } finally {
     pending.value = false;
   }
@@ -57,8 +59,8 @@ async function pick(doorNumber: number) {
 
 <template>
   <FullscreenLayout>
-    <h1>The Three Doors</h1>
-    <p>Three numbered doors, all labeled "Exit." Pick a unique number. Two players picking the same number means everyone loses.</p>
+    <h1>{{ t("threeDoors.title") }}</h1>
+    <p>{{ t("threeDoors.description") }}</p>
     <div class="doors">
       <button
         v-for="n in [1, 2, 3]"
@@ -67,11 +69,11 @@ async function pick(doorNumber: number) {
         :disabled="picked !== null || pending"
         @click="pick(n)"
       >
-        Door {{ n }}
+        {{ t("threeDoors.door", { number: n }) }}
       </button>
     </div>
     <p v-if="picked !== null">
-      You picked door {{ picked }}. Waiting for the reveal.
+      {{ t("threeDoors.picked", { number: picked }) }}
     </p>
     <p
       v-if="errorMessage"

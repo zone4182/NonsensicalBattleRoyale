@@ -1,11 +1,15 @@
 <script setup lang="ts">
+import { useI18n } from "vue-i18n";
+import LocaleSwitcher from "../components/LocaleSwitcher.vue";
+
 // GM setup / in-play / helpline inbox are three distinct concerns that share this
 // nav, without forcing the same chrome onto the 8 non-GM screens.
+const { t } = useI18n();
 const tabs = [
-  { to: { name: "gm-setup" }, label: "Setup" },
-  { to: { name: "gm-in-play" }, label: "In Play" },
-  { to: { name: "gm-invites" }, label: "Invites" },
-  { to: { name: "gm-helpline-inbox" }, label: "Helpline Inbox" },
+  { to: { name: "gm-setup" }, key: "setup" },
+  { to: { name: "gm-in-play" }, key: "inPlay" },
+  { to: { name: "gm-invites" }, key: "invites" },
+  { to: { name: "gm-helpline-inbox" }, key: "helplineInbox" },
 ];
 </script>
 
@@ -14,12 +18,13 @@ const tabs = [
     <nav class="gm-nav">
       <RouterLink
         v-for="tab in tabs"
-        :key="tab.label"
+        :key="tab.key"
         :to="tab.to"
         class="gm-nav-link"
       >
-        {{ tab.label }}
+        {{ t(`gmNav.${tab.key}`) }}
       </RouterLink>
+      <LocaleSwitcher class="gm-locale-switcher" />
     </nav>
     <div class="gm-content">
       <RouterView />
@@ -44,5 +49,9 @@ const tabs = [
 
 .gm-nav-link.router-link-active {
   color: var(--nbr-accent);
+}
+
+.gm-locale-switcher {
+  margin-left: auto;
 }
 </style>

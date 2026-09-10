@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { onMounted, watch } from "vue";
+import { useI18n } from "vue-i18n";
 import { useRouter } from "vue-router";
 import RoundHeader from "../components/round/RoundHeader.vue";
+import LocaleSwitcher from "../components/LocaleSwitcher.vue";
 import CinematicViewport from "../components/round/CinematicViewport.vue";
 import PlayerRoster from "../components/round/PlayerRoster.vue";
 import YourStatusPanel from "../components/round/YourStatusPanel.vue";
@@ -18,6 +20,7 @@ import { usePoll } from "../composables/usePoll";
 // via `run`).
 const POLL_INTERVAL_MS = 15_000;
 
+const { t } = useI18n();
 const router = useRouter();
 const game = useGameStore();
 const session = useSessionStore();
@@ -51,6 +54,7 @@ watch(
   <section class="screen round-layout">
     <div class="area-header">
       <RoundHeader />
+      <LocaleSwitcher class="header-locale-switcher" />
     </div>
     <div
       v-if="ui.cinematicActive"
@@ -71,7 +75,7 @@ watch(
         v-if="pending"
         class="loading"
       >
-        Loading...
+        {{ t("common.loading") }}
       </p>
     </div>
   </section>
@@ -155,6 +159,14 @@ watch(
 
 .area-header {
   grid-area: header;
+  display: flex;
+  align-items: flex-start;
+  gap: var(--nbr-space-2);
+}
+
+.area-header > :first-child {
+  flex: 1;
+  min-width: 0;
 }
 .area-viewport {
   grid-area: viewport;

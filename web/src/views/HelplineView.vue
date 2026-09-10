@@ -1,9 +1,12 @@
 <script setup lang="ts">
 import { ref } from "vue";
+import { useI18n } from "vue-i18n";
 import { useSessionStore } from "../stores/session";
 import { useApiCall } from "../composables/useApiCall";
 import { callFunction } from "../lib/api";
 import FullscreenLayout from "../layouts/FullscreenLayout.vue";
+
+const { t } = useI18n();
 
 // Send-only this milestone: no read/list endpoint exists yet for helpline threads
 // (out of scope -- only get-game-state was approved as a new read path), so past
@@ -25,8 +28,8 @@ async function send() {
 
 <template>
   <FullscreenLayout>
-    <h1>Helpline</h1>
-    <p>Send a private question to the Game Master. Never player-to-player.</p>
+    <h1>{{ t("helpline.title") }}</h1>
+    <p>{{ t("helpline.description") }}</p>
     <section class="panel pixel-frame">
       <form
         class="helpline-form"
@@ -35,18 +38,18 @@ async function send() {
         <textarea
           v-model="body"
           rows="4"
-          placeholder="Your question..."
+          :placeholder="t('helpline.bodyPlaceholder')"
           :disabled="pending"
         />
         <button
           type="submit"
           :disabled="pending || !body.trim()"
         >
-          {{ pending ? "Sending..." : "Send" }}
+          {{ pending ? t("helpline.sending") : t("helpline.send") }}
         </button>
       </form>
       <p v-if="sent">
-        Sent to the GM.
+        {{ t("helpline.sent") }}
       </p>
     </section>
   </FullscreenLayout>

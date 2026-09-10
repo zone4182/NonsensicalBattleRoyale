@@ -1,13 +1,16 @@
 <script setup lang="ts">
 import { ref } from "vue";
+import { useI18n } from "vue-i18n";
 import { useSessionStore } from "../stores/session";
 import { useApiCall } from "../composables/useApiCall";
 import { callFunction } from "../lib/api";
 import FullscreenLayout from "../layouts/FullscreenLayout.vue";
 
+const { t } = useI18n();
+
 // No endpoint yet describes the real per-round narration options -- this is a fixed
 // placeholder list. Future milestone scope: server-driven per-round option sets.
-const NARRATION_OPTIONS = ["Somber", "Theatrical", "Mysterious", "Blunt"];
+const NARRATION_OPTIONS = ["somber", "theatrical", "mysterious", "blunt"];
 
 const session = useSessionStore();
 const { pending, run } = useApiCall();
@@ -24,11 +27,8 @@ async function cast(option: string) {
 
 <template>
   <FullscreenLayout>
-    <h1>The Seance</h1>
-    <p>
-      Vote among alternate narration flavors for this round's already-decided elimination announcement. Entirely
-      cosmetic.
-    </p>
+    <h1>{{ t("seance.title") }}</h1>
+    <p>{{ t("seance.description") }}</p>
     <section class="panel pixel-frame">
       <ul class="option-list">
         <li
@@ -40,12 +40,12 @@ async function cast(option: string) {
             :disabled="pending || submitted"
             @click="cast(option)"
           >
-            {{ option }}
+            {{ t(`seance.options.${option}`) }}
           </button>
         </li>
       </ul>
       <p v-if="submitted">
-        Vote cast: {{ selected }}.
+        {{ t("seance.voteCast", { option: selected ? t(`seance.options.${selected}`) : "" }) }}
       </p>
     </section>
   </FullscreenLayout>

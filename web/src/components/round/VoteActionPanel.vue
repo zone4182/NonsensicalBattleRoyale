@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import { computed } from "vue";
+import { useI18n } from "vue-i18n";
 import { useRouter } from "vue-router";
 import { useGameStore } from "../../stores/game";
 
 // Deliberately small and separate from the roster (GAME-DESIGN.md §UI Layout) -- opens
 // the private vote modal as its own route rather than an inline click-to-vote panel.
+const { t } = useI18n();
 const router = useRouter();
 const game = useGameStore();
 
@@ -28,8 +30,7 @@ function openVoteModal() {
   <div class="vote-action-panel">
     <template v-if="isGhost">
       <p class="vote-status">
-        You're a ghost -- spectating only. (Seance, GAME-DESIGN.md's ghost-only vote on
-        this round's narration flavor, isn't wired up yet.)
+        {{ t("voteAction.ghostNotice") }}
       </p>
     </template>
     <template v-else>
@@ -38,19 +39,19 @@ function openVoteModal() {
         :disabled="!canVote"
         @click="openVoteModal"
       >
-        {{ canChangeVote ? "Change vote" : canVote ? "Vote" : "Vote cast" }}
+        {{ canChangeVote ? t("voteAction.changeVote") : canVote ? t("voteAction.vote") : t("voteAction.voteCast") }}
       </button>
       <p
         v-if="!votesRemaining && !canChangeVote"
         class="vote-status"
       >
-        You've cast your vote this round -- it's final.
+        {{ t("voteAction.votedFinal") }}
       </p>
       <p
         v-else-if="canChangeVote"
         class="vote-status"
       >
-        You've voted, but can still change your mind before this round resolves.
+        {{ t("voteAction.votedChangeable") }}
       </p>
     </template>
   </div>

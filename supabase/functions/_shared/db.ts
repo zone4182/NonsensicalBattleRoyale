@@ -242,14 +242,26 @@ export async function pickDoubleVoteHolder(
   `;
   if (alive.length === 0) return null;
 
-  const recentHolders = await exec<{ double_vote_player_id: string | null }[]>`
-    select double_vote_player_id from battle_royale.rounds
-    where game_id = ${gameId} and double_vote_player_id is not null
-    order by round_number desc
-    limit ${floorRounds}
-  `;
+  // -1 is a sentinel: each player holds the double vote at most once per game, ever
+  // -- every past holder (not just the last N rounds) is excluded, and unlike the
+  // floor-N case, there's deliberately no fallback to the full alive pool once
+  // everyone's had a turn. Once no one's eligible, no one gets it that round; that's
+  // the intended end state for "once only," not a deadlock to work around.
+  const onceOnly = floorRounds === -1;
+
+  const recentHolders = onceOnly
+    ? await exec<{ double_vote_player_id: string | null }[]>`
+        select double_vote_player_id from battle_royale.rounds
+        where game_id = ${gameId} and double_vote_player_id is not null
+      `
+    : await exec<{ double_vote_player_id: string | null }[]>`
+        select double_vote_player_id from battle_royale.rounds
+        where game_id = ${gameId} and double_vote_player_id is not null
+        order by round_number desc
+        limit ${floorRounds}
+      `;
   const excluded = new Set(recentHolders.map((r) => r.double_vote_player_id));
   const eligible = alive.filter((p) => !excluded.has(p.id));
-  const pool = eligible.length > 0 ? eligible : alive;
-  return pool[Math.floor(Math.random() * pool.length)].id;
+  if (eligible.length === 0) return onceOnly ? null : alive[Math.floor(Math.random() * alive.length)].id;
+  return eligible[Math.floor(Math.random() * eligible.length)].id;
 }

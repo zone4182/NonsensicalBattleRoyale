@@ -1,9 +1,12 @@
 <script setup lang="ts">
 import { ref } from "vue";
+import { useI18n } from "vue-i18n";
 import { useRoute, useRouter } from "vue-router";
 import { useSessionStore } from "../stores/session";
 import { callFunction, ApiCallError } from "../lib/api";
 import FullscreenLayout from "../layouts/FullscreenLayout.vue";
+
+const { t } = useI18n();
 
 interface RedeemResponse {
   player_id: string;
@@ -38,12 +41,12 @@ async function redeem() {
   } catch (err) {
     if (err instanceof ApiCallError) {
       const messages: Record<string, string> = {
-        invite_not_found: "No invite exists for this token.",
-        already_redeemed: "This invite has already been redeemed.",
+        invite_not_found: t("join.errors.inviteNotFound"),
+        already_redeemed: t("join.errors.alreadyRedeemed"),
       };
       errorMessage.value = messages[err.code] ?? err.message;
     } else {
-      errorMessage.value = "Something went wrong.";
+      errorMessage.value = t("common.somethingWentWrong");
     }
   } finally {
     pending.value = false;
@@ -53,8 +56,8 @@ async function redeem() {
 
 <template>
   <FullscreenLayout>
-    <h1>You've been invited</h1>
-    <p>Enter your personal invite token to arrive at the house.</p>
+    <h1>{{ t("join.heading") }}</h1>
+    <p>{{ t("join.subheading") }}</p>
     <section class="panel pixel-frame">
       <form
         class="redeem-form"
@@ -63,14 +66,14 @@ async function redeem() {
         <input
           v-model="token"
           type="text"
-          placeholder="invite token"
+          :placeholder="t('join.tokenPlaceholder')"
           :disabled="pending"
         >
         <button
           type="submit"
           :disabled="pending || !token.trim()"
         >
-          {{ pending ? "Redeeming..." : "Redeem invite" }}
+          {{ pending ? t("join.redeeming") : t("join.redeemButton") }}
         </button>
       </form>
       <p
@@ -82,7 +85,7 @@ async function redeem() {
     </section>
     <p class="back-link">
       <RouterLink :to="{ name: 'home' }">
-        ← back
+        {{ t("common.back") }}
       </RouterLink>
     </p>
   </FullscreenLayout>

@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
+import { useI18n } from "vue-i18n";
 import { callFunction, ApiCallError } from "../../lib/api";
+
+const { t } = useI18n();
 
 interface CreateGameResponse {
   game_id: string;
@@ -21,25 +24,9 @@ const allowVoteChange = ref(false);
 const doubleVoteEnabled = ref(true);
 const doubleVoteFloorRounds = ref(2);
 
-const roundResolutionModeHints: Record<typeof roundResolutionMode.value, string> = {
-  manual: "Rounds only resolve when you click \"Resolve now\" yourself, even after the deadline passes.",
-  automatic: "Rounds resolve on their own the moment the deadline passes -- no need to have the app open.",
-};
-const roundResolutionModeHint = computed(() => roundResolutionModeHints[roundResolutionMode.value]);
-
-const missedDeadlineModeHints: Record<typeof missedDeadlineMode.value, string> = {
-  forfeit_fatal: "Missing the vote deadline eliminates that player, same as being voted out.",
-  no_consequence: "Missing the deadline does nothing beyond that player not casting a vote this round.",
-  one_round_penalty: "Missing the deadline excludes the player from voting and using powers next round only -- not eliminated.",
-};
-const missedDeadlineModeHint = computed(() => missedDeadlineModeHints[missedDeadlineMode.value]);
-
-const round1StartModeHints: Record<typeof round1StartMode.value, string> = {
-  wait_for_all: "Round 1 starts automatically the moment every invited player has redeemed their invite.",
-  gm_manual: "Round 1 only starts when you click \"Start Round 1\" yourself, whenever you're ready.",
-  scheduled: "Round 1 starts automatically at a time you set, regardless of who has accepted. Anyone who hasn't redeemed their invite by then is excluded from the game entirely.",
-};
-const round1StartModeHint = computed(() => round1StartModeHints[round1StartMode.value]);
+const roundResolutionModeHint = computed(() => t(`gmSetup.rules.roundResolutionHints.${roundResolutionMode.value}`));
+const missedDeadlineModeHint = computed(() => t(`gmSetup.rules.missedDeadlineHints.${missedDeadlineMode.value}`));
+const round1StartModeHint = computed(() => t(`gmSetup.rules.round1StartHints.${round1StartMode.value}`));
 
 const pending = ref(false);
 const errorMessage = ref<string | null>(null);
@@ -68,7 +55,7 @@ async function createGame() {
     );
     created.value = res;
   } catch (err) {
-    errorMessage.value = err instanceof ApiCallError ? err.message : "Something went wrong.";
+    errorMessage.value = err instanceof ApiCallError ? err.message : t("common.somethingWentWrong");
   } finally {
     pending.value = false;
   }
@@ -81,13 +68,13 @@ async function copyToken() {
 
 <template>
   <div>
-    <h1>GM Setup</h1>
-    <p>Create the game, then invite players using their own invite links (not built yet in this milestone).</p>
+    <h1>{{ t("gmSetup.title") }}</h1>
+    <p>{{ t("gmSetup.description") }}</p>
     <p class="field-hint">
-      Round 1 can't start until at least 5 players have accepted their invite, whichever start mode you pick below.
+      {{ t("gmSetup.minPlayersHint") }}
     </p>
     <p class="field-hint">
-      Regardless of resolution mode, you can always resolve a round early yourself once every alive player has voted.
+      {{ t("gmSetup.manualResolveHint") }}
     </p>
 
     <!--
@@ -101,111 +88,111 @@ async function copyToken() {
     >
       <div class="setup-layout">
         <section class="panel pixel-frame">
-          <h2>Game basics</h2>
+          <h2>{{ t("gmSetup.basics.heading") }}</h2>
           <label>
-            Game name
+            {{ t("gmSetup.basics.gameName") }}
             <input
               v-model="name"
               type="text"
               required
             >
-            <span class="field-hint">Identifies this game instance to you in the GM panel -- players never see it.</span>
+            <span class="field-hint">{{ t("gmSetup.basics.gameNameHint") }}</span>
           </label>
           <label>
-            Your display name
+            {{ t("gmSetup.basics.displayName") }}
             <input
               v-model="gmDisplayName"
               type="text"
               required
             >
-            <span class="field-hint">How you appear as the Game Master in narration and the end-of-game reveal -- doesn't have to be your real name.</span>
+            <span class="field-hint">{{ t("gmSetup.basics.displayNameHint") }}</span>
           </label>
         </section>
 
         <section class="panel pixel-frame">
-          <h2>Round rules</h2>
+          <h2>{{ t("gmSetup.rules.heading") }}</h2>
           <label>
-            Round interval (minutes)
+            {{ t("gmSetup.rules.roundInterval") }}
             <input
               v-model.number="roundIntervalMinutes"
               type="number"
               min="10"
               required
             >
-            <span class="field-hint">How long each round's voting window stays open before it resolves. 10 minutes minimum -- shorter than that can miss the automatic-resolve check, which runs every 5 minutes. Use a large number (e.g. 1440 for a full day) for an async game spread over days.</span>
+            <span class="field-hint">{{ t("gmSetup.rules.roundIntervalHint") }}</span>
           </label>
           <label>
-            Missed-deadline mode
+            {{ t("gmSetup.rules.missedDeadlineMode") }}
             <select v-model="missedDeadlineMode">
-              <option value="forfeit_fatal">Forfeit is fatal</option>
-              <option value="no_consequence">No consequence</option>
-              <option value="one_round_penalty">One-round penalty</option>
+              <option value="forfeit_fatal">{{ t("gmSetup.rules.missedDeadlineOptions.forfeitFatal") }}</option>
+              <option value="no_consequence">{{ t("gmSetup.rules.missedDeadlineOptions.noConsequence") }}</option>
+              <option value="one_round_penalty">{{ t("gmSetup.rules.missedDeadlineOptions.oneRoundPenalty") }}</option>
             </select>
-            <span class="field-hint">What happens to a player who doesn't vote before the deadline. {{ missedDeadlineModeHint }}</span>
+            <span class="field-hint">{{ t("gmSetup.rules.missedDeadlineHintPrefix") }} {{ missedDeadlineModeHint }}</span>
           </label>
           <label>
-            Round 1 start mode
+            {{ t("gmSetup.rules.round1StartMode") }}
             <select v-model="round1StartMode">
-              <option value="wait_for_all">Wait until everyone accepts</option>
-              <option value="gm_manual">GM starts manually</option>
-              <option value="scheduled">Auto-start at a scheduled time</option>
+              <option value="wait_for_all">{{ t("gmSetup.rules.round1StartOptions.waitForAll") }}</option>
+              <option value="gm_manual">{{ t("gmSetup.rules.round1StartOptions.gmManual") }}</option>
+              <option value="scheduled">{{ t("gmSetup.rules.round1StartOptions.scheduled") }}</option>
             </select>
-            <span class="field-hint">How and when round 1 begins. {{ round1StartModeHint }}</span>
+            <span class="field-hint">{{ t("gmSetup.rules.round1StartHintPrefix") }} {{ round1StartModeHint }}</span>
           </label>
           <label>
-            Round resolution mode
+            {{ t("gmSetup.rules.roundResolutionMode") }}
             <select v-model="roundResolutionMode">
-              <option value="manual">Always manually resolve</option>
-              <option value="automatic">Automatic, once the deadline passes</option>
+              <option value="manual">{{ t("gmSetup.rules.roundResolutionOptions.manual") }}</option>
+              <option value="automatic">{{ t("gmSetup.rules.roundResolutionOptions.automatic") }}</option>
             </select>
-            <span class="field-hint">How every round after the first one ends. {{ roundResolutionModeHint }}</span>
+            <span class="field-hint">{{ t("gmSetup.rules.roundResolutionHintPrefix") }} {{ roundResolutionModeHint }}</span>
           </label>
           <label class="checkbox-label">
             <input
               v-model="allowVoteChange"
               type="checkbox"
             >
-            Allow players to change their vote
+            {{ t("gmSetup.rules.allowVoteChange") }}
           </label>
           <span class="field-hint">
-            If off (default), a vote is final the moment it's cast. If on, a player can re-vote as many times as they want before the round resolves -- only their latest vote(s) count.
+            {{ t("gmSetup.rules.allowVoteChangeHint") }}
           </span>
         </section>
 
         <section class="panel pixel-frame">
-          <h2>Hidden powers &amp; bots</h2>
+          <h2>{{ t("gmSetup.powers.heading") }}</h2>
           <label class="checkbox-label">
             <input
               v-model="doubleVoteEnabled"
               type="checkbox"
             >
-            Random double vote
+            {{ t("gmSetup.powers.doubleVoteEnabled") }}
           </label>
           <span class="field-hint">
-            On by default. Each round, one random alive player is secretly given a second vote -- they're told privately and never have to disclose it. This is part of the game's hidden powers system: players are never told it exists, they only discover it by experiencing it.
+            {{ t("gmSetup.powers.doubleVoteEnabledHint") }}
           </span>
           <label v-if="doubleVoteEnabled">
-            Double-vote cooldown (rounds)
+            {{ t("gmSetup.powers.doubleVoteFloorRounds") }}
             <input
               v-model.number="doubleVoteFloorRounds"
               type="number"
-              min="1"
+              min="-1"
               required
             >
-            <span class="field-hint">How many recent rounds' holders are excluded when picking who gets it next, so the same player isn't re-picked too soon. Falls back to picking from everyone alive if excluding recent holders would leave no one eligible (e.g. a very small player count). Default 2.</span>
+            <span class="field-hint">{{ t("gmSetup.powers.doubleVoteFloorRoundsHint") }}</span>
           </label>
           <label class="checkbox-label">
             <input
               v-model="botMode"
               type="checkbox"
             >
-            Bot mode
+            {{ t("gmSetup.powers.botMode") }}
           </label>
           <span class="field-hint">
-            Fills the game with algorithm-controlled players (random moves for now) so you can test a full game solo. You still need at least one real player besides yourself -- bots supplement a game, they don't replace it.
+            {{ t("gmSetup.powers.botModeHint") }}
           </span>
           <label v-if="botMode">
-            Number of bots
+            {{ t("gmSetup.powers.botCount") }}
             <select v-model.number="botCount">
               <option
                 v-for="n in botCountOptions"
@@ -215,20 +202,20 @@ async function copyToken() {
                 {{ n }}
               </option>
             </select>
-            <span class="field-hint">How many bots to add alongside the real players you invite (max 19, and bots + real players together should stay within the 20-player ceiling).</span>
+            <span class="field-hint">{{ t("gmSetup.powers.botCountHint") }}</span>
           </label>
         </section>
 
         <section class="panel pixel-frame">
-          <h2>Access</h2>
+          <h2>{{ t("gmSetup.access.heading") }}</h2>
           <label>
-            Setup secret
+            {{ t("gmSetup.access.setupSecret") }}
             <input
               v-model="setupSecret"
               type="password"
               required
             >
-            <span class="field-hint">A shared secret that proves you're allowed to create a game -- separate from the invite links you'll send players.</span>
+            <span class="field-hint">{{ t("gmSetup.access.setupSecretHint") }}</span>
           </label>
         </section>
       </div>
@@ -237,7 +224,7 @@ async function copyToken() {
         type="submit"
         :disabled="pending"
       >
-        {{ pending ? "Creating..." : "Create game" }}
+        {{ pending ? t("gmSetup.creating") : t("gmSetup.createGame") }}
       </button>
     </form>
     <p
@@ -250,13 +237,13 @@ async function copyToken() {
       v-if="created"
       class="created-token"
     >
-      <p>Game created. GM invite token (shown once):</p>
+      <p>{{ t("gmSetup.created") }}</p>
       <code>{{ created.gm_invite_token }}</code>
       <button
         type="button"
         @click="copyToken"
       >
-        Copy
+        {{ t("gmSetup.copy") }}
       </button>
     </div>
   </div>

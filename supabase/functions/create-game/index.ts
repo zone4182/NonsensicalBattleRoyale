@@ -4,6 +4,7 @@ import { sql } from "../_shared/db.ts";
 import {
   optionalBoolean,
   optionalIntInRange,
+  optionalIntInRangeOrSentinel,
   optionalOneOf,
   requireIntAtLeast,
   requireOneOf,
@@ -36,7 +37,9 @@ Deno.serve(async (req) => {
     const roundResolutionMode = optionalOneOf(body, "round_resolution_mode", ROUND_RESOLUTION_MODES) ?? "manual";
     const allowVoteChange = optionalBoolean(body, "allow_vote_change") ?? false;
     const doubleVoteEnabled = optionalBoolean(body, "double_vote_enabled") ?? true;
-    const doubleVoteFloorRounds = optionalIntInRange(body, "double_vote_floor_rounds", 1, 20) ?? 2;
+    // -1 is a sentinel: each player holds the double vote at most once per game, ever
+    // -- see pickDoubleVoteHolder in _shared/db.ts.
+    const doubleVoteFloorRounds = optionalIntInRangeOrSentinel(body, "double_vote_floor_rounds", 1, 20, -1) ?? 2;
 
     const db = sql();
 

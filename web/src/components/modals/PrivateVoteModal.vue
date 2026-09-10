@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from "vue";
+import { useI18n } from "vue-i18n";
 import { useRouter } from "vue-router";
 import { useGameStore } from "../../stores/game";
 import { useSessionStore } from "../../stores/session";
@@ -8,6 +9,7 @@ import { callFunction, ApiCallError } from "../../lib/api";
 // Deliberately its own route (not a v-if inside MainRoundView): votes must stay
 // anonymous even in the UI's own visual language, so this must never share a DOM tree
 // with the public roster panel. See GAME-DESIGN.md §UI Layout.
+const { t } = useI18n();
 const router = useRouter();
 const game = useGameStore();
 const session = useSessionStore();
@@ -32,9 +34,9 @@ const pending = ref(false);
 const errorMessage = ref<string | null>(null);
 
 const VOTE_ERROR_MESSAGES: Record<string, string> = {
-  no_open_round: "There's no open round to vote in right now.",
-  invalid_target: "That player can't be voted for.",
-  vote_entitlement_exhausted: "You've already cast all your votes this round.",
+  no_open_round: t("privateVote.errors.noOpenRound"),
+  invalid_target: t("privateVote.errors.invalidTarget"),
+  vote_entitlement_exhausted: t("privateVote.errors.voteEntitlementExhausted"),
 };
 
 onMounted(() => {
@@ -65,7 +67,7 @@ async function confirmVote() {
     await game.refresh(token);
     router.push({ name: "main-round" });
   } catch (err) {
-    errorMessage.value = err instanceof ApiCallError ? (VOTE_ERROR_MESSAGES[err.code] ?? err.message) : "Something went wrong.";
+    errorMessage.value = err instanceof ApiCallError ? (VOTE_ERROR_MESSAGES[err.code] ?? err.message) : t("common.somethingWentWrong");
   } finally {
     pending.value = false;
   }
@@ -78,8 +80,8 @@ function close() {
 
 <template>
   <section class="screen private-vote-modal">
-    <h1>Cast your vote</h1>
-    <p>Private and anonymous -- no attribution, ever, until the end-of-game reveal.</p>
+    <h1>{{ t("privateVote.title") }}</h1>
+    <p>{{ t("privateVote.subtitle") }}</p>
     <ul
       v-if="candidates.length"
       class="candidate-list"
@@ -98,20 +100,20 @@ function close() {
             @change="selectedId = player.id"
           >
           {{ player.displayName }}
-          <span v-if="player.status !== 'alive'">(ghost)</span>
+          <span v-if="player.status !== 'alive'">{{ t("privateVote.ghostSuffix") }}</span>
         </label>
       </li>
     </ul>
     <p v-else>
-      No player roster loaded yet.
+      {{ t("privateVote.noRoster") }}
     </p>
     <label class="reason-label">
-      Reason (optional, only the GM ever sees this)
+      {{ t("privateVote.reasonLabel") }}
       <textarea
         v-model="reason"
         :maxlength="REASON_MAX_LENGTH"
         rows="2"
-        placeholder="Why this vote?"
+        :placeholder="t('privateVote.reasonPlaceholder')"
       />
       <span class="reason-count">{{ reason.length }}/{{ REASON_MAX_LENGTH }}</span>
     </label>
@@ -127,13 +129,13 @@ function close() {
         :disabled="!selectedId || pending || !canVote"
         @click="confirmVote"
       >
-        {{ pending ? "Casting..." : "Confirm vote" }}
+        {{ pending ? t("privateVote.casting") : t("privateVote.confirmVote") }}
       </button>
       <button
         type="button"
         @click="close"
       >
-        Close
+        {{ t("common.close") }}
       </button>
     </div>
   </section>

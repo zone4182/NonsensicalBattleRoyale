@@ -1,8 +1,11 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from "vue";
+import { useI18n } from "vue-i18n";
 import { useSessionStore } from "../../stores/session";
 import { useGameStore } from "../../stores/game";
 import { callFunction, ApiCallError } from "../../lib/api";
+
+const { t } = useI18n();
 
 interface InviteRow {
   id: string;
@@ -59,7 +62,7 @@ async function createInvite() {
     displayName.value = "";
     await loadInvites();
   } catch (err) {
-    errorMessage.value = err instanceof ApiCallError ? err.message : "Something went wrong.";
+    errorMessage.value = err instanceof ApiCallError ? err.message : t("common.somethingWentWrong");
   } finally {
     pending.value = false;
   }
@@ -76,8 +79,8 @@ async function copyLink(token: string) {
 
 <template>
   <div>
-    <h1>GM: Invites</h1>
-    <p>Create a player invite, then copy the link and send it yourself -- there's no in-app sending.</p>
+    <h1>{{ t("gmInvites.title") }}</h1>
+    <p>{{ t("gmInvites.description") }}</p>
 
     <!--
       Mobile: stacked (create panel above list panel). Tablet and up (>=721px, same
@@ -86,7 +89,7 @@ async function copyLink(token: string) {
     -->
     <div class="invites-layout">
       <section class="panel-create pixel-frame">
-        <h2>Create invite</h2>
+        <h2>{{ t("gmInvites.create.heading") }}</h2>
         <form
           class="invite-form"
           @submit.prevent="createInvite"
@@ -94,18 +97,18 @@ async function copyLink(token: string) {
           <input
             v-model="displayName"
             type="text"
-            placeholder="player display name"
+            :placeholder="t('gmInvites.create.namePlaceholder')"
             :disabled="!canCreateInvite || pending"
           >
           <button
             type="submit"
             :disabled="!canCreateInvite || pending || !displayName.trim()"
           >
-            {{ pending ? "Creating..." : "Create invite" }}
+            {{ pending ? t("gmInvites.create.creating") : t("gmInvites.create.createInvite") }}
           </button>
         </form>
         <p v-if="!canCreateInvite">
-          Invites can only be created while the game is in setup.
+          {{ t("gmInvites.create.setupOnly") }}
         </p>
         <p
           v-if="errorMessage"
@@ -116,9 +119,9 @@ async function copyLink(token: string) {
       </section>
 
       <section class="panel-list pixel-frame">
-        <h2>Invites ({{ invites.length }})</h2>
+        <h2>{{ t("gmInvites.list.heading", { count: invites.length }) }}</h2>
         <p v-if="!invites.length">
-          No invites created yet.
+          {{ t("gmInvites.list.empty") }}
         </p>
         <ul
           v-else
@@ -129,14 +132,14 @@ async function copyLink(token: string) {
             :key="invite.id"
           >
             {{ invite.display_name }} ({{ invite.role }}) --
-            <span v-if="invite.redeemed_at">Redeemed</span>
-            <span v-else>Pending</span>
+            <span v-if="invite.redeemed_at">{{ t("gmInvites.list.redeemed") }}</span>
+            <span v-else>{{ t("gmInvites.list.pending") }}</span>
             <button
               v-if="!invite.redeemed_at && tokensByInviteId[invite.id]"
               type="button"
               @click="copyLink(tokensByInviteId[invite.id])"
             >
-              Copy link
+              {{ t("gmInvites.list.copyLink") }}
             </button>
           </li>
         </ul>

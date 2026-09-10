@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from "vue";
+import { useI18n } from "vue-i18n";
 import { useRouter } from "vue-router";
 import { useSessionStore } from "../../stores/session";
 import { useGameStore } from "../../stores/game";
@@ -79,6 +80,7 @@ const POWER_KEYS = [
   "false_flag",
 ];
 
+const { t } = useI18n();
 const router = useRouter();
 const session = useSessionStore();
 const game = useGameStore();
@@ -95,7 +97,7 @@ async function loadOverview() {
   try {
     overview.value = await callFunction<GmGameOverview>("gm-game-overview", {}, { token: session.token });
   } catch (err) {
-    overviewError.value = err instanceof ApiCallError ? err.message : "Something went wrong.";
+    overviewError.value = err instanceof ApiCallError ? err.message : t("common.somethingWentWrong");
   }
 }
 
@@ -114,10 +116,10 @@ async function startRound() {
   startMessage.value = null;
   try {
     const res = await callFunction<StartRoundResponse>("start-round", {}, { token: session.token });
-    startMessage.value = `Round ${res.round_number} started. Deadline: ${res.voting_deadline_at}`;
+    startMessage.value = t("roundHeader.round", { number: res.round_number }) + ". " + t("roundHeader.deadline", { deadline: res.voting_deadline_at });
     await game.refresh(session.token);
   } catch (err) {
-    startMessage.value = err instanceof ApiCallError ? err.message : "Something went wrong.";
+    startMessage.value = err instanceof ApiCallError ? err.message : t("common.somethingWentWrong");
   } finally {
     startPending.value = false;
   }
@@ -134,21 +136,25 @@ async function resolveNow() {
   try {
     const res = await callFunction<ResolveRoundResponse>("resolve-round", {}, { token: session.token });
     if (res.resolved_count === 0) {
-      resolveMessage.value =
-        "Not ready yet -- the deadline hasn't passed and not every alive player has cast their full vote(s) yet.";
+      resolveMessage.value = t("gmInPlay.controls.notReadyResolve");
     } else {
       const summaries = res.resolutions.map((r) => {
         const names = r.eliminated_player_ids
           .map((id) => game.players.find((p) => p.id === id)?.displayName ?? id)
           .join(", ");
-        return `Round ${r.round_number}: eliminated ${names || "no one"} (tie: ${r.tie_break_method}) -> phase ${r.new_phase}`;
+        return t("gmInPlay.controls.resolutionSummary", {
+          number: r.round_number,
+          names: names || t("gmInPlay.votes.noOne"),
+          tieBreak: r.tie_break_method,
+          phase: r.new_phase,
+        });
       });
       resolveMessage.value = summaries.join(" | ");
       await game.refresh(session.token);
       await loadOverview();
     }
   } catch (err) {
-    resolveMessage.value = err instanceof ApiCallError ? err.message : "Something went wrong.";
+    resolveMessage.value = err instanceof ApiCallError ? err.message : t("common.somethingWentWrong");
   } finally {
     resolvePending.value = false;
   }
@@ -169,12 +175,12 @@ async function resolveDoors() {
     const res = await callFunction<{ resolved_count: number }>("resolve-doors", {}, { token: session.token });
     resolveDoorsMessage.value =
       res.resolved_count === 0
-        ? "Not ready yet -- not every alive player has picked a door."
-        : "Doors resolved -- game over.";
+        ? t("gmInPlay.controls.notReadyDoors")
+        : t("gmInPlay.controls.doorsResolved");
     await game.refresh(session.token);
     await loadOverview();
   } catch (err) {
-    resolveDoorsMessage.value = err instanceof ApiCallError ? err.message : "Something went wrong.";
+    resolveDoorsMessage.value = err instanceof ApiCallError ? err.message : t("common.somethingWentWrong");
   } finally {
     resolveDoorsPending.value = false;
   }
@@ -195,7 +201,7 @@ const finishMessage = ref<string | null>(null);
 
 async function finishGame() {
   if (!session.token) return;
-  if (!window.confirm("Finish this game? You won't be able to revisit it (not built yet) -- this just closes it out.")) return;
+  if (!window.confirm(t("gmInPlay.controls.finishConfirm"))) return;
   finishPending.value = true;
   finishMessage.value = null;
   try {
@@ -203,7 +209,7 @@ async function finishGame() {
     session.clearSession();
     router.push({ name: "home" });
   } catch (err) {
-    finishMessage.value = err instanceof ApiCallError ? err.message : "Something went wrong.";
+    finishMessage.value = err instanceof ApiCallError ? err.message : t("common.somethingWentWrong");
   } finally {
     finishPending.value = false;
   }
@@ -228,7 +234,7 @@ async function submit() {
   let payload: unknown;
   if (actionType.value === "grant_power") {
     if (!grantTargetPlayerId.value) {
-      errorMessage.value = "Pick a target player.";
+      errorMessage.value = t("gmInPlay.actionLog.targetRequired");
       return;
     }
     payload = { power_key: grantPowerKey.value, target_player_id: grantTargetPlayerId.value };
@@ -236,7 +242,7 @@ async function submit() {
     try {
       payload = JSON.parse(payloadText.value || "{}");
     } catch {
-      errorMessage.value = "Payload must be valid JSON.";
+      errorMessage.value = t("gmInPlay.actionLog.invalidJson");
       return;
     }
   }
@@ -251,7 +257,7 @@ async function submit() {
     );
     lastActionId.value = res.gm_action_id;
   } catch (err) {
-    errorMessage.value = err instanceof ApiCallError ? err.message : "Something went wrong.";
+    errorMessage.value = err instanceof ApiCallError ? err.message : t("common.somethingWentWrong");
   } finally {
     pending.value = false;
   }
@@ -260,139 +266,144 @@ async function submit() {
 
 <template>
   <div>
-    <h1>GM: In Play</h1>
+    <h1>{{ t("gmInPlay.title") }}</h1>
     <p class="game-identity">
-      {{ game.gameName ?? "Unnamed game" }}
-      <span class="game-id">({{ game.gameId ?? "-" }})</span>
+      {{ game.gameName ?? t("gmInPlay.unnamedGame") }}
+      <span class="game-id">({{ game.gameId ?? "–" }})</span>
     </p>
-    <h2>Settings</h2>
+    <h2>{{ t("gmInPlay.settings.heading") }}</h2>
     <div
       v-if="overview"
       class="table-scroll"
     >
-    <table class="settings-table">
-      <tbody>
-        <tr>
-          <th>Round interval</th>
-          <td>{{ overview.game.round_interval_minutes }} min</td>
-        </tr>
-        <tr>
-          <th>Missed-deadline mode</th>
-          <td>{{ overview.game.missed_deadline_mode }}</td>
-        </tr>
-        <tr>
-          <th>Round 1 start mode</th>
-          <td>{{ overview.game.round1_start_mode }}</td>
-        </tr>
-        <tr>
-          <th>Round resolution mode</th>
-          <td>{{ overview.game.round_resolution_mode }}</td>
-        </tr>
-        <tr>
-          <th>Players can change their vote</th>
-          <td>{{ overview.game.allow_vote_change ? "Yes" : "No" }}</td>
-        </tr>
-        <tr>
-          <th>Random double vote</th>
-          <td>{{ overview.game.double_vote_enabled ? "Enabled" : "Disabled" }}</td>
-        </tr>
-        <tr v-if="overview.game.double_vote_enabled">
-          <th>Double-vote cooldown (rounds)</th>
-          <td>{{ overview.game.double_vote_floor_rounds }}</td>
-        </tr>
-        <tr>
-          <th>Survival streak threshold</th>
-          <td>{{ overview.game.survival_streak_threshold }}</td>
-        </tr>
-        <tr>
-          <th>Created</th>
-          <td>{{ overview.game.created_at }}</td>
-        </tr>
-      </tbody>
-    </table>
+      <table class="settings-table">
+        <tbody>
+          <tr>
+            <th>{{ t("gmInPlay.settings.roundInterval") }}</th>
+            <td>{{ t("gmInPlay.settings.minutesSuffix", { minutes: overview.game.round_interval_minutes }) }}</td>
+          </tr>
+          <tr>
+            <th>{{ t("gmInPlay.settings.missedDeadlineMode") }}</th>
+            <td>{{ overview.game.missed_deadline_mode }}</td>
+          </tr>
+          <tr>
+            <th>{{ t("gmInPlay.settings.round1StartMode") }}</th>
+            <td>{{ overview.game.round1_start_mode }}</td>
+          </tr>
+          <tr>
+            <th>{{ t("gmInPlay.settings.roundResolutionMode") }}</th>
+            <td>{{ overview.game.round_resolution_mode }}</td>
+          </tr>
+          <tr>
+            <th>{{ t("gmInPlay.settings.allowVoteChange") }}</th>
+            <td>{{ overview.game.allow_vote_change ? t("gmInPlay.settings.yes") : t("gmInPlay.settings.no") }}</td>
+          </tr>
+          <tr>
+            <th>{{ t("gmInPlay.settings.doubleVoteEnabled") }}</th>
+            <td>{{ overview.game.double_vote_enabled ? t("gmInPlay.settings.enabled") : t("gmInPlay.settings.disabled") }}</td>
+          </tr>
+          <tr v-if="overview.game.double_vote_enabled">
+            <th>{{ t("gmInPlay.settings.doubleVoteFloorRounds") }}</th>
+            <td>
+              {{
+                overview.game.double_vote_floor_rounds === -1
+                  ? t("gmInPlay.settings.onceEver")
+                  : t("gmInPlay.settings.roundsSuffix", { count: overview.game.double_vote_floor_rounds })
+              }}
+            </td>
+          </tr>
+          <tr>
+            <th>{{ t("gmInPlay.settings.survivalStreakThreshold") }}</th>
+            <td>{{ overview.game.survival_streak_threshold }}</td>
+          </tr>
+          <tr>
+            <th>{{ t("gmInPlay.settings.created") }}</th>
+            <td>{{ overview.game.created_at }}</td>
+          </tr>
+        </tbody>
+      </table>
     </div>
     <p
       v-else-if="overviewError"
       class="error"
     >
-      Couldn't load settings: {{ overviewError }}
+      {{ t("gmInPlay.settings.loadError", { error: overviewError }) }}
     </p>
     <p v-else>
-      Loading settings...
+      {{ t("gmInPlay.settings.loading") }}
     </p>
 
-    <h2>Resolved rounds -- full vote breakdown</h2>
+    <h2>{{ t("gmInPlay.votes.heading") }}</h2>
     <p class="field-hint">
-      GM-only. Players never see who voted for whom until the game ends -- this view is
-      an exception made specifically for you, not a change to what players are shown.
+      {{ t("gmInPlay.votes.hint") }}
     </p>
     <p v-if="overview && overview.rounds.length === 0">
-      No rounds resolved yet.
+      {{ t("gmInPlay.votes.none") }}
     </p>
     <section
       v-for="round in overview?.rounds ?? []"
       :key="round.round_number"
       class="round-votes-block"
     >
-      <h3>Round {{ round.round_number }}</h3>
+      <h3>{{ t("gmInPlay.votes.round", { number: round.round_number }) }}</h3>
       <p>
-        Eliminated: {{ round.eliminated_player_display_name ?? "no one" }}
-        <span v-if="round.tie_break_method === 'random'">(random tie-break)</span>
+        {{ t("gmInPlay.votes.eliminated", { name: round.eliminated_player_display_name ?? t("gmInPlay.votes.noOne") }) }}
+        <span v-if="round.tie_break_method === 'random'">{{ t("gmInPlay.votes.randomTieBreak") }}</span>
       </p>
       <div class="table-scroll">
-      <table class="votes-table">
-        <thead>
-          <tr>
-            <th>Voter</th>
-            <th>Target</th>
-            <th>Votes received</th>
-            <th>Double vote</th>
-            <th>Reason</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr
-            v-for="(vote, i) in round.votes"
-            :key="i"
-            :class="{ 'eliminated-row': vote.target_display_name === round.eliminated_player_display_name }"
-          >
-            <td>{{ vote.voter_display_name }}</td>
-            <td>{{ vote.target_display_name }}</td>
-            <td>{{ vote.target_vote_count }}</td>
-            <td>{{ vote.is_double_vote ? "Yes" : "" }}</td>
-            <td>{{ vote.reason ?? "" }}</td>
-          </tr>
-        </tbody>
-      </table>
+        <table class="votes-table">
+          <thead>
+            <tr>
+              <th>{{ t("gmInPlay.votes.voter") }}</th>
+              <th>{{ t("gmInPlay.votes.target") }}</th>
+              <th>{{ t("gmInPlay.votes.votesReceived") }}</th>
+              <th>{{ t("gmInPlay.votes.doubleVote") }}</th>
+              <th>{{ t("gmInPlay.votes.reason") }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              v-for="(vote, i) in round.votes"
+              :key="i"
+              :class="{ 'eliminated-row': vote.target_display_name === round.eliminated_player_display_name }"
+            >
+              <td>{{ vote.voter_display_name }}</td>
+              <td>{{ vote.target_display_name }}</td>
+              <td>{{ vote.target_vote_count }}</td>
+              <td>{{ vote.is_double_vote ? t("gmInPlay.settings.yes") : "" }}</td>
+              <td>{{ vote.reason ?? "" }}</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </section>
 
     <template v-if="overview && overview.door_picks.length > 0">
-      <h2>Three Doors</h2>
+      <h2>{{ t("gmInPlay.threeDoors.heading") }}</h2>
       <div class="table-scroll">
-      <table class="votes-table">
-        <thead>
-          <tr>
-            <th>Player</th>
-            <th>Door</th>
-            <th>Outcome</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr
-            v-for="pick in overview.door_picks"
-            :key="pick.player_display_name"
-          >
-            <td>{{ pick.player_display_name }}</td>
-            <td>{{ pick.door_number }}</td>
-            <td>{{ pick.resolved_outcome ?? "pending" }}</td>
-          </tr>
-        </tbody>
-      </table>
+        <table class="votes-table">
+          <thead>
+            <tr>
+              <th>{{ t("gmInPlay.threeDoors.player") }}</th>
+              <th>{{ t("gmInPlay.threeDoors.door") }}</th>
+              <th>{{ t("gmInPlay.threeDoors.outcome") }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              v-for="pick in overview.door_picks"
+              :key="pick.player_display_name"
+            >
+              <td>{{ pick.player_display_name }}</td>
+              <td>{{ pick.door_number }}</td>
+              <td>{{ pick.resolved_outcome ?? t("gmInPlay.threeDoors.pending") }}</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </template>
 
-    <p>Game phase: {{ game.phase ?? "unknown" }}</p>
+    <p>{{ t("gmInPlay.gamePhase", { phase: game.phase ?? t("gmInPlay.unknownPhase") }) }}</p>
 
     <RoundHeader v-if="game.currentRound" />
 
@@ -403,7 +414,7 @@ async function submit() {
         :disabled="startPending"
         @click="startRound"
       >
-        {{ startPending ? "Starting..." : "Start Round 1" }}
+        {{ startPending ? t("gmInPlay.controls.starting") : t("gmInPlay.controls.startRound1") }}
       </button>
       <p v-if="startMessage">
         {{ startMessage }}
@@ -417,7 +428,7 @@ async function submit() {
         :disabled="resolvePending"
         @click="resolveNow"
       >
-        {{ resolvePending ? "Resolving..." : "Resolve now" }}
+        {{ resolvePending ? t("gmInPlay.controls.resolving") : t("gmInPlay.controls.resolveNow") }}
       </button>
       <p v-if="resolveMessage">
         {{ resolveMessage }}
@@ -431,7 +442,7 @@ async function submit() {
         :disabled="resolveDoorsPending"
         @click="resolveDoors"
       >
-        {{ resolveDoorsPending ? "Resolving..." : "Resolve doors" }}
+        {{ resolveDoorsPending ? t("gmInPlay.controls.resolving") : t("gmInPlay.controls.resolveDoors") }}
       </button>
       <p v-if="resolveDoorsMessage">
         {{ resolveDoorsMessage }}
@@ -445,11 +456,10 @@ async function submit() {
         :disabled="finishPending"
         @click="finishGame"
       >
-        {{ finishPending ? "Finishing..." : "Finish game" }}
+        {{ finishPending ? t("gmInPlay.controls.finishing") : t("gmInPlay.controls.finishGame") }}
       </button>
       <p class="field-hint">
-        Closes this game out and sends you back to the landing page. Revisiting a
-        finished game isn't built yet -- planned for a later version.
+        {{ t("gmInPlay.controls.finishGameHint") }}
       </p>
       <p
         v-if="finishMessage"
@@ -461,13 +471,13 @@ async function submit() {
 
     <hr>
 
-    <p>Log a GM action (tie-break, power grant, narration edit, or twist). Every call is logged and auditable.</p>
+    <p>{{ t("gmInPlay.actionLog.description") }}</p>
     <form
       class="action-form"
       @submit.prevent="submit"
     >
       <label>
-        Action type
+        {{ t("gmInPlay.actionLog.actionType") }}
         <select v-model="actionType">
           <option
             v-for="type in ACTION_TYPES"
@@ -477,7 +487,7 @@ async function submit() {
         </select>
       </label>
       <label>
-        Round id (optional)
+        {{ t("gmInPlay.actionLog.roundId") }}
         <input
           v-model="roundId"
           type="text"
@@ -487,7 +497,7 @@ async function submit() {
 
       <template v-if="actionType === 'grant_power'">
         <label>
-          Power
+          {{ t("gmInPlay.actionLog.power") }}
           <select v-model="grantPowerKey">
             <option
               v-for="key in POWER_KEYS"
@@ -497,12 +507,12 @@ async function submit() {
           </select>
         </label>
         <label>
-          Target player
+          {{ t("gmInPlay.actionLog.targetPlayer") }}
           <select v-model="grantTargetPlayerId">
             <option
               value=""
               disabled
-            >Select a player</option>
+            >{{ t("gmInPlay.actionLog.selectPlayer") }}</option>
             <option
               v-for="p in game.players.filter((pl) => pl.status === 'alive' && pl.role === 'player')"
               :key="p.id"
@@ -514,7 +524,7 @@ async function submit() {
         </label>
       </template>
       <label v-else>
-        Payload (JSON)
+        {{ t("gmInPlay.actionLog.payload") }}
         <textarea
           v-model="payloadText"
           rows="4"
@@ -524,7 +534,7 @@ async function submit() {
         type="submit"
         :disabled="pending"
       >
-        {{ pending ? "Logging..." : "Log action" }}
+        {{ pending ? t("gmInPlay.actionLog.logging") : t("gmInPlay.actionLog.logAction") }}
       </button>
     </form>
     <p
@@ -534,7 +544,7 @@ async function submit() {
       {{ errorMessage }}
     </p>
     <p v-if="lastActionId">
-      Logged as {{ lastActionId }}.
+      {{ t("gmInPlay.actionLog.logged", { id: lastActionId }) }}
     </p>
   </div>
 </template>

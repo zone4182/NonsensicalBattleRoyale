@@ -1,0 +1,318 @@
+{
+  "common": {
+    "back": "← back",
+    "loading": "Loading...",
+    "somethingWentWrong": "Something went wrong.",
+    "close": "Close"
+  },
+  "home": {
+    "title": "Nonsensical Battle Royale",
+    "tagline": "Where Clue, Diplomacy, Werewolf, Among Us, and Machiavelli meet. An asynchronous social deduction game, played with real friends over real days. Accept your invite, and something starts. Every round, everyone votes in secret on who doesn't make it to the next one.",
+    "hostGame": "Host a new game",
+    "joinGame": "Join a game"
+  },
+  "join": {
+    "heading": "You've been invited",
+    "subheading": "Enter your personal invite token to arrive at the house.",
+    "tokenPlaceholder": "invite token",
+    "redeeming": "Redeeming...",
+    "redeemButton": "Redeem invite",
+    "errors": {
+      "inviteNotFound": "No invite exists for this token.",
+      "alreadyRedeemed": "This invite has already been redeemed."
+    }
+  },
+  "seance": {
+    "title": "The Seance",
+    "description": "Vote among alternate narration flavors for this round's already-decided elimination announcement. Entirely cosmetic.",
+    "options": {
+      "somber": "Somber",
+      "theatrical": "Theatrical",
+      "mysterious": "Mysterious",
+      "blunt": "Blunt"
+    },
+    "voteCast": "Vote cast: {option}."
+  },
+  "helpline": {
+    "title": "Helpline",
+    "description": "Send a private question to the Game Master. Never player-to-player.",
+    "bodyPlaceholder": "Your question...",
+    "sending": "Sending...",
+    "send": "Send",
+    "sent": "Sent to the GM."
+  },
+  "threeDoors": {
+    "title": "The Three Doors",
+    "description": "Three numbered doors, all labeled \"Exit.\" Pick a unique number. Two players picking the same number means everyone loses.",
+    "door": "Door {number}",
+    "picked": "You picked door {number}. Waiting for the reveal.",
+    "errors": {
+      "notThreeDoorsPhase": "The Three Doors endgame is not currently active.",
+      "invalidDoorNumber": "Pick a door numbered 1, 2, or 3."
+    }
+  },
+  "endGameReveal": {
+    "title": "End-of-Game Reveal",
+    "body": "Unlocks the Vote Tree, Power Log, and GM Action Log for everyone once the game ends. The Vote Tree (a branching diagram that must stay legible at 3-20+ players) is a hard problem deferred to a later milestone -- this is a placeholder only. See GAME-DESIGN.md §End-of-Game Reveal."
+  },
+  "notFound": {
+    "title": "404",
+    "body": "There's nothing behind this door."
+  },
+  "arrival": {
+    "title": "Arrival",
+    "storyPart1a": "Having accepted the invitation, you travel to the mansion mentioned in the letter. On arrival you find your old friends, each one happier to see you than the last. There's laughter, drinks, old stories being retold, and no shortage of arguing over who sleeps where. The catching-up runs deep into the night, until everyone finally goes to bed.",
+    "storyPart1b": "None of you suspect that this will be the last night anything still feels normal.",
+    "nextMorning": "The Next Morning",
+    "storyPart2a": "Slowly, everyone wakes up. One by one, the guests drift into the kitchen -- coffee, hangovers, the usual morning-after murmur. But {gmName} is missing. Their seat at the table stays empty while the rest wonder where they've gotten to.",
+    "storyPart2b": "One of you walks to the toilet -- and finds them there. Dead. Still half on the seat, pants around their ankles. A deep stab wound gapes in their neck; the blood has spread into a wide, dark pool across the tiles, reaching the walls and the sink. Their eyes are wide open, frozen in terror. The smell of blood hangs thick and sweet in the small, airless room. No doubt about it: this was no accident -- and whoever did it is still somewhere in this house.",
+    "gmFallbackName": "the Game Master",
+    "continue": "Continue",
+    "waiting": "Waiting for the rest of the house to arrive before the game can begin..."
+  },
+  "roundHeader": {
+    "round": "Round {number}",
+    "deadline": "Deadline: {deadline}",
+    "deadlinePassed": "Deadline passed",
+    "countdown": "{days}d {hours}h {minutes}m {seconds}s"
+  },
+  "playerRoster": {
+    "title": "Roster",
+    "noPlayers": "No players loaded yet.",
+    "host": "Host",
+    "noGm": "No Game Master.",
+    "guests": "Guests ({count})",
+    "noneStanding": "No one left standing.",
+    "dead": "Dead ({count})"
+  },
+  "narrationLog": {
+    "title": "Narration",
+    "empty": "Bart's ghost has nothing to say yet."
+  },
+  "voteAction": {
+    "ghostNotice": "You're a ghost -- spectating only. (Seance, GAME-DESIGN.md's ghost-only vote on this round's narration flavor, isn't wired up yet.)",
+    "changeVote": "Change vote",
+    "vote": "Vote",
+    "voteCast": "Vote cast",
+    "votedFinal": "You've cast your vote this round -- it's final.",
+    "votedChangeable": "You've voted, but can still change your mind before this round resolves."
+  },
+  "powerUse": {
+    "notUsable": "Not usable yet",
+    "arming": "Arming...",
+    "armForRound": "Arm for this round",
+    "asking": "Asking...",
+    "ask": "Ask",
+    "roundPlaceholder": "round #",
+    "viewing": "Viewing...",
+    "view": "View",
+    "armed": "Armed for round {roundNumber}.",
+    "whisperYes": "Yes -- you were the top target last round.",
+    "whisperNo": "No.",
+    "doubleVoteHolder": "Double vote holder: {playerId}",
+    "noDoubleVoteHolder": "No one holds the double vote right now.",
+    "noVotesCast": "No votes cast."
+  },
+  "privateVote": {
+    "title": "Cast your vote",
+    "subtitle": "Private and anonymous -- no attribution, ever, until the end-of-game reveal.",
+    "noRoster": "No player roster loaded yet.",
+    "ghostSuffix": "(ghost)",
+    "reasonLabel": "Reason (optional, only the GM ever sees this)",
+    "reasonPlaceholder": "Why this vote?",
+    "casting": "Casting...",
+    "confirmVote": "Confirm vote",
+    "errors": {
+      "noOpenRound": "There's no open round to vote in right now.",
+      "invalidTarget": "That player can't be voted for.",
+      "voteEntitlementExhausted": "You've already cast all your votes this round."
+    }
+  },
+  "gmNav": {
+    "setup": "Setup",
+    "inPlay": "In Play",
+    "invites": "Invites",
+    "helplineInbox": "Helpline Inbox"
+  },
+  "gmSetup": {
+    "title": "GM Setup",
+    "description": "Create the game, then invite players using their own invite links (not built yet in this milestone).",
+    "minPlayersHint": "Round 1 can't start until at least 5 players have accepted their invite, whichever start mode you pick below.",
+    "manualResolveHint": "Regardless of resolution mode, you can always resolve a round early yourself once every alive player has voted.",
+    "basics": {
+      "heading": "Game basics",
+      "gameName": "Game name",
+      "gameNameHint": "Identifies this game instance to you in the GM panel -- players never see it.",
+      "displayName": "Your display name",
+      "displayNameHint": "How you appear as the Game Master in narration and the end-of-game reveal -- doesn't have to be your real name."
+    },
+    "rules": {
+      "heading": "Round rules",
+      "roundInterval": "Round interval (minutes)",
+      "roundIntervalHint": "How long each round's voting window stays open before it resolves. 10 minutes minimum -- shorter than that can miss the automatic-resolve check, which runs every 5 minutes. Use a large number (e.g. 1440 for a full day) for an async game spread over days.",
+      "missedDeadlineMode": "Missed-deadline mode",
+      "missedDeadlineOptions": {
+        "forfeitFatal": "Forfeit is fatal",
+        "noConsequence": "No consequence",
+        "oneRoundPenalty": "One-round penalty"
+      },
+      "missedDeadlineHintPrefix": "What happens to a player who doesn't vote before the deadline.",
+      "missedDeadlineHints": {
+        "forfeit_fatal": "Missing the vote deadline eliminates that player, same as being voted out.",
+        "no_consequence": "Missing the deadline does nothing beyond that player not casting a vote this round.",
+        "one_round_penalty": "Missing the deadline excludes the player from voting and using powers next round only -- not eliminated."
+      },
+      "round1StartMode": "Round 1 start mode",
+      "round1StartOptions": {
+        "waitForAll": "Wait until everyone accepts",
+        "gmManual": "GM starts manually",
+        "scheduled": "Auto-start at a scheduled time"
+      },
+      "round1StartHintPrefix": "How and when round 1 begins.",
+      "round1StartHints": {
+        "wait_for_all": "Round 1 starts automatically the moment every invited player has redeemed their invite.",
+        "gm_manual": "Round 1 only starts when you click \"Start Round 1\" yourself, whenever you're ready.",
+        "scheduled": "Round 1 starts automatically at a time you set, regardless of who has accepted. Anyone who hasn't redeemed their invite by then is excluded from the game entirely."
+      },
+      "roundResolutionMode": "Round resolution mode",
+      "roundResolutionOptions": {
+        "manual": "Always manually resolve",
+        "automatic": "Automatic, once the deadline passes"
+      },
+      "roundResolutionHintPrefix": "How every round after the first one ends.",
+      "roundResolutionHints": {
+        "manual": "Rounds only resolve when you click \"Resolve now\" yourself, even after the deadline passes.",
+        "automatic": "Rounds resolve on their own the moment the deadline passes -- no need to have the app open."
+      },
+      "allowVoteChange": "Allow players to change their vote",
+      "allowVoteChangeHint": "If off (default), a vote is final the moment it's cast. If on, a player can re-vote as many times as they want before the round resolves -- only their latest vote(s) count."
+    },
+    "powers": {
+      "heading": "Hidden powers & bots",
+      "doubleVoteEnabled": "Random double vote",
+      "doubleVoteEnabledHint": "On by default. Each round, one random alive player is secretly given a second vote -- they're told privately and never have to disclose it. This is part of the game's hidden powers system: players are never told it exists, they only discover it by experiencing it.",
+      "doubleVoteFloorRounds": "Double-vote cooldown (rounds)",
+      "doubleVoteFloorRoundsHint": "How many recent rounds' holders are excluded when picking who gets it next, so the same player isn't re-picked too soon. Falls back to picking from everyone alive if excluding recent holders would leave no one eligible (e.g. a very small player count). Default 2. Set to -1 for a stricter rule instead: each player can hold the double vote at most once for the entire game -- once everyone's had a turn, no one gets it again for the rest of the game (no fallback).",
+      "botMode": "Bot mode",
+      "botModeHint": "Fills the game with algorithm-controlled players (random moves for now) so you can test a full game solo. You still need at least one real player besides yourself -- bots supplement a game, they don't replace it.",
+      "botCount": "Number of bots",
+      "botCountHint": "How many bots to add alongside the real players you invite (max 19, and bots + real players together should stay within the 20-player ceiling)."
+    },
+    "access": {
+      "heading": "Access",
+      "setupSecret": "Setup secret",
+      "setupSecretHint": "A shared secret that proves you're allowed to create a game -- separate from the invite links you'll send players."
+    },
+    "creating": "Creating...",
+    "createGame": "Create game",
+    "created": "Game created. GM invite token (shown once):",
+    "copy": "Copy"
+  },
+  "gmInvites": {
+    "title": "GM: Invites",
+    "description": "Create a player invite, then copy the link and send it yourself -- there's no in-app sending.",
+    "create": {
+      "heading": "Create invite",
+      "namePlaceholder": "player display name",
+      "creating": "Creating...",
+      "createInvite": "Create invite",
+      "setupOnly": "Invites can only be created while the game is in setup."
+    },
+    "list": {
+      "heading": "Invites ({count})",
+      "empty": "No invites created yet.",
+      "redeemed": "Redeemed",
+      "pending": "Pending",
+      "copyLink": "Copy link"
+    }
+  },
+  "gmHelplineInbox": {
+    "title": "GM: Helpline Inbox",
+    "description": "No helpline-read endpoint exists yet this milestone -- the original message id must be obtained out-of-band (e.g. via psql) until a future milestone adds a thread-list endpoint.",
+    "reply": {
+      "heading": "Reply",
+      "inReplyToPlaceholder": "original message id (uuid)",
+      "bodyPlaceholder": "Your reply...",
+      "sending": "Sending...",
+      "send": "Send reply",
+      "sent": "Reply sent."
+    }
+  },
+  "gmInPlay": {
+    "title": "GM: In Play",
+    "unnamedGame": "Unnamed game",
+    "settings": {
+      "heading": "Settings",
+      "roundInterval": "Round interval",
+      "minutesSuffix": "{minutes} min",
+      "missedDeadlineMode": "Missed-deadline mode",
+      "round1StartMode": "Round 1 start mode",
+      "roundResolutionMode": "Round resolution mode",
+      "allowVoteChange": "Players can change their vote",
+      "doubleVoteEnabled": "Random double vote",
+      "enabled": "Enabled",
+      "disabled": "Disabled",
+      "yes": "Yes",
+      "no": "No",
+      "doubleVoteFloorRounds": "Double-vote cooldown",
+      "onceEver": "Once per player, ever",
+      "roundsSuffix": "{count} round(s)",
+      "survivalStreakThreshold": "Survival streak threshold",
+      "created": "Created",
+      "loadError": "Couldn't load settings: {error}",
+      "loading": "Loading settings..."
+    },
+    "votes": {
+      "heading": "Resolved rounds -- full vote breakdown",
+      "hint": "GM-only. Players never see who voted for whom until the game ends -- this view is an exception made specifically for you, not a change to what players are shown.",
+      "none": "No rounds resolved yet.",
+      "round": "Round {number}",
+      "eliminated": "Eliminated: {name}",
+      "noOne": "no one",
+      "randomTieBreak": "(random tie-break)",
+      "voter": "Voter",
+      "target": "Target",
+      "votesReceived": "Votes received",
+      "doubleVote": "Double vote",
+      "reason": "Reason"
+    },
+    "threeDoors": {
+      "heading": "Three Doors",
+      "player": "Player",
+      "door": "Door",
+      "outcome": "Outcome",
+      "pending": "pending"
+    },
+    "gamePhase": "Game phase: {phase}",
+    "unknownPhase": "unknown",
+    "controls": {
+      "starting": "Starting...",
+      "startRound1": "Start Round 1",
+      "resolving": "Resolving...",
+      "resolveNow": "Resolve now",
+      "notReadyResolve": "Not ready yet -- the deadline hasn't passed and not every alive player has cast their full vote(s) yet.",
+      "resolveDoors": "Resolve doors",
+      "notReadyDoors": "Not ready yet -- not every alive player has picked a door.",
+      "doorsResolved": "Doors resolved -- game over.",
+      "finishing": "Finishing...",
+      "finishGame": "Finish game",
+      "finishGameHint": "Closes this game out and sends you back to the landing page. Revisiting a finished game isn't built yet -- planned for a later version.",
+      "finishConfirm": "Finish this game? You won't be able to revisit it (not built yet) -- this just closes it out.",
+      "resolutionSummary": "Round {number}: eliminated {names} (tie: {tieBreak}) -> phase {phase}"
+    },
+    "actionLog": {
+      "description": "Log a GM action (tie-break, power grant, narration edit, or twist). Every call is logged and auditable.",
+      "actionType": "Action type",
+      "roundId": "Round id (optional)",
+      "power": "Power",
+      "targetPlayer": "Target player",
+      "selectPlayer": "Select a player",
+      "targetRequired": "Pick a target player.",
+      "payload": "Payload (JSON)",
+      "invalidJson": "Payload must be valid JSON.",
+      "logging": "Logging...",
+      "logAction": "Log action",
+      "logged": "Logged as {id}."
+    }
+  }
+}

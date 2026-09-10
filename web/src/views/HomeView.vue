@@ -1,37 +1,45 @@
 <script setup lang="ts">
+import { useI18n } from "vue-i18n";
 import FullscreenLayout from "../layouts/FullscreenLayout.vue";
+
+const { t } = useI18n();
 </script>
 
 <template>
   <FullscreenLayout>
-    <h1>Nonsensical Battle Royale</h1>
-    <p class="tagline">
-      Where Clue, Diplomacy, Werewolf, Among Us, and Machiavelli meet.
-      An asynchronous social deduction game, played with real friends over real days.
-      Accept your invite, and something starts. Every round, everyone votes in secret
-      on who doesn't make it to the next one.
-    </p>
-    <div class="actions">
-      <RouterLink
-        :to="{ name: 'gm-setup' }"
-        class="action action-primary"
-      >
-        Host a new game
-      </RouterLink>
-      <RouterLink
-        :to="{ name: 'join' }"
-        class="action"
-      >
-        Join a game
-      </RouterLink>
+    <div class="home-content">
+      <h1>{{ t("home.title") }}</h1>
+      <p class="tagline">
+        {{ t("home.tagline") }}
+      </p>
+      <div class="actions">
+        <RouterLink
+          :to="{ name: 'gm-setup' }"
+          class="action action-primary"
+        >
+          {{ t("home.hostGame") }}
+        </RouterLink>
+        <RouterLink
+          :to="{ name: 'join' }"
+          class="action"
+        >
+          {{ t("home.joinGame") }}
+        </RouterLink>
+      </div>
     </div>
   </FullscreenLayout>
 </template>
 
 <style scoped>
+.home-content {
+  text-align: center;
+}
+
 .tagline {
   color: var(--nbr-muted);
   max-width: 46ch;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .actions {
@@ -39,7 +47,7 @@ import FullscreenLayout from "../layouts/FullscreenLayout.vue";
   flex-direction: column;
   gap: var(--nbr-space-2);
   max-width: 320px;
-  margin-top: var(--nbr-space-4);
+  margin: var(--nbr-space-4) auto 0;
 }
 
 .action {

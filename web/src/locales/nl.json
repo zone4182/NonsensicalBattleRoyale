@@ -1,0 +1,318 @@
+{
+  "common": {
+    "back": "← terug",
+    "loading": "Laden...",
+    "somethingWentWrong": "Er is iets misgegaan.",
+    "close": "Sluiten"
+  },
+  "home": {
+    "title": "Nonsensical Battle Royale",
+    "tagline": "Waar Cluedo, Diplomacy, Werewolf, Among Us en Machiavelli samenkomen. Een asynchroon sociaal deductiespel, gespeeld met echte vrienden over echte dagen. Accepteer je uitnodiging, en er begint iets. Elke ronde stemt iedereen in het geheim op wie de volgende ronde niet haalt.",
+    "hostGame": "Start een nieuw spel",
+    "joinGame": "Doe mee aan een spel"
+  },
+  "join": {
+    "heading": "Je bent uitgenodigd",
+    "subheading": "Voer je persoonlijke uitnodigingstoken in om bij het huis aan te komen.",
+    "tokenPlaceholder": "uitnodigingstoken",
+    "redeeming": "Bezig met inwisselen...",
+    "redeemButton": "Uitnodiging inwisselen",
+    "errors": {
+      "inviteNotFound": "Er bestaat geen uitnodiging voor deze token.",
+      "alreadyRedeemed": "Deze uitnodiging is al ingewisseld."
+    }
+  },
+  "seance": {
+    "title": "De Seance",
+    "description": "Stem op een andere verteltoon voor de al vaststaande eliminatie-aankondiging van deze ronde. Volledig cosmetisch.",
+    "options": {
+      "somber": "Somber",
+      "theatrical": "Theatraal",
+      "mysterious": "Mysterieus",
+      "blunt": "Bot"
+    },
+    "voteCast": "Stem uitgebracht: {option}."
+  },
+  "helpline": {
+    "title": "Hulplijn",
+    "description": "Stuur een privévraag naar de Game Master. Nooit speler-naar-speler.",
+    "bodyPlaceholder": "Je vraag...",
+    "sending": "Bezig met versturen...",
+    "send": "Versturen",
+    "sent": "Verzonden naar de GM."
+  },
+  "threeDoors": {
+    "title": "De Drie Deuren",
+    "description": "Drie genummerde deuren, allemaal gelabeld \"Uitgang.\" Kies een uniek nummer. Als twee spelers hetzelfde nummer kiezen, verliest iedereen.",
+    "door": "Deur {number}",
+    "picked": "Je koos deur {number}. Wachten op de onthulling.",
+    "errors": {
+      "notThreeDoorsPhase": "De Drie Deuren-eindfase is momenteel niet actief.",
+      "invalidDoorNumber": "Kies deur 1, 2 of 3."
+    }
+  },
+  "endGameReveal": {
+    "title": "Onthulling aan het einde van het spel",
+    "body": "Ontgrendelt de Stemboom, het Krachtenlog en het GM-actielog voor iedereen zodra het spel eindigt. De Stemboom (een vertakkend diagram dat leesbaar moet blijven bij 3-20+ spelers) is een lastig probleem dat naar een latere mijlpaal is verschoven -- dit is alleen een placeholder. Zie GAME-DESIGN.md §End-of-Game Reveal."
+  },
+  "notFound": {
+    "title": "404",
+    "body": "Er is niets achter deze deur."
+  },
+  "arrival": {
+    "title": "Aankomst",
+    "storyPart1a": "Na het aanvaarden van de uitnodiging reis je naar het landhuis dat in de brief werd genoemd. Bij aankomst tref je je oude vrienden aan, allemaal blijer je te zien dan de vorige. Er is gelach, drank, oude verhalen die opnieuw verteld worden, en genoeg discussie over wie waar slaapt. Het bijpraten duurt tot diep in de nacht, tot iedereen eindelijk naar bed gaat.",
+    "storyPart1b": "Niemand van jullie vermoedt dat dit de laatste nacht zal zijn dat iets nog normaal aanvoelt.",
+    "nextMorning": "De Volgende Ochtend",
+    "storyPart2a": "Langzaam wordt iedereen wakker. Een voor een druppelen de gasten de keuken in -- koffie, kater, het gebruikelijke ochtendgemompel. Maar {gmName} ontbreekt. Hun stoel aan tafel blijft leeg terwijl de rest zich afvraagt waar ze gebleven zijn.",
+    "storyPart2b": "Een van jullie loopt naar het toilet -- en vindt hen daar. Dood. Nog half op de bril, broek rond de enkels. Een diepe steekwond gaapt in hun nek; het bloed heeft zich verspreid tot een brede, donkere plas over de tegels, tot aan de muren en de wastafel. Hun ogen staan wijd open, bevroren in angst. De geur van bloed hangt dik en zoet in de kleine, muffe ruimte. Geen twijfel mogelijk: dit was geen ongeluk -- en wie het ook deed, bevindt zich nog ergens in dit huis.",
+    "gmFallbackName": "de Game Master",
+    "continue": "Doorgaan",
+    "waiting": "Wachten tot de rest van het huis is aangekomen voordat het spel kan beginnen..."
+  },
+  "roundHeader": {
+    "round": "Ronde {number}",
+    "deadline": "Deadline: {deadline}",
+    "deadlinePassed": "Deadline verstreken",
+    "countdown": "{days}d {hours}u {minutes}m {seconds}s"
+  },
+  "playerRoster": {
+    "title": "Bezetting",
+    "noPlayers": "Nog geen spelers geladen.",
+    "host": "Gastheer",
+    "noGm": "Geen Game Master.",
+    "guests": "Gasten ({count})",
+    "noneStanding": "Niemand meer over.",
+    "dead": "Dood ({count})"
+  },
+  "narrationLog": {
+    "title": "Verhaal",
+    "empty": "Barts geest heeft nog niets te zeggen."
+  },
+  "voteAction": {
+    "ghostNotice": "Je bent een geest -- alleen toeschouwer. (De Seance, GAME-DESIGN.md's geest-only stem op de verteltoon van deze ronde, is nog niet aangesloten.)",
+    "changeVote": "Stem wijzigen",
+    "vote": "Stemmen",
+    "voteCast": "Stem uitgebracht",
+    "votedFinal": "Je hebt deze ronde je stem uitgebracht -- die staat vast.",
+    "votedChangeable": "Je hebt gestemd, maar kunt nog van gedachten veranderen voordat deze ronde wordt afgehandeld."
+  },
+  "powerUse": {
+    "notUsable": "Nog niet bruikbaar",
+    "arming": "Bezig met activeren...",
+    "armForRound": "Activeren voor deze ronde",
+    "asking": "Bezig met vragen...",
+    "ask": "Vragen",
+    "roundPlaceholder": "ronde #",
+    "viewing": "Bezig met bekijken...",
+    "view": "Bekijken",
+    "armed": "Geactiveerd voor ronde {roundNumber}.",
+    "whisperYes": "Ja -- jij was vorige ronde het belangrijkste doelwit.",
+    "whisperNo": "Nee.",
+    "doubleVoteHolder": "Houder van dubbele stem: {playerId}",
+    "noDoubleVoteHolder": "Niemand heeft momenteel de dubbele stem.",
+    "noVotesCast": "Geen stemmen uitgebracht."
+  },
+  "privateVote": {
+    "title": "Breng je stem uit",
+    "subtitle": "Privé en anoniem -- nooit toe te wijzen, tot de onthulling aan het einde van het spel.",
+    "noRoster": "Nog geen spelersbezetting geladen.",
+    "ghostSuffix": "(geest)",
+    "reasonLabel": "Reden (optioneel, alleen de GM ziet dit ooit)",
+    "reasonPlaceholder": "Waarom deze stem?",
+    "casting": "Bezig met uitbrengen...",
+    "confirmVote": "Stem bevestigen",
+    "errors": {
+      "noOpenRound": "Er is momenteel geen open ronde om op te stemmen.",
+      "invalidTarget": "Op deze speler kan niet gestemd worden.",
+      "voteEntitlementExhausted": "Je hebt deze ronde al al je stemmen uitgebracht."
+    }
+  },
+  "gmNav": {
+    "setup": "Instellen",
+    "inPlay": "Bezig",
+    "invites": "Uitnodigingen",
+    "helplineInbox": "Hulplijn Inbox"
+  },
+  "gmSetup": {
+    "title": "GM Instellingen",
+    "description": "Maak het spel aan en nodig daarna spelers uit via hun eigen uitnodigingslinks (nog niet gebouwd in deze mijlpaal).",
+    "minPlayersHint": "Ronde 1 kan pas starten als minstens 5 spelers hun uitnodiging hebben geaccepteerd, ongeacht welke startmodus je hieronder kiest.",
+    "manualResolveHint": "Ongeacht de afhandelingsmodus kun je altijd zelf een ronde vroegtijdig afhandelen zodra elke levende speler heeft gestemd.",
+    "basics": {
+      "heading": "Spelbasis",
+      "gameName": "Spelnaam",
+      "gameNameHint": "Identificeert dit spel voor jou in het GM-paneel -- spelers zien dit nooit.",
+      "displayName": "Jouw weergavenaam",
+      "displayNameHint": "Hoe je verschijnt als Game Master in het verhaal en de eindonthulling -- hoeft niet je echte naam te zijn."
+    },
+    "rules": {
+      "heading": "Rondesregels",
+      "roundInterval": "Rondeinterval (minuten)",
+      "roundIntervalHint": "Hoe lang het stemvenster van elke ronde open blijft voordat deze wordt afgehandeld. Minimaal 10 minuten -- korter kan de automatische afhandelingscontrole missen, die elke 5 minuten draait. Gebruik een groot getal (bijv. 1440 voor een volle dag) voor een asynchroon spel over meerdere dagen.",
+      "missedDeadlineMode": "Modus bij gemiste deadline",
+      "missedDeadlineOptions": {
+        "forfeitFatal": "Niet stemmen is fataal",
+        "noConsequence": "Geen gevolgen",
+        "oneRoundPenalty": "Straf van één ronde"
+      },
+      "missedDeadlineHintPrefix": "Wat er gebeurt met een speler die niet stemt voor de deadline.",
+      "missedDeadlineHints": {
+        "forfeit_fatal": "Het missen van de stemdeadline elimineert die speler, net als weggestemd worden.",
+        "no_consequence": "Het missen van de deadline heeft geen gevolgen, behalve dat die speler deze ronde geen stem uitbrengt.",
+        "one_round_penalty": "Het missen van de deadline sluit de speler alleen de volgende ronde uit van stemmen en het gebruik van krachten -- niet geëlimineerd."
+      },
+      "round1StartMode": "Startmodus ronde 1",
+      "round1StartOptions": {
+        "waitForAll": "Wachten tot iedereen accepteert",
+        "gmManual": "GM start handmatig",
+        "scheduled": "Automatisch starten op een gepland tijdstip"
+      },
+      "round1StartHintPrefix": "Hoe en wanneer ronde 1 begint.",
+      "round1StartHints": {
+        "wait_for_all": "Ronde 1 start automatisch zodra elke uitgenodigde speler zijn uitnodiging heeft ingewisseld.",
+        "gm_manual": "Ronde 1 start pas wanneer jij zelf op \"Start Ronde 1\" klikt, wanneer jij er klaar voor bent.",
+        "scheduled": "Ronde 1 start automatisch op een door jou ingesteld tijdstip, ongeacht wie heeft geaccepteerd. Iedereen die dan zijn uitnodiging nog niet heeft ingewisseld, wordt volledig van het spel uitgesloten."
+      },
+      "roundResolutionMode": "Afhandelingsmodus ronde",
+      "roundResolutionOptions": {
+        "manual": "Altijd handmatig afhandelen",
+        "automatic": "Automatisch, zodra de deadline verstrijkt"
+      },
+      "roundResolutionHintPrefix": "Hoe elke ronde na de eerste eindigt.",
+      "roundResolutionHints": {
+        "manual": "Rondes worden alleen afgehandeld wanneer jij zelf op \"Nu afhandelen\" klikt, ook na het verstrijken van de deadline.",
+        "automatic": "Rondes worden automatisch afgehandeld zodra de deadline verstrijkt -- de app hoeft niet open te staan."
+      },
+      "allowVoteChange": "Spelers mogen hun stem wijzigen",
+      "allowVoteChangeHint": "Indien uit (standaard), staat een stem vast zodra deze is uitgebracht. Indien aan, kan een speler zo vaak opnieuw stemmen als gewenst voordat de ronde wordt afgehandeld -- alleen de laatste stem(men) telt/tellen."
+    },
+    "powers": {
+      "heading": "Verborgen krachten & bots",
+      "doubleVoteEnabled": "Willekeurige dubbele stem",
+      "doubleVoteEnabledHint": "Standaard aan. Elke ronde krijgt willekeurig één levende speler in het geheim een tweede stem -- ze worden privé geïnformeerd en hoeven dit nooit bekend te maken. Dit maakt deel uit van het verborgen-krachtensysteem van het spel: spelers krijgen nooit te horen dat dit bestaat, ze ontdekken het alleen door het zelf mee te maken.",
+      "doubleVoteFloorRounds": "Afkoelperiode dubbele stem (rondes)",
+      "doubleVoteFloorRoundsHint": "Hoeveel recente rondes se houders worden uitgesloten bij het kiezen van de volgende, zodat dezelfde speler niet te snel opnieuw wordt gekozen. Valt terug op kiezen uit alle levende spelers als het uitsluiten van recente houders niemand geschikt zou overlaten (bijv. bij een heel klein aantal spelers). Standaard 2. Zet op -1 voor een strengere regel: elke speler kan de dubbele stem hooguit één keer per spel krijgen -- zodra iedereen aan de beurt is geweest, krijgt niemand deze meer voor de rest van het spel (geen terugval).",
+      "botMode": "Botmodus",
+      "botModeHint": "Vult het spel met door algoritmes bestuurde spelers (voorlopig willekeurige zetten) zodat je solo een volledig spel kunt testen. Je hebt nog steeds minstens één echte speler naast jezelf nodig -- bots vullen een spel aan, ze vervangen het niet.",
+      "botCount": "Aantal bots",
+      "botCountHint": "Hoeveel bots toe te voegen naast de echte spelers die je uitnodigt (max 19, en bots + echte spelers samen moeten binnen de limiet van 20 spelers blijven)."
+    },
+    "access": {
+      "heading": "Toegang",
+      "setupSecret": "Installatiegeheim",
+      "setupSecretHint": "Een gedeeld geheim dat bewijst dat jij een spel mag aanmaken -- los van de uitnodigingslinks die je naar spelers stuurt."
+    },
+    "creating": "Bezig met aanmaken...",
+    "createGame": "Spel aanmaken",
+    "created": "Spel aangemaakt. GM-uitnodigingstoken (eenmalig getoond):",
+    "copy": "Kopiëren"
+  },
+  "gmInvites": {
+    "title": "GM: Uitnodigingen",
+    "description": "Maak een spelersuitnodiging aan, kopieer dan de link en stuur deze zelf -- er is geen verzending binnen de app.",
+    "create": {
+      "heading": "Uitnodiging aanmaken",
+      "namePlaceholder": "weergavenaam speler",
+      "creating": "Bezig met aanmaken...",
+      "createInvite": "Uitnodiging aanmaken",
+      "setupOnly": "Uitnodigingen kunnen alleen worden aangemaakt terwijl het spel in de installatiefase is."
+    },
+    "list": {
+      "heading": "Uitnodigingen ({count})",
+      "empty": "Nog geen uitnodigingen aangemaakt.",
+      "redeemed": "Ingewisseld",
+      "pending": "In afwachting",
+      "copyLink": "Link kopiëren"
+    }
+  },
+  "gmHelplineInbox": {
+    "title": "GM: Hulplijn Inbox",
+    "description": "Er bestaat deze mijlpaal nog geen endpoint om de hulplijn te lezen -- het originele bericht-id moet buiten de app om worden verkregen (bijv. via psql) tot een toekomstige mijlpaal een thread-lijst-endpoint toevoegt.",
+    "reply": {
+      "heading": "Antwoorden",
+      "inReplyToPlaceholder": "origineel bericht-id (uuid)",
+      "bodyPlaceholder": "Je antwoord...",
+      "sending": "Bezig met versturen...",
+      "send": "Antwoord versturen",
+      "sent": "Antwoord verzonden."
+    }
+  },
+  "gmInPlay": {
+    "title": "GM: Bezig",
+    "unnamedGame": "Naamloos spel",
+    "settings": {
+      "heading": "Instellingen",
+      "roundInterval": "Rondeinterval",
+      "minutesSuffix": "{minutes} min",
+      "missedDeadlineMode": "Modus bij gemiste deadline",
+      "round1StartMode": "Startmodus ronde 1",
+      "roundResolutionMode": "Afhandelingsmodus ronde",
+      "allowVoteChange": "Spelers mogen hun stem wijzigen",
+      "doubleVoteEnabled": "Willekeurige dubbele stem",
+      "enabled": "Aan",
+      "disabled": "Uit",
+      "yes": "Ja",
+      "no": "Nee",
+      "doubleVoteFloorRounds": "Afkoelperiode dubbele stem",
+      "onceEver": "Eén keer per speler, ooit",
+      "roundsSuffix": "{count} ronde(s)",
+      "survivalStreakThreshold": "Drempel overlevingsreeks",
+      "created": "Aangemaakt",
+      "loadError": "Instellingen konden niet worden geladen: {error}",
+      "loading": "Instellingen laden..."
+    },
+    "votes": {
+      "heading": "Afgehandelde rondes -- volledige stemverdeling",
+      "hint": "Alleen voor de GM. Spelers zien nooit wie op wie stemde totdat het spel eindigt -- deze weergave is een uitzondering speciaal voor jou, geen verandering in wat spelers te zien krijgen.",
+      "none": "Nog geen rondes afgehandeld.",
+      "round": "Ronde {number}",
+      "eliminated": "Geëlimineerd: {name}",
+      "noOne": "niemand",
+      "randomTieBreak": "(willekeurige gelijkspelbeslissing)",
+      "voter": "Stemmer",
+      "target": "Doelwit",
+      "votesReceived": "Ontvangen stemmen",
+      "doubleVote": "Dubbele stem",
+      "reason": "Reden"
+    },
+    "threeDoors": {
+      "heading": "Drie Deuren",
+      "player": "Speler",
+      "door": "Deur",
+      "outcome": "Uitkomst",
+      "pending": "in afwachting"
+    },
+    "gamePhase": "Spelfase: {phase}",
+    "unknownPhase": "onbekend",
+    "controls": {
+      "starting": "Bezig met starten...",
+      "startRound1": "Start Ronde 1",
+      "resolving": "Bezig met afhandelen...",
+      "resolveNow": "Nu afhandelen",
+      "notReadyResolve": "Nog niet klaar -- de deadline is nog niet verstreken en niet elke levende speler heeft zijn volledige stem(men) uitgebracht.",
+      "resolveDoors": "Deuren afhandelen",
+      "notReadyDoors": "Nog niet klaar -- niet elke levende speler heeft een deur gekozen.",
+      "doorsResolved": "Deuren afgehandeld -- spel voorbij.",
+      "finishing": "Bezig met afronden...",
+      "finishGame": "Spel afronden",
+      "finishGameHint": "Sluit dit spel af en stuurt je terug naar de landingspagina. Een afgerond spel opnieuw bekijken is nog niet gebouwd -- gepland voor een latere versie.",
+      "finishConfirm": "Dit spel afronden? Je kunt het niet meer opnieuw bekijken (nog niet gebouwd) -- dit sluit het alleen af.",
+      "resolutionSummary": "Ronde {number}: {names} geëlimineerd (gelijkspel: {tieBreak}) -> fase {phase}"
+    },
+    "actionLog": {
+      "description": "Log een GM-actie (gelijkspelbeslissing, krachttoekenning, verhaalbewerking of twist). Elke actie wordt gelogd en is controleerbaar.",
+      "actionType": "Actietype",
+      "roundId": "Ronde-id (optioneel)",
+      "power": "Kracht",
+      "targetPlayer": "Doelspeler",
+      "selectPlayer": "Selecteer een speler",
+      "targetRequired": "Kies een doelspeler.",
+      "payload": "Payload (JSON)",
+      "invalidJson": "Payload moet geldige JSON zijn.",
+      "logging": "Bezig met loggen...",
+      "logAction": "Actie loggen",
+      "logged": "Gelogd als {id}."
+    }
+  }
+}
