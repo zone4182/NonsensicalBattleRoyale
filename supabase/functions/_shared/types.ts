@@ -47,6 +47,7 @@ export interface Player {
   role: PlayerRole;
   status: PlayerStatus;
   display_name: string;
+  chosen_display_name: string | null;
   joined_at: string;
   eliminated_in_round_id: string | null;
   vote_suspended_through_round_number: number | null;

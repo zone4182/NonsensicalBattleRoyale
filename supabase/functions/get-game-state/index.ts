@@ -1,6 +1,7 @@
 import { errorResponse, jsonResponse, preflightResponse } from "../_shared/http.ts";
 import { authenticate } from "../_shared/auth.ts";
 import { countActiveVotesForVoter, sql } from "../_shared/db.ts";
+import { publicName } from "../_shared/names.ts";
 import type { Player, Round } from "../_shared/types.ts";
 
 // Read-only. Queries only players/rounds/power_grants/narration_log -- never votes,
@@ -13,7 +14,7 @@ Deno.serve(async (req) => {
     const db = sql();
 
     const roster = await db<Player[]>`
-      select id, display_name, status, role from battle_royale.players
+      select id, display_name, chosen_display_name, status, role from battle_royale.players
       where game_id = ${ctx.game.id}
       order by joined_at asc
     `;
@@ -61,7 +62,7 @@ Deno.serve(async (req) => {
       current_round: openRound
         ? { round_number: openRound.round_number, voting_deadline_at: openRound.voting_deadline_at }
         : null,
-      players: roster.map((p) => ({ id: p.id, display_name: p.display_name, status: p.status, role: p.role })),
+      players: roster.map((p) => ({ id: p.id, display_name: publicName(p.display_name, p.chosen_display_name), status: p.status, role: p.role })),
       your_status: {
         status: ctx.player.status,
         held_powers: grants.map((g) => ({ power_key: g.power_key, category: g.category, count: g.count })),

@@ -24,6 +24,8 @@
     "heading": "You've been invited",
     "subheading": "Enter your personal invite token to arrive at the house.",
     "tokenPlaceholder": "invite token",
+    "displayNamePlaceholder": "your name (optional)",
+    "displayNameHint": "Shown to other players as your name in the roster and narration. Leave blank to use the name the GM invited you as.",
     "redeeming": "Redeeming...",
     "redeemButton": "Redeem invite",
     "errors": {

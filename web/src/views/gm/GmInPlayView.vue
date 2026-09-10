@@ -31,6 +31,12 @@ interface ResolveRoundResponse {
 }
 
 interface GmGameOverview {
+  players: {
+    id: string;
+    display_name: string;
+    status: string;
+    role: string;
+  }[];
   game: {
     round_interval_minutes: number;
     missed_deadline_mode: string;
@@ -140,7 +146,7 @@ async function resolveNow() {
     } else {
       const summaries = res.resolutions.map((r) => {
         const names = r.eliminated_player_ids
-          .map((id) => game.players.find((p) => p.id === id)?.displayName ?? id)
+          .map((id) => overview.value?.players.find((p) => p.id === id)?.display_name ?? id)
           .join(", ");
         return t("gmInPlay.controls.resolutionSummary", {
           number: r.round_number,
@@ -514,11 +520,11 @@ async function submit() {
               disabled
             >{{ t("gmInPlay.actionLog.selectPlayer") }}</option>
             <option
-              v-for="p in game.players.filter((pl) => pl.status === 'alive' && pl.role === 'player')"
+              v-for="p in (overview?.players ?? []).filter((pl) => pl.status === 'alive' && pl.role === 'player')"
               :key="p.id"
               :value="p.id"
             >
-              {{ p.displayName }}
+              {{ p.display_name }}
             </option>
           </select>
         </label>

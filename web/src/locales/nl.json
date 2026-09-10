@@ -24,6 +24,8 @@
     "heading": "Je bent uitgenodigd",
     "subheading": "Voer je persoonlijke uitnodigingstoken in om bij het huis aan te komen.",
     "tokenPlaceholder": "uitnodigingstoken",
+    "displayNamePlaceholder": "jouw naam (optioneel)",
+    "displayNameHint": "Wordt getoond aan andere spelers als jouw naam in de bezetting en het verhaal. Laat leeg om de naam te gebruiken waarmee de GM je heeft uitgenodigd.",
     "redeeming": "Bezig met inwisselen...",
     "redeemButton": "Uitnodiging inwisselen",
     "errors": {

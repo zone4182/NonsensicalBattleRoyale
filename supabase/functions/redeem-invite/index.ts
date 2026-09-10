@@ -2,8 +2,9 @@ import { errorResponse, HttpError, jsonResponse, preflightResponse, readJsonBody
 import { pickDoubleVoteHolder, sql } from "../_shared/db.ts";
 import { grantRandomDrop } from "../_shared/powers.ts";
 import { castBotVotes } from "../_shared/bots.ts";
-import { requireString } from "../_shared/validation.ts";
+import { optionalStringMaxLength, requireString } from "../_shared/validation.ts";
 import { MIN_PLAYERS_TO_START } from "../_shared/constants.ts";
+import { publicName } from "../_shared/names.ts";
 import type { Game, Invite } from "../_shared/types.ts";
 
 // Not authenticated via authenticate() -- the invite isn't redeemed yet, so there's no
@@ -13,6 +14,7 @@ Deno.serve(async (req) => {
   try {
     const body = await readJsonBody<Record<string, unknown>>(req);
     const token = requireString(body, "token");
+    const chosenDisplayName = optionalStringMaxLength(body, "display_name", 60);
 
     const db = sql();
     const result = await db.begin(async (tx) => {
@@ -28,8 +30,8 @@ Deno.serve(async (req) => {
       }
 
       const [player] = await tx`
-        insert into battle_royale.players (game_id, invite_id, role, display_name)
-        values (${invite.game_id}, ${invite.id}, ${invite.role}, ${invite.display_name})
+        insert into battle_royale.players (game_id, invite_id, role, display_name, chosen_display_name)
+        values (${invite.game_id}, ${invite.id}, ${invite.role}, ${invite.display_name}, ${chosenDisplayName ?? null})
         returning id
       `;
 
@@ -93,7 +95,7 @@ Deno.serve(async (req) => {
         role: invite.role,
         gameId: invite.game_id,
         gamePhase,
-        displayName: invite.display_name,
+        displayName: publicName(invite.display_name, chosenDisplayName ?? null),
       };
     });
 

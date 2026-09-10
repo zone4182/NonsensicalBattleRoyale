@@ -1,6 +1,7 @@
 import { errorResponse, jsonResponse, preflightResponse } from "../_shared/http.ts";
 import { authenticate, requireRole } from "../_shared/auth.ts";
 import { revealVotesForGame, sql, type VoteAttribution } from "../_shared/db.ts";
+import { gmName } from "../_shared/names.ts";
 import type { Round } from "../_shared/types.ts";
 
 // GM-only. Three things live here that never appear anywhere else:
@@ -26,10 +27,10 @@ Deno.serve(async (req) => {
       order by round_number asc
     `;
 
-    const players = await db<{ id: string; display_name: string }[]>`
-      select id, display_name from battle_royale.players where game_id = ${ctx.game.id}
+    const players = await db<{ id: string; display_name: string; chosen_display_name: string | null; status: string; role: string }[]>`
+      select id, display_name, chosen_display_name, status, role from battle_royale.players where game_id = ${ctx.game.id}
     `;
-    const nameById = new Map(players.map((p) => [p.id, p.display_name]));
+    const nameById = new Map(players.map((p) => [p.id, gmName(p.display_name, p.chosen_display_name)]));
 
     const votes = await revealVotesForGame(ctx.game.id);
     const votesByRoundId = new Map<string, VoteAttribution[]>();
@@ -47,6 +48,7 @@ Deno.serve(async (req) => {
     `;
 
     return jsonResponse({
+      players: players.map((p) => ({ id: p.id, display_name: nameById.get(p.id) ?? p.display_name, status: p.status, role: p.role })),
       game: {
         round_interval_minutes: ctx.game.round_interval_minutes,
         missed_deadline_mode: ctx.game.missed_deadline_mode,
@@ -74,8 +76,8 @@ Deno.serve(async (req) => {
           tie_break_method: r.tie_break_method,
           resolved_at: r.resolved_at,
           votes: roundVotes.map((v) => ({
-            voter_display_name: v.voter_display_name,
-            target_display_name: v.target_display_name,
+            voter_display_name: gmName(v.voter_display_name, v.voter_chosen_display_name),
+            target_display_name: gmName(v.target_display_name, v.target_chosen_display_name),
             target_vote_count: countByTarget.get(v.target_player_id) ?? 0,
             is_double_vote: v.is_double_vote,
             reason: v.reason,

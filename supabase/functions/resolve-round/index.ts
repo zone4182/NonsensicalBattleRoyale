@@ -11,6 +11,7 @@ import {
 } from "../_shared/db.ts";
 import { evaluateEarnTriggers, grantRandomDrop } from "../_shared/powers.ts";
 import { castBotDoorPicks, castBotVotes } from "../_shared/bots.ts";
+import { publicName } from "../_shared/names.ts";
 import type { Game, Player, PowerGrant, Round } from "../_shared/types.ts";
 
 interface Resolution {
@@ -89,7 +90,7 @@ Deno.serve(async (req) => {
           where game_id = ${game.id} and status = 'alive' and role = 'player'
         `;
         const aliveIds = aliveRoster.map((p) => p.id);
-        const nameById = new Map(aliveRoster.map((p) => [p.id, p.display_name]));
+        const nameById = new Map(aliveRoster.map((p) => [p.id, publicName(p.display_name, p.chosen_display_name)]));
 
         // Armed defensive grants for THIS round -- all of them are resolved one way or
         // another by the end of this transaction, since their armed window has passed

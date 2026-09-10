@@ -84,8 +84,10 @@ export interface VoteAttribution {
   round_number: number;
   voter_player_id: string;
   voter_display_name: string;
+  voter_chosen_display_name: string | null;
   target_player_id: string;
   target_display_name: string;
+  target_chosen_display_name: string | null;
   is_double_vote: boolean;
   reason: string | null;
   cast_at: string;
@@ -98,8 +100,10 @@ export async function revealVotesForGame(gameId: string): Promise<VoteAttributio
       r.round_number,
       voter.id as voter_player_id,
       voter.display_name as voter_display_name,
+      voter.chosen_display_name as voter_chosen_display_name,
       target.id as target_player_id,
       target.display_name as target_display_name,
+      target.chosen_display_name as target_chosen_display_name,
       v.is_double_vote,
       v.reason,
       v.cast_at

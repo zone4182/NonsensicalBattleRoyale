@@ -21,6 +21,7 @@ const router = useRouter();
 const session = useSessionStore();
 
 const token = ref(typeof route.params.token === "string" ? route.params.token : "");
+const displayName = ref("");
 const pending = ref(false);
 const errorMessage = ref<string | null>(null);
 
@@ -29,7 +30,10 @@ async function redeem() {
   pending.value = true;
   errorMessage.value = null;
   try {
-    const res = await callFunction<RedeemResponse>("redeem-invite", { token: token.value.trim() });
+    const res = await callFunction<RedeemResponse>("redeem-invite", {
+      token: token.value.trim(),
+      display_name: displayName.value.trim() || undefined,
+    });
     session.setSession({
       token: token.value.trim(),
       role: res.role,
@@ -69,6 +73,13 @@ async function redeem() {
           :placeholder="t('join.tokenPlaceholder')"
           :disabled="pending"
         >
+        <input
+          v-model="displayName"
+          type="text"
+          :placeholder="t('join.displayNamePlaceholder')"
+          :disabled="pending"
+          maxlength="60"
+        >
         <button
           type="submit"
           :disabled="pending || !token.trim()"
@@ -76,6 +87,9 @@ async function redeem() {
           {{ pending ? t("join.redeeming") : t("join.redeemButton") }}
         </button>
       </form>
+      <p class="field-hint">
+        {{ t("join.displayNameHint") }}
+      </p>
       <p
         v-if="errorMessage"
         class="error"
@@ -99,16 +113,22 @@ async function redeem() {
 
 .redeem-form {
   display: flex;
+  flex-direction: column;
   gap: var(--nbr-space-2);
 }
 
 .redeem-form input {
-  flex: 1;
   background: var(--nbr-bg-raised);
   color: var(--nbr-fg);
   border: 1px solid var(--nbr-border);
   padding: var(--nbr-space-2);
   font-family: inherit;
+}
+
+.field-hint {
+  color: var(--nbr-muted);
+  font-size: 0.85em;
+  margin-top: var(--nbr-space-2);
 }
 
 .error {
