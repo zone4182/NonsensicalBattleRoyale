@@ -7,7 +7,8 @@
   },
   "home": {
     "title": "Nonsensical Battle Royale",
-    "tagline": "Where Clue, Diplomacy, Werewolf, Among Us, and Machiavelli meet. An asynchronous social deduction game, played with real friends over real days. Accept your invite, and something starts. Every round, everyone votes in secret on who doesn't make it to the next one.",
+    "subtitle": "The question is... who's next?",
+    "tagline": "Where Clue, Diplomacy, Werewolf, Among Us, and Machiavelli meet. An asynchronous social deduction game, played with real friends over real days. Accept your invite, and find out what fate has in store for you. Every round, everyone votes in secret on who doesn't make it to the next one.",
     "hostGame": "Host a new game",
     "joinGame": "Join a game",
     "installApp": "Install app",
@@ -111,9 +112,12 @@
   },
   "notifications": {
     "enable": "Enable notifications",
-    "disable": "Disable notifications",
-    "updating": "Updating...",
-    "deniedHint": "Notifications are blocked for this site -- enable them in your browser or device settings to turn them back on."
+    "deniedHint": "Notifications are blocked for this site -- enable them in your browser or device settings to turn them back on.",
+    "unsupportedHint": "Notifications aren't supported in this browser."
+  },
+  "playerSettings": {
+    "button": "Settings",
+    "title": "Settings"
   },
   "voteAction": {
     "ghostNotice": "You're a ghost -- spectating only. (Seance, GAME-DESIGN.md's ghost-only vote on this round's narration flavor, isn't wired up yet.)",

@@ -7,7 +7,8 @@
   },
   "home": {
     "title": "Nonsensical Battle Royale",
-    "tagline": "Waar Cluedo, Diplomacy, Werewolf, Among Us en Machiavelli samenkomen. Een asynchroon sociaal deductiespel, gespeeld met echte vrienden over echte dagen. Accepteer je uitnodiging, en er begint iets. Elke ronde stemt iedereen in het geheim op wie de volgende ronde niet haalt.",
+    "subtitle": "De vraag is... wie is de volgende?",
+    "tagline": "Waar Cluedo, Diplomacy, Werewolf, Among Us en Machiavelli samenkomen. Een asynchroon sociaal deductiespel, gespeeld met echte vrienden over echte dagen. Accepteer je uitnodiging, en kom erachter wat het lot voor je in petto heeft. Elke ronde stemt iedereen in het geheim op wie de volgende ronde niet haalt.",
     "hostGame": "Start een nieuw spel",
     "joinGame": "Doe mee aan een spel",
     "installApp": "App installeren",
@@ -111,9 +112,12 @@
   },
   "notifications": {
     "enable": "Meldingen inschakelen",
-    "disable": "Meldingen uitschakelen",
-    "updating": "Bezig met bijwerken...",
-    "deniedHint": "Meldingen zijn geblokkeerd voor deze site -- schakel ze weer in via je browser- of apparaatinstellingen."
+    "deniedHint": "Meldingen zijn geblokkeerd voor deze site -- schakel ze weer in via je browser- of apparaatinstellingen.",
+    "unsupportedHint": "Meldingen worden niet ondersteund in deze browser."
+  },
+  "playerSettings": {
+    "button": "Instellingen",
+    "title": "Instellingen"
   },
   "voteAction": {
     "ghostNotice": "Je bent een geest -- alleen toeschouwer. (De Seance, GAME-DESIGN.md's geest-only stem op de verteltoon van deze ronde, is nog niet aangesloten.)",

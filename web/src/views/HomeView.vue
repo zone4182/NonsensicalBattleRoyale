@@ -14,6 +14,9 @@ const showIosModal = ref(false);
   <FullscreenLayout>
     <div class="home-content">
       <h1>{{ t("home.title") }}</h1>
+      <p class="subtitle">
+        {{ t("home.subtitle") }}
+      </p>
       <p class="tagline">
         {{ t("home.tagline") }}
       </p>
@@ -65,9 +68,17 @@ const showIosModal = ref(false);
   text-align: center;
 }
 
+.subtitle {
+  color: var(--nbr-accent);
+  font-family: var(--nbr-font-display);
+  font-size: 1em;
+  margin-top: var(--nbr-space-2);
+}
+
 .tagline {
   color: var(--nbr-muted);
   max-width: 46ch;
+  margin-top: var(--nbr-space-3);
   margin-left: auto;
   margin-right: auto;
 }

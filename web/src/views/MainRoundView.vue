@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, watch } from "vue";
+import { onMounted, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import { useRouter } from "vue-router";
 import RoundHeader from "../components/round/RoundHeader.vue";
@@ -9,6 +9,7 @@ import PlayerRoster from "../components/round/PlayerRoster.vue";
 import YourStatusPanel from "../components/round/YourStatusPanel.vue";
 import NarrationLog from "../components/round/NarrationLog.vue";
 import VoteActionPanel from "../components/round/VoteActionPanel.vue";
+import PlayerSettingsModal from "../components/PlayerSettingsModal.vue";
 import { useGameStore } from "../stores/game";
 import { useSessionStore } from "../stores/session";
 import { useUiStore } from "../stores/ui";
@@ -26,6 +27,7 @@ const game = useGameStore();
 const session = useSessionStore();
 const ui = useUiStore();
 const { pending, run } = useApiCall();
+const showSettings = ref(false);
 
 onMounted(() => {
   if (session.token) run(() => game.refresh(session.token as string));
@@ -63,9 +65,20 @@ watch(
       <CinematicViewport />
     </div>
     <div class="area-hub pixel-frame">
+      <button
+        type="button"
+        class="settings-button"
+        @click="showSettings = true"
+      >
+        {{ t("playerSettings.button") }}
+      </button>
       <PlayerRoster />
       <YourStatusPanel />
     </div>
+    <PlayerSettingsModal
+      :open="showSettings"
+      @close="showSettings = false"
+    />
     <div class="area-narration pixel-frame">
       <NarrationLog />
     </div>
@@ -187,5 +200,19 @@ watch(
 }
 .area-action {
   grid-area: action;
+}
+
+.settings-button {
+  align-self: flex-start;
+  background: none;
+  color: var(--nbr-muted);
+  border: 1px solid var(--nbr-border);
+  padding: var(--nbr-space-1) var(--nbr-space-2);
+  font-size: 0.85em;
+}
+
+.settings-button:hover {
+  color: var(--nbr-fg);
+  border-color: var(--nbr-accent);
 }
 </style>
