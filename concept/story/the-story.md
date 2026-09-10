@@ -10,19 +10,19 @@ Maar helaas heeft het lot een sinistere wending voor jullie in petto.
 
 ## Hoofdstuk 2: Een Duistere Ontdekking
 
-Terwijl jullie de puzzelstukjes van jullie omgeving proberen samen te voegen, dringt een verontrustend besef tot jullie door. Jullie dierbare vriend, degene die altijd jullie avonturen orkestreerde en jullie paden leidde — <naam hier> (aka de Spelleider) — is plotseling overleden. Hij wordt met een mes in zijn rug dood aangetroffen, en dit werpt een schaduw van onzekerheid over jullie bijeenkomst.
+Terwijl jullie de puzzelstukjes van jullie omgeving proberen samen te voegen, dringt een verontrustend besef tot jullie door. Jullie dierbare vriend, degene die altijd jullie avonturen orkestreerde en jullie paden leidde — <naam hier> (aka de Spelleider) — is dood. Jullie vinden hem in een brede plas geronnen bloed, een diepe messteek in zijn rug, zijn ogen nog wijd open van doodsangst. De geur van bloed hangt zwaar in de lucht. Dit was geen ongeluk — en wie dit deed, bevindt zich nog ergens onder jullie.
 
 ## Hoofdstuk 3: Wantrouwen Sluipt Binnen
 
 In deze onverwachte wending begint de warmte van vriendschap te vervagen naarmate argwaan jullie harten binnendringt. De eens hechte groep raakt verstrikt in een web van samenzwering, waar overleven het ultieme doel wordt.
 
-Want slechts één van jullie zal de kans verdienen om naar huis terug te keren, terwijl de rest een gruwelijk lot wacht.
+Want slechts één van jullie zal dit huis levend verlaten; voor de rest wacht een meedogenloos, gruwelijk einde.
 
 ## Hoofdstuk 4: De Wekelijkse Stemming
 
 Met elke voorbije week, wanneer de zon ondergaat, zullen jullie samenkomen om jullie stemmen uit te brengen en zo te beslissen welke ongelukkige ziel het volgende slachtoffer zal worden.
 
-De inzet is hoog, want zij die worden uitgestemd zullen een gruwelijk einde tegemoet gaan, hun geesten veroordeeld om voor altijd in dit huis rond te dwalen.
+De inzet is hoog: wie wordt uitgestemd, sterft een gruwelijke dood, en hun geest blijft voor altijd gevangen, dwalend door dit huis.
 
 ## Hoofdstuk 5: Het Leven als Geest
 
@@ -56,19 +56,19 @@ But alas, fate has a sinister twist in store for you.
 
 ## Chapter 2: A Dark Discovery
 
-As you try to piece together your surroundings, a disturbing realization dawns on you. Your dear friend, the one who always orchestrated your adventures and guided your paths — <name here> (aka the Game Master) — has suddenly passed away. He is found dead with a knife in his back, casting a shadow of uncertainty over your gathering.
+As you try to piece together your surroundings, a disturbing realization dawns on you. Your dear friend, the one who always orchestrated your adventures and guided your paths — <name here> (aka the Game Master) — is dead. You find him in a wide pool of clotted blood, a deep stab wound in his back, his eyes still wide with terror. The smell of blood hangs heavy in the air. This was no accident — and whoever did it is still among you.
 
 ## Chapter 3: Suspicion Creeps In
 
 In this unexpected turn of events, the warmth of friendship begins to fade as suspicion creeps into your hearts. The once close-knit group becomes entangled in a web of conspiracy, where survival becomes the ultimate goal.
 
-For only one of you will earn the chance to return home, while the rest await a gruesome fate.
+For only one of you will leave this house alive; a merciless, gruesome end awaits the rest.
 
 ## Chapter 4: The Weekly Vote
 
 With each passing week, as the sun sets, you will gather to cast your votes and decide who among you will become the next unfortunate victim.
 
-The stakes are high, for those who are voted out will meet a grisly end, their spirits condemned to wander this house forever.
+The stakes are high: whoever is voted out dies a gruesome death, their spirit trapped forever, wandering this house.
 
 ## Chapter 5: Life as a Ghost
 

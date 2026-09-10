@@ -39,6 +39,8 @@ Een kort bericht na het accepteren van de uitnodiging: geduld, er wordt gewacht 
 
 Na het accepteren van de uitnodiging reizen jullie af naar het landhuis dat in de brief werd genoemd. Bij aankomst tref je oude vrienden, de één nog blijer om je te zien dan de ander. Er wordt gelachen, gedronken, oude verhalen worden opgehaald, en er wordt uitgebreid ruzie gemaakt over wie waar slaapt. Tot diep in de nacht wordt er bijgepraat, tot uiteindelijk iedereen naar bed gaat.
 
+Niemand van jullie vermoedt dat dit de laatste avond zal zijn waarop alles nog normaal voelt.
+
 ## Fase 4: Het Ontwaken en een Duistere Ontdekking
 
 *Geen gameplay — alleen verhaal.*
@@ -98,6 +100,8 @@ A short message after accepting the invitation: be patient, everyone is waiting 
 *No gameplay — story only. Triggered either manually by the Game Master or automatically once every invite has been accepted.*
 
 Having accepted the invitation, you travel to the mansion mentioned in the letter. On arrival you find your old friends, each one happier to see you than the last. There's laughter, drinks, old stories being retold, and no shortage of arguing over who sleeps where. The catching-up runs deep into the night, until everyone finally goes to bed.
+
+None of you suspect that this will be the last night anything still feels normal.
 
 ## Phase 4: The Awakening and a Dark Discovery
 
