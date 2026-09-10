@@ -55,6 +55,7 @@ Deno.serve(async (req) => {
         round1_start_mode: ctx.game.round1_start_mode,
         round_resolution_mode: ctx.game.round_resolution_mode,
         allow_vote_change: ctx.game.allow_vote_change,
+        tie_break_mode: ctx.game.tie_break_mode,
         double_vote_enabled: ctx.game.double_vote_enabled,
         double_vote_floor_rounds: ctx.game.double_vote_floor_rounds,
         survival_streak_threshold: ctx.game.survival_streak_threshold,

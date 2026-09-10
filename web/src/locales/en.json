@@ -193,6 +193,16 @@
         "no_consequence": "Missing the deadline does nothing beyond that player not casting a vote this round.",
         "one_round_penalty": "Missing the deadline excludes the player from voting and using powers next round only -- not eliminated."
       },
+      "tieBreakMode": "Tie-break behavior",
+      "tieBreakOptions": {
+        "random": "Coin flip",
+        "noElimination": "No one dies"
+      },
+      "tieBreakHintPrefix": "What happens when two or more players are tied for the most votes.",
+      "tieBreakHints": {
+        "random": "A random one of the tied players is eliminated, same as a real coin flip.",
+        "no_elimination": "No one is eliminated this round -- the narration announces that everyone got lucky and lives to see another day."
+      },
       "round1StartMode": "Round 1 start mode",
       "round1StartOptions": {
         "waitForAll": "Wait until everyone accepts",
@@ -280,6 +290,9 @@
       "round1StartMode": "Round 1 start mode",
       "roundResolutionMode": "Round resolution mode",
       "allowVoteChange": "Players can change their vote",
+      "tieBreakMode": "Tie-break behavior",
+      "tieBreakRandom": "Coin flip",
+      "tieBreakNoElimination": "No one dies",
       "doubleVoteEnabled": "Random double vote",
       "enabled": "Enabled",
       "disabled": "Disabled",
@@ -301,6 +314,7 @@
       "eliminated": "Eliminated: {name}",
       "noOne": "no one",
       "randomTieBreak": "(random tie-break)",
+      "noEliminationTieBreak": "(tied -- no one eliminated)",
       "voter": "Voter",
       "target": "Target",
       "votesReceived": "Votes received",

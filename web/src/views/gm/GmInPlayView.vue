@@ -21,7 +21,7 @@ interface Resolution {
   round_id: string;
   round_number: number;
   eliminated_player_ids: string[];
-  tie_break_method: "none" | "random";
+  tie_break_method: "none" | "random" | "no_elimination";
   new_phase: string;
 }
 
@@ -43,6 +43,7 @@ interface GmGameOverview {
     round1_start_mode: string;
     round_resolution_mode: string;
     allow_vote_change: boolean;
+    tie_break_mode: string;
     double_vote_enabled: boolean;
     double_vote_floor_rounds: number;
     survival_streak_threshold: number;
@@ -331,6 +332,16 @@ async function submit() {
             <td>{{ overview.game.allow_vote_change ? t("gmInPlay.settings.yes") : t("gmInPlay.settings.no") }}</td>
           </tr>
           <tr>
+            <th>{{ t("gmInPlay.settings.tieBreakMode") }}</th>
+            <td>
+              {{
+                overview.game.tie_break_mode === "no_elimination"
+                  ? t("gmInPlay.settings.tieBreakNoElimination")
+                  : t("gmInPlay.settings.tieBreakRandom")
+              }}
+            </td>
+          </tr>
+          <tr>
             <th>{{ t("gmInPlay.settings.doubleVoteEnabled") }}</th>
             <td>{{ overview.game.double_vote_enabled ? t("gmInPlay.settings.enabled") : t("gmInPlay.settings.disabled") }}</td>
           </tr>
@@ -381,6 +392,7 @@ async function submit() {
       <p>
         {{ t("gmInPlay.votes.eliminated", { name: round.eliminated_player_display_name ?? t("gmInPlay.votes.noOne") }) }}
         <span v-if="round.tie_break_method === 'random'">{{ t("gmInPlay.votes.randomTieBreak") }}</span>
+        <span v-else-if="round.tie_break_method === 'no_elimination'">{{ t("gmInPlay.votes.noEliminationTieBreak") }}</span>
       </p>
       <div class="table-scroll">
         <table class="votes-table">

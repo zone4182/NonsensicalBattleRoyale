@@ -14,11 +14,12 @@ import { generateInviteToken } from "../_shared/tokens.ts";
 import { createBotPlayers } from "../_shared/bots.ts";
 import { enforceRateLimit } from "../_shared/rateLimit.ts";
 import { MIN_ROUND_INTERVAL_MINUTES } from "../_shared/constants.ts";
-import type { MissedDeadlineMode, Round1StartMode, RoundResolutionMode } from "../_shared/types.ts";
+import type { MissedDeadlineMode, Round1StartMode, RoundResolutionMode, TieBreakMode } from "../_shared/types.ts";
 
 const MISSED_DEADLINE_MODES: readonly MissedDeadlineMode[] = ["forfeit_fatal", "no_consequence", "one_round_penalty"];
 const ROUND1_START_MODES: readonly Round1StartMode[] = ["wait_for_all", "gm_manual", "scheduled"];
 const ROUND_RESOLUTION_MODES: readonly RoundResolutionMode[] = ["automatic", "manual"];
+const TIE_BREAK_MODES: readonly TieBreakMode[] = ["random", "no_elimination"];
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return preflightResponse();
@@ -47,6 +48,7 @@ Deno.serve(async (req) => {
     // -1 is a sentinel: each player holds the double vote at most once per game, ever
     // -- see pickDoubleVoteHolder in _shared/db.ts.
     const doubleVoteFloorRounds = optionalIntInRangeOrSentinel(body, "double_vote_floor_rounds", 1, 20, -1) ?? 2;
+    const tieBreakMode = optionalOneOf(body, "tie_break_mode", TIE_BREAK_MODES) ?? "random";
 
     const db = sql();
 
@@ -54,10 +56,10 @@ Deno.serve(async (req) => {
       const [game] = await tx`
         insert into battle_royale.games
           (name, round_interval_minutes, missed_deadline_mode, round1_start_mode, round_resolution_mode,
-           allow_vote_change, double_vote_enabled, double_vote_floor_rounds)
+           allow_vote_change, double_vote_enabled, double_vote_floor_rounds, tie_break_mode)
         values (
           ${name}, ${roundIntervalMinutes}, ${missedDeadlineMode}, ${round1StartMode},
-          ${roundResolutionMode}, ${allowVoteChange}, ${doubleVoteEnabled}, ${doubleVoteFloorRounds}
+          ${roundResolutionMode}, ${allowVoteChange}, ${doubleVoteEnabled}, ${doubleVoteFloorRounds}, ${tieBreakMode}
         )
         returning id
       `;

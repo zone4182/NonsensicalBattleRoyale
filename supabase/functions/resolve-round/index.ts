@@ -139,12 +139,16 @@ Deno.serve(async (req) => {
         const nonVoters = await playersWithNoVoteInRound(round.id, aliveIds);
 
         let eliminatedByVote: string | null = null;
-        let tieBreakMethod: "none" | "random" = "none";
+        let tieBreakMethod: "none" | "random" | "no_elimination" = "none";
         if (tally.length > 0) {
           const maxVotes = Math.max(...tally.map((t) => t.voteCount));
           const topTargets = tally.filter((t) => t.voteCount === maxVotes).map((t) => t.targetPlayerId);
           if (topTargets.length === 1) {
             eliminatedByVote = topTargets[0];
+          } else if (game.tie_break_mode === "no_elimination") {
+            // GM-configured alternative to the coin flip below: a tie means no one
+            // dies this round at all, rather than randomly picking among the tied.
+            tieBreakMethod = "no_elimination";
           } else {
             eliminatedByVote = topTargets[Math.floor(Math.random() * topTargets.length)];
             tieBreakMethod = "random";
@@ -211,6 +215,8 @@ Deno.serve(async (req) => {
             tieBreakMethod === "random"
               ? `Round ${round.round_number} ends in a dead-even tie. Fate (and a coin toss) chose ${name} to be eliminated.`
               : `Round ${round.round_number} is over. The house has spoken: ${name} is eliminated.`;
+        } else if (tieBreakMethod === "no_elimination") {
+          narration = `Round ${round.round_number} ends in a dead-even tie. Fortunately, everyone lives to see another day.`;
         } else if (tally.length > 0) {
           narration = `Round ${round.round_number} is over. The votes are in, but the house's chosen target walks away unharmed.`;
         } else {

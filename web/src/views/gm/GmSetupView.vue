@@ -23,10 +23,15 @@ const roundResolutionMode = ref<"manual" | "automatic">("manual");
 const allowVoteChange = ref(false);
 const doubleVoteEnabled = ref(true);
 const doubleVoteFloorRounds = ref(2);
+// Extensible on purpose -- 'random' is the existing coin-flip-among-the-tied
+// behavior; 'no_elimination' is new. More tie-break strategies can be added to this
+// list later without touching anything else here.
+const tieBreakMode = ref<"random" | "no_elimination">("random");
 
 const roundResolutionModeHint = computed(() => t(`gmSetup.rules.roundResolutionHints.${roundResolutionMode.value}`));
 const missedDeadlineModeHint = computed(() => t(`gmSetup.rules.missedDeadlineHints.${missedDeadlineMode.value}`));
 const round1StartModeHint = computed(() => t(`gmSetup.rules.round1StartHints.${round1StartMode.value}`));
+const tieBreakModeHint = computed(() => t(`gmSetup.rules.tieBreakHints.${tieBreakMode.value}`));
 
 const pending = ref(false);
 const errorMessage = ref<string | null>(null);
@@ -48,6 +53,7 @@ async function createGame() {
         bot_count: botMode.value ? botCount.value : undefined,
         round_resolution_mode: roundResolutionMode.value,
         allow_vote_change: allowVoteChange.value,
+        tie_break_mode: tieBreakMode.value,
         double_vote_enabled: doubleVoteEnabled.value,
         double_vote_floor_rounds: doubleVoteEnabled.value ? doubleVoteFloorRounds.value : undefined,
       },
@@ -129,6 +135,14 @@ async function copyToken() {
               <option value="one_round_penalty">{{ t("gmSetup.rules.missedDeadlineOptions.oneRoundPenalty") }}</option>
             </select>
             <span class="field-hint">{{ t("gmSetup.rules.missedDeadlineHintPrefix") }} {{ missedDeadlineModeHint }}</span>
+          </label>
+          <label>
+            {{ t("gmSetup.rules.tieBreakMode") }}
+            <select v-model="tieBreakMode">
+              <option value="random">{{ t("gmSetup.rules.tieBreakOptions.random") }}</option>
+              <option value="no_elimination">{{ t("gmSetup.rules.tieBreakOptions.noElimination") }}</option>
+            </select>
+            <span class="field-hint">{{ t("gmSetup.rules.tieBreakHintPrefix") }} {{ tieBreakModeHint }}</span>
           </label>
           <label>
             {{ t("gmSetup.rules.round1StartMode") }}

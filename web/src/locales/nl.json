@@ -193,6 +193,16 @@
         "no_consequence": "Het missen van de deadline heeft geen gevolgen, behalve dat die speler deze ronde geen stem uitbrengt.",
         "one_round_penalty": "Het missen van de deadline sluit de speler alleen de volgende ronde uit van stemmen en het gebruik van krachten -- niet geëlimineerd."
       },
+      "tieBreakMode": "Gedrag bij gelijkspel",
+      "tieBreakOptions": {
+        "random": "Muntje opgooien",
+        "noElimination": "Niemand gaat dood"
+      },
+      "tieBreakHintPrefix": "Wat er gebeurt als twee of meer spelers gelijk staan voor de meeste stemmen.",
+      "tieBreakHints": {
+        "random": "Willekeurig een van de gelijkstaande spelers wordt geëlimineerd, als een echte muntworp.",
+        "no_elimination": "Niemand wordt deze ronde geëlimineerd -- het verhaal meldt dat iedereen geluk had en een dag langer leeft."
+      },
       "round1StartMode": "Startmodus ronde 1",
       "round1StartOptions": {
         "waitForAll": "Wachten tot iedereen accepteert",
@@ -280,6 +290,9 @@
       "round1StartMode": "Startmodus ronde 1",
       "roundResolutionMode": "Afhandelingsmodus ronde",
       "allowVoteChange": "Spelers mogen hun stem wijzigen",
+      "tieBreakMode": "Gedrag bij gelijkspel",
+      "tieBreakRandom": "Muntje opgooien",
+      "tieBreakNoElimination": "Niemand gaat dood",
       "doubleVoteEnabled": "Willekeurige dubbele stem",
       "enabled": "Aan",
       "disabled": "Uit",
@@ -301,6 +314,7 @@
       "eliminated": "Geëlimineerd: {name}",
       "noOne": "niemand",
       "randomTieBreak": "(willekeurige gelijkspelbeslissing)",
+      "noEliminationTieBreak": "(gelijkspel -- niemand geëlimineerd)",
       "voter": "Stemmer",
       "target": "Doelwit",
       "votesReceived": "Ontvangen stemmen",
