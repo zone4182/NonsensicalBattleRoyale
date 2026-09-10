@@ -1,0 +1,31 @@
+/* Arcade/8-bit UI window border -- chamfered pixel corners, 100% CSS (no images or SVG).
+   The corner "notch" is 4 overlapping linear-gradients per corner (one horizontal strip,
+   one vertical strip) that punch an L-shaped hole back to the page background, right at
+   the border box's corner -- the classic retro console UI frame look. */
+
+.pixel-frame {
+  --nbr-frame-border: 3px;
+  --nbr-frame-notch: 6px;
+
+  position: relative;
+  background: var(--nbr-bg-raised);
+  border: var(--nbr-frame-border) solid var(--nbr-accent);
+}
+
+.pixel-frame::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(to right, var(--nbr-bg) var(--nbr-frame-notch), transparent 0) top left,
+    linear-gradient(to bottom, var(--nbr-bg) var(--nbr-frame-notch), transparent 0) top left,
+    linear-gradient(to left, var(--nbr-bg) var(--nbr-frame-notch), transparent 0) top right,
+    linear-gradient(to bottom, var(--nbr-bg) var(--nbr-frame-notch), transparent 0) top right,
+    linear-gradient(to right, var(--nbr-bg) var(--nbr-frame-notch), transparent 0) bottom left,
+    linear-gradient(to top, var(--nbr-bg) var(--nbr-frame-notch), transparent 0) bottom left,
+    linear-gradient(to left, var(--nbr-bg) var(--nbr-frame-notch), transparent 0) bottom right,
+    linear-gradient(to top, var(--nbr-bg) var(--nbr-frame-notch), transparent 0) bottom right;
+  background-repeat: no-repeat;
+  background-size: var(--nbr-frame-notch) var(--nbr-frame-notch);
+}

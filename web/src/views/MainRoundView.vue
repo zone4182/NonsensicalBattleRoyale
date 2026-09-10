@@ -50,16 +50,14 @@ watch(
     <div class="area-header">
       <RoundHeader />
     </div>
-    <div class="area-viewport">
+    <div class="area-viewport pixel-frame">
       <CinematicViewport />
     </div>
-    <div class="area-roster">
+    <div class="area-hub pixel-frame">
       <PlayerRoster />
-    </div>
-    <div class="area-status">
       <YourStatusPanel />
     </div>
-    <div class="area-narration">
+    <div class="area-narration pixel-frame">
       <NarrationLog />
     </div>
     <div class="area-action">
@@ -85,8 +83,8 @@ watch(
   display: grid;
   grid-template-areas:
     "header header"
-    "viewport roster"
-    "viewport status"
+    "viewport hub"
+    "viewport hub"
     "narration action";
   grid-template-columns: 2fr 1fr;
   grid-template-rows: auto auto auto 1fr;
@@ -99,16 +97,20 @@ watch(
 }
 .area-viewport {
   grid-area: viewport;
+  padding: var(--nbr-space-3);
 }
-.area-roster {
-  grid-area: roster;
-}
-.area-status {
-  grid-area: status;
+.area-hub {
+  grid-area: hub;
+  padding: var(--nbr-space-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--nbr-space-3);
+  overflow-y: auto;
 }
 .area-narration {
   grid-area: narration;
   min-height: 0;
+  padding: var(--nbr-space-3);
 }
 .area-action {
   grid-area: action;
