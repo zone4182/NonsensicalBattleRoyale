@@ -306,6 +306,11 @@
       "loadError": "Instellingen konden niet worden geladen: {error}",
       "loading": "Instellingen laden..."
     },
+    "currentRound": {
+      "heading": "Huidige ronde ({number}) -- stemstatus",
+      "player": "Speler",
+      "voteCast": "Stem uitgebracht"
+    },
     "votes": {
       "heading": "Afgehandelde rondes -- volledige stemverdeling",
       "hint": "Alleen voor de GM. Spelers zien nooit wie op wie stemde totdat het spel eindigt -- deze weergave is een uitzondering speciaal voor jou, geen verandering in wat spelers te zien krijgen.",

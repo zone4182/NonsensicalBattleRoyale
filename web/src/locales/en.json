@@ -306,6 +306,11 @@
       "loadError": "Couldn't load settings: {error}",
       "loading": "Loading settings..."
     },
+    "currentRound": {
+      "heading": "Current round ({number}) -- vote status",
+      "player": "Player",
+      "voteCast": "Vote cast"
+    },
     "votes": {
       "heading": "Resolved rounds -- full vote breakdown",
       "hint": "GM-only. Players never see who voted for whom until the game ends -- this view is an exception made specifically for you, not a change to what players are shown.",

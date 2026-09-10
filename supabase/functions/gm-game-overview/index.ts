@@ -1,10 +1,10 @@
 import { errorResponse, jsonResponse, preflightResponse } from "../_shared/http.ts";
 import { authenticate, requireRole } from "../_shared/auth.ts";
-import { revealVotesForGame, sql, type VoteAttribution } from "../_shared/db.ts";
+import { countActiveVotesForVoter, revealVotesForGame, sql, type VoteAttribution } from "../_shared/db.ts";
 import { gmName } from "../_shared/names.ts";
 import type { Round } from "../_shared/types.ts";
 
-// GM-only. Three things live here that never appear anywhere else:
+// GM-only. Four things live here that never appear anywhere else:
 //   1. The game's own settings (round timing, missed-deadline/round1-start/resolution
 //      modes, vote-change) -- ctx.game already has the full row, no extra query needed.
 //   2. Full vote attribution (who voted for whom) per resolved round -- see
@@ -12,6 +12,10 @@ import type { Round } from "../_shared/types.ts";
 //      specifically, live, unlike the player-facing end-of-game-only reveal.
 //   3. Three Doors picks, live -- door_picks was never anonymity-gated the way votes
 //      is (no "only the reveal function" rule for this table), so this is a plain read.
+//   4. The CURRENT open round's per-player "has voted yet" status -- boolean only, via
+//      countActiveVotesForVoter (never touches a vote's target), so it never crosses
+//      the "who voted for whom stays unrevealed until resolved" boundary the way
+//      revealVotesForGame's own restriction to resolved rounds protects.
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return preflightResponse();
   try {
@@ -47,8 +51,31 @@ Deno.serve(async (req) => {
       order by picked_at asc
     `;
 
+    const [openRound] = await db<Round[]>`
+      select * from battle_royale.rounds where game_id = ${ctx.game.id} and resolved_at is null
+      order by round_number desc limit 1
+    `;
+
+    let currentRound = null;
+    if (openRound) {
+      const aliveRoster = players.filter((p) => p.status === "alive" && p.role === "player");
+      const voteStatuses = await Promise.all(
+        aliveRoster.map(async (p) => {
+          const entitlement = openRound.double_vote_player_id === p.id ? 2 : 1;
+          const cast = await countActiveVotesForVoter(openRound.id, p.id);
+          return { id: p.id, display_name: nameById.get(p.id) ?? p.display_name, voted: cast >= entitlement };
+        }),
+      );
+      currentRound = {
+        round_number: openRound.round_number,
+        voting_deadline_at: openRound.voting_deadline_at,
+        players: voteStatuses,
+      };
+    }
+
     return jsonResponse({
       players: players.map((p) => ({ id: p.id, display_name: nameById.get(p.id) ?? p.display_name, status: p.status, role: p.role })),
+      current_round: currentRound,
       game: {
         round_interval_minutes: ctx.game.round_interval_minutes,
         missed_deadline_mode: ctx.game.missed_deadline_mode,

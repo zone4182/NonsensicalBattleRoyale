@@ -37,6 +37,15 @@ interface GmGameOverview {
     status: string;
     role: string;
   }[];
+  current_round: {
+    round_number: number;
+    voting_deadline_at: string;
+    players: {
+      id: string;
+      display_name: string;
+      voted: boolean;
+    }[];
+  } | null;
   game: {
     round_interval_minutes: number;
     missed_deadline_mode: string;
@@ -235,6 +244,7 @@ function exportSession() {
     phase: game.phase,
     settings: overview.value.game,
     players: overview.value.players,
+    current_round: overview.value.current_round,
     rounds: overview.value.rounds,
     door_picks: overview.value.door_picks,
   };
@@ -375,6 +385,29 @@ async function submit() {
     <p v-else>
       {{ t("gmInPlay.settings.loading") }}
     </p>
+
+    <template v-if="overview?.current_round">
+      <h2>{{ t("gmInPlay.currentRound.heading", { number: overview.current_round.round_number }) }}</h2>
+      <div class="table-scroll">
+        <table class="votes-table">
+          <thead>
+            <tr>
+              <th>{{ t("gmInPlay.currentRound.player") }}</th>
+              <th>{{ t("gmInPlay.currentRound.voteCast") }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              v-for="p in overview.current_round.players"
+              :key="p.id"
+            >
+              <td>{{ p.display_name }}</td>
+              <td>{{ p.voted ? t("gmInPlay.settings.yes") : t("gmInPlay.settings.no") }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </template>
 
     <h2>{{ t("gmInPlay.votes.heading") }}</h2>
     <p class="field-hint">
