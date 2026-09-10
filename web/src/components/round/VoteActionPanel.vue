@@ -54,13 +54,41 @@ function openVoteModal() {
         {{ t("voteAction.votedChangeable") }}
       </p>
     </template>
+    <RouterLink
+      :to="{ name: 'helpline' }"
+      class="help-link"
+    >
+      {{ t("voteAction.help") }}
+    </RouterLink>
   </div>
 </template>
 
 <style scoped>
+.vote-action-panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--nbr-space-2);
+}
+
 .vote-status {
   color: var(--nbr-muted);
   font-size: 0.85em;
   margin-top: var(--nbr-space-1);
+}
+
+.help-link {
+  display: block;
+  text-align: center;
+  text-decoration: none;
+  background: var(--nbr-bg-raised);
+  color: var(--nbr-muted);
+  border: 1px solid var(--nbr-border);
+  padding: var(--nbr-space-2) var(--nbr-space-3);
+  font-size: 0.85em;
+}
+
+.help-link:hover {
+  color: var(--nbr-fg);
+  border-color: var(--nbr-accent);
 }
 </style>

@@ -397,6 +397,8 @@ verify_jwt = false
 verify_jwt = false
 [functions.helpline-message]
 verify_jwt = false
+[functions.list-helpline-messages]
+verify_jwt = false
 [functions.submit-door-pick]
 verify_jwt = false
 [functions.resolve-round]

@@ -46,11 +46,16 @@
   },
   "helpline": {
     "title": "Hulplijn",
-    "description": "Stuur een privévraag naar de Game Master. Nooit speler-naar-speler.",
+    "disclaimer": "Dit bericht gaat privé naar de Game Master voor hulp met het spel en de spelregels -- hoe stemmen werkt, een regel waar je niet zeker van bent, een technisch probleem. Niet voor tips of hints om te winnen.",
+    "askNew": "Stel een nieuwe vraag",
     "bodyPlaceholder": "Je vraag...",
     "sending": "Bezig met versturen...",
     "send": "Versturen",
-    "sent": "Verzonden naar de GM."
+    "history": "Jouw vragen",
+    "noMessages": "Je hebt nog niets gevraagd.",
+    "you": "Jij",
+    "gm": "GM",
+    "awaitingReply": "Wachten op een antwoord van de GM..."
   },
   "threeDoors": {
     "title": "De Drie Deuren",
@@ -106,7 +111,8 @@
     "vote": "Stemmen",
     "voteCast": "Stem uitgebracht",
     "votedFinal": "Je hebt deze ronde je stem uitgebracht -- die staat vast.",
-    "votedChangeable": "Je hebt gestemd, maar kunt nog van gedachten veranderen voordat deze ronde wordt afgehandeld."
+    "votedChangeable": "Je hebt gestemd, maar kunt nog van gedachten veranderen voordat deze ronde wordt afgehandeld.",
+    "help": "Hulp nodig?"
   },
   "powerUse": {
     "notUsable": "Nog niet bruikbaar",
@@ -239,14 +245,14 @@
   },
   "gmHelplineInbox": {
     "title": "GM: Hulplijn Inbox",
-    "description": "Er bestaat deze mijlpaal nog geen endpoint om de hulplijn te lezen -- het originele bericht-id moet buiten de app om worden verkregen (bijv. via psql) tot een toekomstige mijlpaal een thread-lijst-endpoint toevoegt.",
+    "description": "Privévragen van spelers over het spel en de spelregels. Kies hieronder een speler om hun geschiedenis te zien en te antwoorden.",
+    "noPlayers": "Nog niemand heeft een hulplijnbericht gestuurd.",
+    "playerFilter": "Speler",
+    "gmReplyLabel": "Jouw antwoord",
     "reply": {
-      "heading": "Antwoorden",
-      "inReplyToPlaceholder": "origineel bericht-id (uuid)",
       "bodyPlaceholder": "Je antwoord...",
       "sending": "Bezig met versturen...",
-      "send": "Antwoord versturen",
-      "sent": "Antwoord verzonden."
+      "send": "Antwoord versturen"
     }
   },
   "gmInPlay": {

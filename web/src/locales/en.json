@@ -46,11 +46,16 @@
   },
   "helpline": {
     "title": "Helpline",
-    "description": "Send a private question to the Game Master. Never player-to-player.",
+    "disclaimer": "This message goes privately to the Game Master for help with the game and its mechanics -- how voting works, a rule you're unsure about, a technical problem. Not for tips or hints on how to win.",
+    "askNew": "Ask a new question",
     "bodyPlaceholder": "Your question...",
     "sending": "Sending...",
     "send": "Send",
-    "sent": "Sent to the GM."
+    "history": "Your questions",
+    "noMessages": "You haven't asked anything yet.",
+    "you": "You",
+    "gm": "GM",
+    "awaitingReply": "Waiting for a reply from the GM..."
   },
   "threeDoors": {
     "title": "The Three Doors",
@@ -106,7 +111,8 @@
     "vote": "Vote",
     "voteCast": "Vote cast",
     "votedFinal": "You've cast your vote this round -- it's final.",
-    "votedChangeable": "You've voted, but can still change your mind before this round resolves."
+    "votedChangeable": "You've voted, but can still change your mind before this round resolves.",
+    "help": "Need help?"
   },
   "powerUse": {
     "notUsable": "Not usable yet",
@@ -239,14 +245,14 @@
   },
   "gmHelplineInbox": {
     "title": "GM: Helpline Inbox",
-    "description": "No helpline-read endpoint exists yet this milestone -- the original message id must be obtained out-of-band (e.g. via psql) until a future milestone adds a thread-list endpoint.",
+    "description": "Private questions from players about the game and its mechanics. Pick a player below to see their history and reply.",
+    "noPlayers": "No one has sent a helpline message yet.",
+    "playerFilter": "Player",
+    "gmReplyLabel": "Your reply",
     "reply": {
-      "heading": "Reply",
-      "inReplyToPlaceholder": "original message id (uuid)",
       "bodyPlaceholder": "Your reply...",
       "sending": "Sending...",
-      "send": "Send reply",
-      "sent": "Reply sent."
+      "send": "Send reply"
     }
   },
   "gmInPlay": {
