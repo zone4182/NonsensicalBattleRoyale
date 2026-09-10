@@ -12,6 +12,7 @@ import {
 } from "../_shared/validation.ts";
 import { generateInviteToken } from "../_shared/tokens.ts";
 import { createBotPlayers } from "../_shared/bots.ts";
+import { enforceRateLimit } from "../_shared/rateLimit.ts";
 import { MIN_ROUND_INTERVAL_MINUTES } from "../_shared/constants.ts";
 import type { MissedDeadlineMode, Round1StartMode, RoundResolutionMode } from "../_shared/types.ts";
 
@@ -22,6 +23,12 @@ const ROUND_RESOLUTION_MODES: readonly RoundResolutionMode[] = ["automatic", "ma
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return preflightResponse();
   try {
+    // 10 attempts per 30 minutes per client IP, counted regardless of whether the
+    // secret check below passes -- security-review finding: this endpoint's shared
+    // secret had no brute-force throttling at all. Checked before the secret itself so
+    // guesses always count, successful or not.
+    await enforceRateLimit(req, "create-game", 10, 30);
+
     // No invite token exists yet at this point, so this is the one endpoint gated by a
     // shared setup secret instead of authenticate() (confirmed with the user).
     requireSetupSecret(req);

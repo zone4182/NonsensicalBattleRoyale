@@ -3,6 +3,7 @@ import { pickDoubleVoteHolder, sql } from "../_shared/db.ts";
 import { grantRandomDrop } from "../_shared/powers.ts";
 import { castBotVotes } from "../_shared/bots.ts";
 import { sendPushToPlayers } from "../_shared/push.ts";
+import { enforceRateLimit } from "../_shared/rateLimit.ts";
 import { optionalStringMaxLength, requireString } from "../_shared/validation.ts";
 import { MIN_PLAYERS_TO_START } from "../_shared/constants.ts";
 import { publicName } from "../_shared/names.ts";
@@ -13,6 +14,11 @@ import type { Game, Invite } from "../_shared/types.ts";
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return preflightResponse();
   try {
+    // 10 attempts per 30 minutes per client IP, counted regardless of whether the
+    // token turns out to be valid -- security-review finding: this endpoint had no
+    // brute-force throttling on token guesses.
+    await enforceRateLimit(req, "redeem-invite", 10, 30);
+
     const body = await readJsonBody<Record<string, unknown>>(req);
     const token = requireString(body, "token");
     const chosenDisplayName = optionalStringMaxLength(body, "display_name", 60);
