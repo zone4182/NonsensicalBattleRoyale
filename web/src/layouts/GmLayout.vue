@@ -30,7 +30,8 @@ const tabs = [
 <style scoped>
 .gm-nav {
   display: flex;
-  gap: var(--nbr-space-3);
+  flex-wrap: wrap;
+  gap: var(--nbr-space-1) var(--nbr-space-3);
   border-bottom: 1px solid var(--nbr-border);
   padding-bottom: var(--nbr-space-2);
   margin-bottom: var(--nbr-space-3);

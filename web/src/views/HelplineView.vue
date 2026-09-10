@@ -27,30 +27,37 @@ async function send() {
   <FullscreenLayout>
     <h1>Helpline</h1>
     <p>Send a private question to the Game Master. Never player-to-player.</p>
-    <form
-      class="helpline-form"
-      @submit.prevent="send"
-    >
-      <textarea
-        v-model="body"
-        rows="4"
-        placeholder="Your question..."
-        :disabled="pending"
-      />
-      <button
-        type="submit"
-        :disabled="pending || !body.trim()"
+    <section class="panel pixel-frame">
+      <form
+        class="helpline-form"
+        @submit.prevent="send"
       >
-        {{ pending ? "Sending..." : "Send" }}
-      </button>
-    </form>
-    <p v-if="sent">
-      Sent to the GM.
-    </p>
+        <textarea
+          v-model="body"
+          rows="4"
+          placeholder="Your question..."
+          :disabled="pending"
+        />
+        <button
+          type="submit"
+          :disabled="pending || !body.trim()"
+        >
+          {{ pending ? "Sending..." : "Send" }}
+        </button>
+      </form>
+      <p v-if="sent">
+        Sent to the GM.
+      </p>
+    </section>
   </FullscreenLayout>
 </template>
 
 <style scoped>
+.panel {
+  margin-top: var(--nbr-space-3);
+  padding: var(--nbr-space-3);
+}
+
 .helpline-form {
   display: flex;
   flex-direction: column;

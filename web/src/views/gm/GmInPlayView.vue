@@ -266,10 +266,11 @@ async function submit() {
       <span class="game-id">({{ game.gameId ?? "-" }})</span>
     </p>
     <h2>Settings</h2>
-    <table
+    <div
       v-if="overview"
-      class="settings-table"
+      class="table-scroll"
     >
+    <table class="settings-table">
       <tbody>
         <tr>
           <th>Round interval</th>
@@ -309,6 +310,7 @@ async function submit() {
         </tr>
       </tbody>
     </table>
+    </div>
     <p
       v-else-if="overviewError"
       class="error"
@@ -337,6 +339,7 @@ async function submit() {
         Eliminated: {{ round.eliminated_player_display_name ?? "no one" }}
         <span v-if="round.tie_break_method === 'random'">(random tie-break)</span>
       </p>
+      <div class="table-scroll">
       <table class="votes-table">
         <thead>
           <tr>
@@ -361,10 +364,12 @@ async function submit() {
           </tr>
         </tbody>
       </table>
+      </div>
     </section>
 
     <template v-if="overview && overview.door_picks.length > 0">
       <h2>Three Doors</h2>
+      <div class="table-scroll">
       <table class="votes-table">
         <thead>
           <tr>
@@ -384,6 +389,7 @@ async function submit() {
           </tr>
         </tbody>
       </table>
+      </div>
     </template>
 
     <p>Game phase: {{ game.phase ?? "unknown" }}</p>
@@ -542,10 +548,14 @@ async function submit() {
   font-size: 0.85em;
 }
 
+.table-scroll {
+  overflow-x: auto;
+  margin-bottom: var(--nbr-space-3);
+}
+
 .settings-table,
 .votes-table {
   border-collapse: collapse;
-  margin-bottom: var(--nbr-space-3);
 }
 
 .settings-table th,

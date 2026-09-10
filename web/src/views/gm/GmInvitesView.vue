@@ -79,58 +79,95 @@ async function copyLink(token: string) {
     <h1>GM: Invites</h1>
     <p>Create a player invite, then copy the link and send it yourself -- there's no in-app sending.</p>
 
-    <form
-      class="invite-form"
-      @submit.prevent="createInvite"
-    >
-      <input
-        v-model="displayName"
-        type="text"
-        placeholder="player display name"
-        :disabled="!canCreateInvite || pending"
-      >
-      <button
-        type="submit"
-        :disabled="!canCreateInvite || pending || !displayName.trim()"
-      >
-        {{ pending ? "Creating..." : "Create invite" }}
-      </button>
-    </form>
-    <p v-if="!canCreateInvite">
-      Invites can only be created while the game is in setup.
-    </p>
-    <p
-      v-if="errorMessage"
-      class="error"
-    >
-      {{ errorMessage }}
-    </p>
-
-    <ul class="invite-list">
-      <li
-        v-for="invite in invites"
-        :key="invite.id"
-      >
-        {{ invite.display_name }} ({{ invite.role }}) --
-        <span v-if="invite.redeemed_at">Redeemed</span>
-        <span v-else>Pending</span>
-        <button
-          v-if="!invite.redeemed_at && tokensByInviteId[invite.id]"
-          type="button"
-          @click="copyLink(tokensByInviteId[invite.id])"
+    <!--
+      Mobile: stacked (create panel above list panel). Tablet and up (>=721px, same
+      threshold as MainRoundView's tiers): side by side -- both panels are short
+      enough that a 2-column layout doesn't need a separate desktop-only tier here.
+    -->
+    <div class="invites-layout">
+      <section class="panel-create pixel-frame">
+        <h2>Create invite</h2>
+        <form
+          class="invite-form"
+          @submit.prevent="createInvite"
         >
-          Copy link
-        </button>
-      </li>
-    </ul>
+          <input
+            v-model="displayName"
+            type="text"
+            placeholder="player display name"
+            :disabled="!canCreateInvite || pending"
+          >
+          <button
+            type="submit"
+            :disabled="!canCreateInvite || pending || !displayName.trim()"
+          >
+            {{ pending ? "Creating..." : "Create invite" }}
+          </button>
+        </form>
+        <p v-if="!canCreateInvite">
+          Invites can only be created while the game is in setup.
+        </p>
+        <p
+          v-if="errorMessage"
+          class="error"
+        >
+          {{ errorMessage }}
+        </p>
+      </section>
+
+      <section class="panel-list pixel-frame">
+        <h2>Invites ({{ invites.length }})</h2>
+        <p v-if="!invites.length">
+          No invites created yet.
+        </p>
+        <ul
+          v-else
+          class="invite-list"
+        >
+          <li
+            v-for="invite in invites"
+            :key="invite.id"
+          >
+            {{ invite.display_name }} ({{ invite.role }}) --
+            <span v-if="invite.redeemed_at">Redeemed</span>
+            <span v-else>Pending</span>
+            <button
+              v-if="!invite.redeemed_at && tokensByInviteId[invite.id]"
+              type="button"
+              @click="copyLink(tokensByInviteId[invite.id])"
+            >
+              Copy link
+            </button>
+          </li>
+        </ul>
+      </section>
+    </div>
   </div>
 </template>
 
 <style scoped>
+.invites-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--nbr-space-3);
+  margin-top: var(--nbr-space-3);
+}
+
+@media (min-width: 721px) {
+  .invites-layout {
+    grid-template-columns: 1fr 1fr;
+    align-items: start;
+  }
+}
+
+.panel-create,
+.panel-list {
+  padding: var(--nbr-space-3);
+}
+
 .invite-form {
   display: flex;
   gap: var(--nbr-space-2);
-  max-width: 480px;
 }
 
 .invite-form input {

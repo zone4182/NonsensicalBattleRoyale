@@ -89,126 +89,150 @@ async function copyToken() {
     <p class="field-hint">
       Regardless of resolution mode, you can always resolve a round early yourself once every alive player has voted.
     </p>
+
+    <!--
+      Mobile: panels stack in reading order. Tablet and up (>=721px, same threshold
+      as MainRoundView/GmInvitesView): a 2-column grid, so the form doesn't read as
+      one very long column on wider screens.
+    -->
     <form
       class="setup-form"
       @submit.prevent="createGame"
     >
-      <label>
-        Game name
-        <input
-          v-model="name"
-          type="text"
-          required
-        >
-        <span class="field-hint">Identifies this game instance to you in the GM panel -- players never see it.</span>
-      </label>
-      <label>
-        Your display name
-        <input
-          v-model="gmDisplayName"
-          type="text"
-          required
-        >
-        <span class="field-hint">How you appear as the Game Master in narration and the end-of-game reveal -- doesn't have to be your real name.</span>
-      </label>
-      <label>
-        Round interval (minutes)
-        <input
-          v-model.number="roundIntervalMinutes"
-          type="number"
-          min="10"
-          required
-        >
-        <span class="field-hint">How long each round's voting window stays open before it resolves. 10 minutes minimum -- shorter than that can miss the automatic-resolve check, which runs every 5 minutes. Use a large number (e.g. 1440 for a full day) for an async game spread over days.</span>
-      </label>
-      <label>
-        Missed-deadline mode
-        <select v-model="missedDeadlineMode">
-          <option value="forfeit_fatal">Forfeit is fatal</option>
-          <option value="no_consequence">No consequence</option>
-          <option value="one_round_penalty">One-round penalty</option>
-        </select>
-        <span class="field-hint">What happens to a player who doesn't vote before the deadline. {{ missedDeadlineModeHint }}</span>
-      </label>
-      <label>
-        Round 1 start mode
-        <select v-model="round1StartMode">
-          <option value="wait_for_all">Wait until everyone accepts</option>
-          <option value="gm_manual">GM starts manually</option>
-          <option value="scheduled">Auto-start at a scheduled time</option>
-        </select>
-        <span class="field-hint">How and when round 1 begins. {{ round1StartModeHint }}</span>
-      </label>
-      <label>
-        Round resolution mode
-        <select v-model="roundResolutionMode">
-          <option value="manual">Always manually resolve</option>
-          <option value="automatic">Automatic, once the deadline passes</option>
-        </select>
-        <span class="field-hint">How every round after the first one ends. {{ roundResolutionModeHint }}</span>
-      </label>
-      <label class="checkbox-label">
-        <input
-          v-model="allowVoteChange"
-          type="checkbox"
-        >
-        Allow players to change their vote
-      </label>
-      <span class="field-hint">
-        If off (default), a vote is final the moment it's cast. If on, a player can re-vote as many times as they want before the round resolves -- only their latest vote(s) count.
-      </span>
-      <label class="checkbox-label">
-        <input
-          v-model="doubleVoteEnabled"
-          type="checkbox"
-        >
-        Random double vote
-      </label>
-      <span class="field-hint">
-        On by default. Each round, one random alive player is secretly given a second vote -- they're told privately and never have to disclose it. This is part of the game's hidden powers system: players are never told it exists, they only discover it by experiencing it.
-      </span>
-      <label v-if="doubleVoteEnabled">
-        Double-vote cooldown (rounds)
-        <input
-          v-model.number="doubleVoteFloorRounds"
-          type="number"
-          min="1"
-          required
-        >
-        <span class="field-hint">How many recent rounds' holders are excluded when picking who gets it next, so the same player isn't re-picked too soon. Falls back to picking from everyone alive if excluding recent holders would leave no one eligible (e.g. a very small player count). Default 2.</span>
-      </label>
-      <label class="checkbox-label">
-        <input
-          v-model="botMode"
-          type="checkbox"
-        >
-        Bot mode
-      </label>
-      <span class="field-hint">
-        Fills the game with algorithm-controlled players (random moves for now) so you can test a full game solo. You still need at least one real player besides yourself -- bots supplement a game, they don't replace it.
-      </span>
-      <label v-if="botMode">
-        Number of bots
-        <select v-model.number="botCount">
-          <option
-            v-for="n in botCountOptions"
-            :key="n"
-            :value="n"
-          >
-            {{ n }}
-          </option>
-        </select>
-        <span class="field-hint">How many bots to add alongside the real players you invite (max 19, and bots + real players together should stay within the 20-player ceiling).</span>
-      </label>
-      <label>
-        Setup secret
-        <input
-          v-model="setupSecret"
-          type="password"
-          required
-        >
-        <span class="field-hint">A shared secret that proves you're allowed to create a game -- separate from the invite links you'll send players.</span>
-      </label>
+      <div class="setup-layout">
+        <section class="panel pixel-frame">
+          <h2>Game basics</h2>
+          <label>
+            Game name
+            <input
+              v-model="name"
+              type="text"
+              required
+            >
+            <span class="field-hint">Identifies this game instance to you in the GM panel -- players never see it.</span>
+          </label>
+          <label>
+            Your display name
+            <input
+              v-model="gmDisplayName"
+              type="text"
+              required
+            >
+            <span class="field-hint">How you appear as the Game Master in narration and the end-of-game reveal -- doesn't have to be your real name.</span>
+          </label>
+        </section>
+
+        <section class="panel pixel-frame">
+          <h2>Round rules</h2>
+          <label>
+            Round interval (minutes)
+            <input
+              v-model.number="roundIntervalMinutes"
+              type="number"
+              min="10"
+              required
+            >
+            <span class="field-hint">How long each round's voting window stays open before it resolves. 10 minutes minimum -- shorter than that can miss the automatic-resolve check, which runs every 5 minutes. Use a large number (e.g. 1440 for a full day) for an async game spread over days.</span>
+          </label>
+          <label>
+            Missed-deadline mode
+            <select v-model="missedDeadlineMode">
+              <option value="forfeit_fatal">Forfeit is fatal</option>
+              <option value="no_consequence">No consequence</option>
+              <option value="one_round_penalty">One-round penalty</option>
+            </select>
+            <span class="field-hint">What happens to a player who doesn't vote before the deadline. {{ missedDeadlineModeHint }}</span>
+          </label>
+          <label>
+            Round 1 start mode
+            <select v-model="round1StartMode">
+              <option value="wait_for_all">Wait until everyone accepts</option>
+              <option value="gm_manual">GM starts manually</option>
+              <option value="scheduled">Auto-start at a scheduled time</option>
+            </select>
+            <span class="field-hint">How and when round 1 begins. {{ round1StartModeHint }}</span>
+          </label>
+          <label>
+            Round resolution mode
+            <select v-model="roundResolutionMode">
+              <option value="manual">Always manually resolve</option>
+              <option value="automatic">Automatic, once the deadline passes</option>
+            </select>
+            <span class="field-hint">How every round after the first one ends. {{ roundResolutionModeHint }}</span>
+          </label>
+          <label class="checkbox-label">
+            <input
+              v-model="allowVoteChange"
+              type="checkbox"
+            >
+            Allow players to change their vote
+          </label>
+          <span class="field-hint">
+            If off (default), a vote is final the moment it's cast. If on, a player can re-vote as many times as they want before the round resolves -- only their latest vote(s) count.
+          </span>
+        </section>
+
+        <section class="panel pixel-frame">
+          <h2>Hidden powers &amp; bots</h2>
+          <label class="checkbox-label">
+            <input
+              v-model="doubleVoteEnabled"
+              type="checkbox"
+            >
+            Random double vote
+          </label>
+          <span class="field-hint">
+            On by default. Each round, one random alive player is secretly given a second vote -- they're told privately and never have to disclose it. This is part of the game's hidden powers system: players are never told it exists, they only discover it by experiencing it.
+          </span>
+          <label v-if="doubleVoteEnabled">
+            Double-vote cooldown (rounds)
+            <input
+              v-model.number="doubleVoteFloorRounds"
+              type="number"
+              min="1"
+              required
+            >
+            <span class="field-hint">How many recent rounds' holders are excluded when picking who gets it next, so the same player isn't re-picked too soon. Falls back to picking from everyone alive if excluding recent holders would leave no one eligible (e.g. a very small player count). Default 2.</span>
+          </label>
+          <label class="checkbox-label">
+            <input
+              v-model="botMode"
+              type="checkbox"
+            >
+            Bot mode
+          </label>
+          <span class="field-hint">
+            Fills the game with algorithm-controlled players (random moves for now) so you can test a full game solo. You still need at least one real player besides yourself -- bots supplement a game, they don't replace it.
+          </span>
+          <label v-if="botMode">
+            Number of bots
+            <select v-model.number="botCount">
+              <option
+                v-for="n in botCountOptions"
+                :key="n"
+                :value="n"
+              >
+                {{ n }}
+              </option>
+            </select>
+            <span class="field-hint">How many bots to add alongside the real players you invite (max 19, and bots + real players together should stay within the 20-player ceiling).</span>
+          </label>
+        </section>
+
+        <section class="panel pixel-frame">
+          <h2>Access</h2>
+          <label>
+            Setup secret
+            <input
+              v-model="setupSecret"
+              type="password"
+              required
+            >
+            <span class="field-hint">A shared secret that proves you're allowed to create a game -- separate from the invite links you'll send players.</span>
+          </label>
+        </section>
+      </div>
+
       <button
         type="submit"
         :disabled="pending"
@@ -242,8 +266,39 @@ async function copyToken() {
 .setup-form {
   display: flex;
   flex-direction: column;
+  gap: var(--nbr-space-3);
+}
+
+.setup-layout {
+  display: flex;
+  flex-direction: column;
+  gap: var(--nbr-space-3);
+  margin-top: var(--nbr-space-3);
+}
+
+@media (min-width: 721px) {
+  /* A strict 2-column grid row-locks panels of very different lengths together (e.g.
+     the short "Game basics" panel next to the much longer "Round rules" one), leaving
+     a large empty gap below the short one instead of letting the next panel start
+     there. Multi-column flow self-balances regardless of how panel lengths change as
+     fields get added/removed later. */
+  .setup-layout {
+    display: block;
+    columns: 2;
+    column-gap: var(--nbr-space-3);
+  }
+
+  .panel {
+    break-inside: avoid;
+    margin-bottom: var(--nbr-space-3);
+  }
+}
+
+.panel {
+  padding: var(--nbr-space-3);
+  display: flex;
+  flex-direction: column;
   gap: var(--nbr-space-2);
-  max-width: 480px;
 }
 
 .setup-form input,

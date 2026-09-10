@@ -9,6 +9,7 @@ import NarrationLog from "../components/round/NarrationLog.vue";
 import VoteActionPanel from "../components/round/VoteActionPanel.vue";
 import { useGameStore } from "../stores/game";
 import { useSessionStore } from "../stores/session";
+import { useUiStore } from "../stores/ui";
 import { useApiCall } from "../composables/useApiCall";
 import { usePoll } from "../composables/usePoll";
 
@@ -20,6 +21,7 @@ const POLL_INTERVAL_MS = 15_000;
 const router = useRouter();
 const game = useGameStore();
 const session = useSessionStore();
+const ui = useUiStore();
 const { pending, run } = useApiCall();
 
 onMounted(() => {
@@ -50,7 +52,10 @@ watch(
     <div class="area-header">
       <RoundHeader />
     </div>
-    <div class="area-viewport pixel-frame">
+    <div
+      v-if="ui.cinematicActive"
+      class="area-viewport pixel-frame"
+    >
       <CinematicViewport />
     </div>
     <div class="area-hub pixel-frame">
@@ -78,6 +83,17 @@ watch(
  * replaces vs. sits above the narration log; whether this is desktop-primary with a
  * mobile variant, or mobile-first) can be resolved later by changing
  * grid-template-areas/grid-template-columns without touching component internals.
+ *
+ * Three tiers:
+ * - Desktop (this base, >1024px): viewport+hub share the top row (2fr/1fr),
+ *   narration+action share the bottom row.
+ * - Tablet (721-1024px, e.g. an iPad in either orientation): there isn't enough
+ *   width for that same 2-column split without squeezing the hub -- viewport goes
+ *   full-width instead, narration+action stack in the wider left column below it,
+ *   hub becomes a full-height column on the right.
+ * - Mobile (<=720px, phones and small tablets in portrait): single column, fully
+ *   stacked. narration+action come before hub -- the per-round story/vote is the
+ *   primary task, the roster is reference info you check less often.
  */
 .round-layout {
   display: grid;
@@ -90,6 +106,51 @@ watch(
   grid-template-rows: auto auto auto 1fr;
   gap: var(--nbr-space-3);
   height: 100%;
+  /* Grid's default align-content stretches leftover vertical space (e.g. .screen's
+     min-height:100% exceeding this tier's actual content) into "auto" row tracks --
+     including an empty one (the viewport row when CinematicViewport is inactive),
+     which reads as a large blank gap. Rows should hug their content instead. */
+  align-content: start;
+}
+
+@media (min-width: 721px) and (max-width: 1024px) {
+  .round-layout {
+    grid-template-areas:
+      "header header"
+      "viewport viewport"
+      "narration hub"
+      "action hub";
+    grid-template-columns: 2fr 1fr;
+    grid-template-rows: auto auto auto auto;
+    height: auto;
+  }
+
+  .area-hub {
+    max-height: none;
+    overflow-y: visible;
+  }
+}
+
+@media (max-width: 720px) {
+  .round-layout {
+    grid-template-areas:
+      "header"
+      "viewport"
+      "narration"
+      "action"
+      "hub";
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto auto auto auto;
+    height: auto;
+  }
+
+  .area-hub {
+    /* Desktop relies on the grid row's fixed height + overflow-y to scroll a long
+       roster in place; stacked mobile/tablet just lets the page itself scroll
+       instead. */
+    max-height: none;
+    overflow-y: visible;
+  }
 }
 
 .area-header {

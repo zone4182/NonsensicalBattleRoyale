@@ -33,41 +33,55 @@ async function reply() {
       No helpline-read endpoint exists yet this milestone -- the original message id must be obtained out-of-band
       (e.g. via psql) until a future milestone adds a thread-list endpoint.
     </p>
-    <form
-      class="reply-form"
-      @submit.prevent="reply"
-    >
-      <input
-        v-model="inReplyTo"
-        type="text"
-        placeholder="original message id (uuid)"
-        :disabled="pending"
+    <!--
+      Just one content block (no thread list yet -- see the note above), so unlike
+      GmSetupView/GmInvitesView there's no second panel to split into a tablet
+      2-column layout. A single framed panel with a sane max-width reads fine at
+      every size.
+    -->
+    <section class="panel pixel-frame">
+      <h2>Reply</h2>
+      <form
+        class="reply-form"
+        @submit.prevent="reply"
       >
-      <textarea
-        v-model="body"
-        rows="4"
-        placeholder="Your reply..."
-        :disabled="pending"
-      />
-      <button
-        type="submit"
-        :disabled="pending || !inReplyTo.trim() || !body.trim()"
-      >
-        {{ pending ? "Sending..." : "Send reply" }}
-      </button>
-    </form>
-    <p v-if="sent">
-      Reply sent.
-    </p>
+        <input
+          v-model="inReplyTo"
+          type="text"
+          placeholder="original message id (uuid)"
+          :disabled="pending"
+        >
+        <textarea
+          v-model="body"
+          rows="4"
+          placeholder="Your reply..."
+          :disabled="pending"
+        />
+        <button
+          type="submit"
+          :disabled="pending || !inReplyTo.trim() || !body.trim()"
+        >
+          {{ pending ? "Sending..." : "Send reply" }}
+        </button>
+      </form>
+      <p v-if="sent">
+        Reply sent.
+      </p>
+    </section>
   </div>
 </template>
 
 <style scoped>
+.panel {
+  max-width: 480px;
+  margin-top: var(--nbr-space-3);
+  padding: var(--nbr-space-3);
+}
+
 .reply-form {
   display: flex;
   flex-direction: column;
   gap: var(--nbr-space-2);
-  max-width: 480px;
 }
 
 .reply-form input,

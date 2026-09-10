@@ -55,29 +55,31 @@ async function redeem() {
   <FullscreenLayout>
     <h1>You've been invited</h1>
     <p>Enter your personal invite token to arrive at the house.</p>
-    <form
-      class="redeem-form"
-      @submit.prevent="redeem"
-    >
-      <input
-        v-model="token"
-        type="text"
-        placeholder="invite token"
-        :disabled="pending"
+    <section class="panel pixel-frame">
+      <form
+        class="redeem-form"
+        @submit.prevent="redeem"
       >
-      <button
-        type="submit"
-        :disabled="pending || !token.trim()"
+        <input
+          v-model="token"
+          type="text"
+          placeholder="invite token"
+          :disabled="pending"
+        >
+        <button
+          type="submit"
+          :disabled="pending || !token.trim()"
+        >
+          {{ pending ? "Redeeming..." : "Redeem invite" }}
+        </button>
+      </form>
+      <p
+        v-if="errorMessage"
+        class="error"
       >
-        {{ pending ? "Redeeming..." : "Redeem invite" }}
-      </button>
-    </form>
-    <p
-      v-if="errorMessage"
-      class="error"
-    >
-      {{ errorMessage }}
-    </p>
+        {{ errorMessage }}
+      </p>
+    </section>
     <p class="back-link">
       <RouterLink :to="{ name: 'home' }">
         ← back
@@ -87,6 +89,11 @@ async function redeem() {
 </template>
 
 <style scoped>
+.panel {
+  margin-top: var(--nbr-space-3);
+  padding: var(--nbr-space-3);
+}
+
 .redeem-form {
   display: flex;
   gap: var(--nbr-space-2);

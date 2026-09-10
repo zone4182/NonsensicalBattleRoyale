@@ -33,13 +33,27 @@ const countdown = computed(() => {
 
   return `${days}d ${pad(hours)}h ${pad(minutes)}m ${pad(seconds)}s`;
 });
+
+// Raw ISO strings ("2026-09-10T09:35:52.038Z") don't fit narrow screens and wrap
+// mid-string -- this is what the countdown above is for anyway, so the absolute time
+// only needs to be a short, glanceable anchor, not a full timestamp.
+const deadlineLabel = computed(() => {
+  const deadline = game.currentRound?.votingDeadlineAt;
+  if (!deadline) return "-";
+  return new Date(deadline).toLocaleString(undefined, {
+    month: "short",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+});
 </script>
 
 <template>
   <header class="round-header">
     <div class="round-header-row">
       <span>Round {{ game.currentRound?.roundNumber ?? "-" }}</span>
-      <span>Deadline: {{ game.currentRound?.votingDeadlineAt ?? "-" }}</span>
+      <span>Deadline: {{ deadlineLabel }}</span>
     </div>
     <div
       v-if="countdown"
@@ -58,7 +72,13 @@ const countdown = computed(() => {
 
 .round-header-row {
   display: flex;
+  flex-wrap: wrap;
+  gap: var(--nbr-space-1) var(--nbr-space-3);
   justify-content: space-between;
+}
+
+.round-header-row span {
+  white-space: nowrap;
 }
 
 .countdown {

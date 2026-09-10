@@ -6,6 +6,7 @@ import FullscreenLayout from "../layouts/FullscreenLayout.vue";
   <FullscreenLayout>
     <h1>Nonsensical Battle Royale</h1>
     <p class="tagline">
+      Where Clue, Diplomacy, Werewolf, Among Us, and Machiavelli meet.
       An asynchronous social deduction game, played with real friends over real days.
       Accept your invite, and something starts. Every round, everyone votes in secret
       on who doesn't make it to the next one.

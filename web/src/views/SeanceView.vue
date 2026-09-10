@@ -29,27 +29,34 @@ async function cast(option: string) {
       Vote among alternate narration flavors for this round's already-decided elimination announcement. Entirely
       cosmetic.
     </p>
-    <ul class="option-list">
-      <li
-        v-for="option in NARRATION_OPTIONS"
-        :key="option"
-      >
-        <button
-          type="button"
-          :disabled="pending || submitted"
-          @click="cast(option)"
+    <section class="panel pixel-frame">
+      <ul class="option-list">
+        <li
+          v-for="option in NARRATION_OPTIONS"
+          :key="option"
         >
-          {{ option }}
-        </button>
-      </li>
-    </ul>
-    <p v-if="submitted">
-      Vote cast: {{ selected }}.
-    </p>
+          <button
+            type="button"
+            :disabled="pending || submitted"
+            @click="cast(option)"
+          >
+            {{ option }}
+          </button>
+        </li>
+      </ul>
+      <p v-if="submitted">
+        Vote cast: {{ selected }}.
+      </p>
+    </section>
   </FullscreenLayout>
 </template>
 
 <style scoped>
+.panel {
+  margin-top: var(--nbr-space-3);
+  padding: var(--nbr-space-3);
+}
+
 .option-list {
   list-style: none;
   padding: 0;

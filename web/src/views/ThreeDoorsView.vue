@@ -85,6 +85,7 @@ async function pick(doorNumber: number) {
 <style scoped>
 .doors {
   display: flex;
+  flex-wrap: wrap;
   gap: var(--nbr-space-3);
 }
 
