@@ -9,7 +9,16 @@
     "title": "Nonsensical Battle Royale",
     "tagline": "Where Clue, Diplomacy, Werewolf, Among Us, and Machiavelli meet. An asynchronous social deduction game, played with real friends over real days. Accept your invite, and something starts. Every round, everyone votes in secret on who doesn't make it to the next one.",
     "hostGame": "Host a new game",
-    "joinGame": "Join a game"
+    "joinGame": "Join a game",
+    "installApp": "Install app",
+    "installedAlready": "App installed",
+    "credit": "A Game by Zone4182"
+  },
+  "iosInstall": {
+    "title": "Install this app",
+    "step1": "Tap the Share icon in Safari's toolbar.",
+    "step2": "Scroll down and tap \"Add to Home Screen\".",
+    "step3": "Tap \"Add\" in the top-right corner to confirm."
   },
   "join": {
     "heading": "You've been invited",

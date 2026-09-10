@@ -9,7 +9,16 @@
     "title": "Nonsensical Battle Royale",
     "tagline": "Waar Cluedo, Diplomacy, Werewolf, Among Us en Machiavelli samenkomen. Een asynchroon sociaal deductiespel, gespeeld met echte vrienden over echte dagen. Accepteer je uitnodiging, en er begint iets. Elke ronde stemt iedereen in het geheim op wie de volgende ronde niet haalt.",
     "hostGame": "Start een nieuw spel",
-    "joinGame": "Doe mee aan een spel"
+    "joinGame": "Doe mee aan een spel",
+    "installApp": "App installeren",
+    "installedAlready": "App geïnstalleerd",
+    "credit": "A Game by Zone4182"
+  },
+  "iosInstall": {
+    "title": "Deze app installeren",
+    "step1": "Tik op het deelicoon in de werkbalk van Safari.",
+    "step2": "Scroll naar beneden en tik op \"Zet op beginscherm\".",
+    "step3": "Tik rechtsboven op \"Voeg toe\" om te bevestigen."
   },
   "join": {
     "heading": "Je bent uitgenodigd",
