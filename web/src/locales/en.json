@@ -325,6 +325,8 @@
       "resolveDoors": "Resolve doors",
       "notReadyDoors": "Not ready yet -- not every alive player has picked a door.",
       "doorsResolved": "Doors resolved -- game over.",
+      "exportSession": "Export session",
+      "exportSessionHint": "Downloads a JSON file with everything shown on this screen -- settings, full vote breakdown per round, and Three Doors picks.",
       "finishing": "Finishing...",
       "finishGame": "Finish game",
       "finishGameHint": "Closes this game out and sends you back to the landing page. Revisiting a finished game isn't built yet -- planned for a later version.",

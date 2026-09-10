@@ -325,6 +325,8 @@
       "resolveDoors": "Deuren afhandelen",
       "notReadyDoors": "Nog niet klaar -- niet elke levende speler heeft een deur gekozen.",
       "doorsResolved": "Deuren afgehandeld -- spel voorbij.",
+      "exportSession": "Sessie exporteren",
+      "exportSessionHint": "Downloadt een JSON-bestand met alles wat op dit scherm te zien is -- instellingen, volledige stemverdeling per ronde en de keuzes bij de Drie Deuren.",
       "finishing": "Bezig met afronden...",
       "finishGame": "Spel afronden",
       "finishGameHint": "Sluit dit spel af en stuurt je terug naar de landingspagina. Een afgerond spel opnieuw bekijken is nog niet gebouwd -- gepland voor een latere versie.",

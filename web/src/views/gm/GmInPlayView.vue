@@ -221,6 +221,32 @@ async function finishGame() {
   }
 }
 
+// --- Export session ---
+// A client-side snapshot of exactly what this screen already shows -- no new
+// endpoint needed, since `overview` + the game store already hold all of it.
+function exportSession() {
+  if (!overview.value) return;
+
+  const snapshot = {
+    exported_at: new Date().toISOString(),
+    game_id: game.gameId,
+    game_name: game.gameName,
+    phase: game.phase,
+    settings: overview.value.game,
+    players: overview.value.players,
+    rounds: overview.value.rounds,
+    door_picks: overview.value.door_picks,
+  };
+
+  const blob = new Blob([JSON.stringify(snapshot, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = `${game.gameId ?? "battle-royale"}-session.json`;
+  link.click();
+  URL.revokeObjectURL(url);
+}
+
 // --- Existing GM action log form ---
 const actionType = ref(ACTION_TYPES[0]);
 const payloadText = ref("{}");
@@ -452,6 +478,19 @@ async function submit() {
       </button>
       <p v-if="resolveDoorsMessage">
         {{ resolveDoorsMessage }}
+      </p>
+    </section>
+
+    <section class="round-controls">
+      <button
+        type="button"
+        :disabled="!overview"
+        @click="exportSession"
+      >
+        {{ t("gmInPlay.controls.exportSession") }}
+      </button>
+      <p class="field-hint">
+        {{ t("gmInPlay.controls.exportSessionHint") }}
       </p>
     </section>
 
