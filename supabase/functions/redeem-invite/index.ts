@@ -2,6 +2,7 @@ import { errorResponse, HttpError, jsonResponse, preflightResponse, readJsonBody
 import { pickDoubleVoteHolder, sql } from "../_shared/db.ts";
 import { grantRandomDrop } from "../_shared/powers.ts";
 import { castBotVotes } from "../_shared/bots.ts";
+import { sendPushToPlayers } from "../_shared/push.ts";
 import { optionalStringMaxLength, requireString } from "../_shared/validation.ts";
 import { MIN_PLAYERS_TO_START } from "../_shared/constants.ts";
 import { publicName } from "../_shared/names.ts";
@@ -44,6 +45,7 @@ Deno.serve(async (req) => {
       `;
 
       let gamePhase: string = game.phase;
+      let newRoundPlayerIds: string[] | null = null;
 
       // wait_for_all: round 1 starts automatically the moment the last invited player
       // redeems -- event-driven off this write, needs no cron. Still subject to the
@@ -87,6 +89,7 @@ Deno.serve(async (req) => {
             aliveRoster.map((p) => p.id),
           );
           await castBotVotes(tx, game.id, round.id, doubleVotePlayerId);
+          newRoundPlayerIds = aliveRoster.map((p) => p.id);
         }
       }
 
@@ -96,8 +99,18 @@ Deno.serve(async (req) => {
         gameId: invite.game_id,
         gamePhase,
         displayName: publicName(invite.display_name, chosenDisplayName ?? null),
+        newRoundPlayerIds,
       };
     });
+
+    // Outside the transaction -- see start-round's identical comment.
+    if (result.newRoundPlayerIds) {
+      await sendPushToPlayers(result.newRoundPlayerIds, {
+        title: "Round 1 has started",
+        body: "Voting is open -- head to the app to cast your vote.",
+        url: "/game",
+      });
+    }
 
     // Arrival prologue content (game-design v0.9 section 3a) is a frontend concern --
     // no content/state is generated for it here yet.

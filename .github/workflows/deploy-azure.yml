@@ -30,6 +30,10 @@ jobs:
           # Production Supabase Edge Functions base URL -- baked into the client build,
           # same shape as the local VITE_FUNCTIONS_URL used in dev.
           VITE_FUNCTIONS_URL: https://zmwsmxulcbhwjvnyvihb.supabase.co/functions/v1
+          # Public VAPID key for Web Push -- pairs with VAPID_PRIVATE_KEY, set as a
+          # Supabase Edge Function secret (never here). Public keys are safe to bake
+          # into the client build.
+          VITE_VAPID_PUBLIC_KEY: BFupLo0Z1XyBUQHpF8UbbrKZJvNq2mogrSCkR0y_VF_F9CxSo3_YE3Y2mgVZvvNWZ6mDh9Lx32JnP8E8BIkKHqo
 
       - name: Deploy to Azure Static Web Apps
         uses: Azure/static-web-apps-deploy@v1

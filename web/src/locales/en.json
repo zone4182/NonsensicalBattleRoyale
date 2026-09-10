@@ -105,6 +105,16 @@
     "title": "Narration",
     "empty": "Bart's ghost has nothing to say yet."
   },
+  "yourStatus": {
+    "title": "Your status",
+    "unknown": "unknown"
+  },
+  "notifications": {
+    "enable": "Enable notifications",
+    "disable": "Disable notifications",
+    "updating": "Updating...",
+    "deniedHint": "Notifications are blocked for this site -- enable them in your browser or device settings to turn them back on."
+  },
   "voteAction": {
     "ghostNotice": "You're a ghost -- spectating only. (Seance, GAME-DESIGN.md's ghost-only vote on this round's narration flavor, isn't wired up yet.)",
     "changeVote": "Change vote",

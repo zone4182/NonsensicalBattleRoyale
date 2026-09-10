@@ -11,6 +11,7 @@ import {
 } from "../_shared/db.ts";
 import { evaluateEarnTriggers, grantRandomDrop } from "../_shared/powers.ts";
 import { castBotDoorPicks, castBotVotes } from "../_shared/bots.ts";
+import { sendPushToPlayers } from "../_shared/push.ts";
 import { publicName } from "../_shared/names.ts";
 import type { Game, Player, PowerGrant, Round } from "../_shared/types.ts";
 
@@ -80,6 +81,7 @@ Deno.serve(async (req) => {
         `;
 
     const resolutions: Resolution[] = [];
+    const roundStartNotifications: { roundNumber: number; playerIds: string[] }[] = [];
 
     for (const round of dueRounds) {
       const resolution = await db.begin(async (tx) => {
@@ -265,6 +267,7 @@ Deno.serve(async (req) => {
           `;
           await grantRandomDrop(tx, game.id, newRound.id, aliveIdsAfter);
           await castBotVotes(tx, game.id, newRound.id, doubleVotePlayerId);
+          roundStartNotifications.push({ roundNumber: round.round_number + 1, playerIds: aliveIdsAfter });
         }
 
         // Earn triggers: only when there's still a game left to play for.
@@ -282,6 +285,15 @@ Deno.serve(async (req) => {
       });
 
       resolutions.push(resolution);
+    }
+
+    // Outside every transaction -- see start-round's identical comment.
+    for (const notification of roundStartNotifications) {
+      await sendPushToPlayers(notification.playerIds, {
+        title: `Round ${notification.roundNumber} has started`,
+        body: "Voting is open -- head to the app to cast your vote.",
+        url: "/game",
+      });
     }
 
     return jsonResponse({ resolved_count: resolutions.length, resolutions });

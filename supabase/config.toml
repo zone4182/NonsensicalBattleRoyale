@@ -409,6 +409,10 @@ verify_jwt = false
 verify_jwt = false
 [functions.send-notifications]
 verify_jwt = false
+[functions.register-push-subscription]
+verify_jwt = false
+[functions.unregister-push-subscription]
+verify_jwt = false
 
 [edge_runtime]
 enabled = true

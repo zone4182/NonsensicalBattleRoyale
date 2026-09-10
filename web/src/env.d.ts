@@ -5,6 +5,7 @@ import "vue-router";
 
 interface ImportMetaEnv {
   readonly VITE_FUNCTIONS_URL: string;
+  readonly VITE_VAPID_PUBLIC_KEY: string;
 }
 
 interface ImportMeta {

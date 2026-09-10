@@ -105,6 +105,16 @@
     "title": "Verhaal",
     "empty": "Barts geest heeft nog niets te zeggen."
   },
+  "yourStatus": {
+    "title": "Jouw status",
+    "unknown": "onbekend"
+  },
+  "notifications": {
+    "enable": "Meldingen inschakelen",
+    "disable": "Meldingen uitschakelen",
+    "updating": "Bezig met bijwerken...",
+    "deniedHint": "Meldingen zijn geblokkeerd voor deze site -- schakel ze weer in via je browser- of apparaatinstellingen."
+  },
   "voteAction": {
     "ghostNotice": "Je bent een geest -- alleen toeschouwer. (De Seance, GAME-DESIGN.md's geest-only stem op de verteltoon van deze ronde, is nog niet aangesloten.)",
     "changeVote": "Stem wijzigen",

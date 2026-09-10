@@ -6,6 +6,13 @@ export default defineConfig({
   plugins: [
     vue(),
     VitePWA({
+      // injectManifest (a custom service worker source we write ourselves, see
+      // src/sw.ts) instead of the default generateSW -- Web Push needs its own
+      // `push`/`notificationclick` listeners, which generateSW's fully-generated
+      // service worker has no hook for.
+      strategies: "injectManifest",
+      srcDir: "src",
+      filename: "sw.ts",
       registerType: "autoUpdate",
       includeAssets: ["icons/*.png"],
       manifest: {
@@ -21,7 +28,7 @@ export default defineConfig({
           { src: "icons/icon-512-maskable.png", sizes: "512x512", type: "image/png", purpose: "maskable" },
         ],
       },
-      devOptions: { enabled: true },
+      devOptions: { enabled: true, type: "module" },
     }),
   ],
 });

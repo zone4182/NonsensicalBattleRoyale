@@ -3,6 +3,7 @@ import { authenticate, requireRole } from "../_shared/auth.ts";
 import { pickDoubleVoteHolder, sql } from "../_shared/db.ts";
 import { grantRandomDrop } from "../_shared/powers.ts";
 import { castBotVotes } from "../_shared/bots.ts";
+import { sendPushToPlayers } from "../_shared/push.ts";
 import { MIN_PLAYERS_TO_START } from "../_shared/constants.ts";
 import type { Game } from "../_shared/types.ts";
 
@@ -68,7 +69,20 @@ Deno.serve(async (req) => {
       );
       await castBotVotes(tx, game.id, round.id, doubleVotePlayerId);
 
-      return { roundId: round.id, roundNumber: round.round_number, votingDeadlineAt: round.voting_deadline_at };
+      return {
+        roundId: round.id,
+        roundNumber: round.round_number,
+        votingDeadlineAt: round.voting_deadline_at,
+        playerIds: aliveRoster.map((p) => p.id),
+      };
+    });
+
+    // Outside the transaction -- a push failure must never roll back the round that
+    // already started. See push.ts's own comment for the same reasoning.
+    await sendPushToPlayers(result.playerIds, {
+      title: `Round ${result.roundNumber} has started`,
+      body: "Voting is open -- head to the app to cast your vote.",
+      url: "/game",
     });
 
     return jsonResponse(

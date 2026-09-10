@@ -64,6 +64,7 @@ export interface Round {
   eliminated_player_id: string | null;
   tie_break_method: string | null;
   double_vote_player_id: string | null;
+  deadline_reminder_sent_at: string | null;
   created_at: string;
 }
 
@@ -88,6 +89,15 @@ export interface GmAction {
   gm_player_id: string;
   action_type: string;
   payload: Record<string, unknown>;
+  created_at: string;
+}
+
+export interface PushSubscriptionRow {
+  id: string;
+  player_id: string;
+  endpoint: string;
+  p256dh: string;
+  auth: string;
   created_at: string;
 }
 
