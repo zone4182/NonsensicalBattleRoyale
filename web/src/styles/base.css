@@ -1,3 +1,4 @@
+@import "./fonts.css";
 @import "./tokens.css";
 
 *,
@@ -17,7 +18,11 @@ body {
   background: var(--nbr-bg);
   color: var(--nbr-fg);
   font-family: var(--nbr-font-mono);
-  line-height: 1.5;
+  /* VT323's em-box reads noticeably smaller than a typical monospace at the same
+     font-size -- bumped base size + tighter line-height to compensate, matching its
+     terminal/CRT proportions rather than a normal-font baseline. */
+  font-size: 1.3rem;
+  line-height: 1.35;
 }
 
 a {
@@ -25,11 +30,13 @@ a {
 }
 
 button {
-  font-family: inherit;
+  font-family: var(--nbr-font-display);
   background: var(--nbr-bg-raised);
   color: var(--nbr-fg);
   border: 1px solid var(--nbr-border);
   padding: var(--nbr-space-2) var(--nbr-space-3);
+  font-size: 0.65rem;
+  line-height: 1.6;
   cursor: pointer;
 }
 
@@ -43,5 +50,8 @@ button:hover {
 }
 
 .screen h1 {
+  font-family: var(--nbr-font-display);
   color: var(--nbr-accent);
+  font-size: 1.4rem;
+  line-height: 1.8;
 }

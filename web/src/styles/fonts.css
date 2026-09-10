@@ -1,0 +1,19 @@
+/* Self-hosted (not the Google Fonts CDN) so the PWA's offline cache and any future
+   Capacitor-wrapped build don't depend on external network access for the app's core
+   look. Latin subset only -- covers English and Dutch (incl. diacritics like ë/ï/ö). */
+
+@font-face {
+  font-family: "Press Start 2P";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/press-start-2p-latin-400.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "VT323";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/vt323-latin-400.woff2") format("woff2");
+}

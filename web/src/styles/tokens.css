@@ -7,7 +7,8 @@
   --nbr-muted: #6b6b6b;
   --nbr-border: #2a2a2a;
 
-  --nbr-font-mono: "IBM Plex Mono", "Courier New", monospace;
+  --nbr-font-mono: "VT323", "IBM Plex Mono", "Courier New", monospace;
+  --nbr-font-display: "Press Start 2P", "Courier New", monospace;
 
   --nbr-space-1: 0.25rem;
   --nbr-space-2: 0.5rem;
