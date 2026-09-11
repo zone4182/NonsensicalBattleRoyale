@@ -169,6 +169,7 @@ async function startRound() {
     const res = await callFunction<StartRoundResponse>("start-round", {}, { token: session.token });
     startMessage.value = t("roundHeader.round", { number: res.round_number }) + ". " + t("roundHeader.deadline", { deadline: res.voting_deadline_at });
     await game.refresh(session.token);
+    await loadOverview();
   } catch (err) {
     startMessage.value = err instanceof ApiCallError ? err.message : t("common.somethingWentWrong");
   } finally {

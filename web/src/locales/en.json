@@ -162,6 +162,7 @@
   },
   "voteAction": {
     "ghostNotice": "You're a ghost -- spectating only. (Seance, GAME-DESIGN.md's ghost-only vote on this round's narration flavor, isn't wired up yet.)",
+    "noOpenRound": "No round is open to vote in right now.",
     "changeVote": "Change vote",
     "vote": "Vote",
     "voteCast": "Vote cast",

@@ -162,6 +162,7 @@
   },
   "voteAction": {
     "ghostNotice": "Je bent een geest -- alleen toeschouwer. (De Seance, GAME-DESIGN.md's geest-only stem op de verteltoon van deze ronde, is nog niet aangesloten.)",
+    "noOpenRound": "Er is momenteel geen open ronde om op te stemmen.",
     "changeVote": "Stem wijzigen",
     "vote": "Stemmen",
     "voteCast": "Stem uitgebracht",

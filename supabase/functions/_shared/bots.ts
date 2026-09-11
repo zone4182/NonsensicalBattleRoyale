@@ -10,12 +10,59 @@ import { ALL_ROOM_IDS, STARTING_ROOM, validDestinations, type RoomId } from "./m
 
 type Exec = ReturnType<typeof sql>;
 
+// Flavor only -- these are just display_name strings, same column a real invite would
+// use, so nothing else needs to know or care that a bot is named "Count Snackula"
+// instead of "Bot 3". Comfortably more than the 19-bot ceiling (see validation.ts'
+// bot_count range) so a single game never needs to repeat one.
+const BOT_NAMES = [
+  "Count Snackula",
+  "Sir Reginald Pancake III",
+  "Baroness Von Suspicion",
+  "Mothman's Accountant",
+  "The Candlestick Whisperer",
+  "Duchess Alibi",
+  "Professor Wobblebottom",
+  "Reverend Doubt",
+  "Lady Trapdoor",
+  "Constable Red Herring",
+  "The Butler Did It (Probably)",
+  "Madame Sixth Sense",
+  "Lord Ominous",
+  "Great Aunt Cyanide",
+  "Inspector Gadabout",
+  "The Understudy Ghost",
+  "Colonel Mustache",
+  "Widow Creakyfloor",
+  "The Substitute Vampire",
+  "Baron Von Sneeze",
+  "Mx. Cryptic",
+  "The Nervous Taxidermist",
+  "Countess Eavesdrop",
+  "Sir Loin of Beef",
+  "The Understaffed Ghost",
+  "Deacon Suspicious",
+  "Auntie Poison Ivy",
+  "The Gardener Who Knows Too Much",
+  "Viscount Alibi-Adjacent",
+  "The Overqualified Maid",
+] as const;
+
+function pickBotNames(count: number): string[] {
+  const shuffled = [...BOT_NAMES].sort(() => Math.random() - 0.5);
+  const names: string[] = shuffled.slice(0, count);
+  // Defensive only -- botCount is capped at 19 (well under BOT_NAMES.length) by
+  // validation.ts, so this never actually triggers.
+  for (let i = names.length; i < count; i++) names.push(`Bot ${i + 1}`);
+  return names;
+}
+
 // Bots are `role = 'player'` rows with `is_bot = true`, each backed by a synthetic,
 // already-redeemed invite (players.invite_id is a required FK -- see the migration).
 // Called once, inside create-game's transaction, right after the real game row exists.
 export async function createBotPlayers(exec: Exec, gameId: string, botCount: number, moveToRoomEnabled: boolean): Promise<void> {
+  const botNames = pickBotNames(botCount);
   for (let i = 1; i <= botCount; i++) {
-    const displayName = `Bot ${i}`;
+    const displayName = botNames[i - 1];
     const [invite] = await exec`
       insert into battle_royale.invites (game_id, token, display_name, role, redeemed_at)
       values (${gameId}, ${generateInviteToken()}, ${displayName}, 'player', now())
