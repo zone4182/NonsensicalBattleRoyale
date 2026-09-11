@@ -37,6 +37,7 @@
   },
   "seance": {
     "title": "De Seance",
+    "imageCaption": "De kring van geesten, reikend naar wat er nog over is van de seancetafel in de woonkamer.",
     "description": "Stem op een andere verteltoon voor de al vaststaande eliminatie-aankondiging van deze ronde. Volledig cosmetisch.",
     "options": {
       "somber": "Somber",
@@ -130,6 +131,7 @@
   },
   "prologueDecision": {
     "prompt": "Wat moeten jullie doen?",
+    "imageCaption": "De keuken -- iedereen praat door elkaar heen, en beslist wat er nu moet gebeuren.",
     "options": {
       "call_police": "Bel de politie",
       "get_help": "Ga naar buiten om hulp te halen",
@@ -152,6 +154,7 @@
     "theLetter": "In de studeerkamer, op het bureau, ligt een verzegelde envelop met ieders naam erop, in pijnlijk herkenbaar handschrift. Het is een brief -- geschreven voor de moord.",
     "theRules": "De regels zijn eenvoudig, staat er. Elke ronde brengt iedereen één stem uit -- anoniem, definitief. Wie de meeste stemmen krijgt, is weg zodra de zon ondergaat. Alleen wie als laatste overblijft, mag door de voordeur naar buiten.",
     "andSoItBegins": "En zo begint het...",
+    "next": "Volgende",
     "continue": "Doorgaan"
   },
   "roundHeader": {

@@ -37,6 +37,7 @@
   },
   "seance": {
     "title": "The Seance",
+    "imageCaption": "The circle of ghosts, reaching for whatever's left of the living room's séance table.",
     "description": "Vote among alternate narration flavors for this round's already-decided elimination announcement. Entirely cosmetic.",
     "options": {
       "somber": "Somber",
@@ -130,6 +131,7 @@
   },
   "prologueDecision": {
     "prompt": "What should you do?",
+    "imageCaption": "The kitchen -- everyone talking over everyone else, deciding what to do next.",
     "options": {
       "call_police": "Call the police",
       "get_help": "Go outside to get help",
@@ -152,6 +154,7 @@
     "theLetter": "In the study, on the desk, lies a sealed envelope with everyone's name on it, written in painfully familiar handwriting. It's a letter -- written before the murder.",
     "theRules": "The rules are simple, it says. Each round, everyone casts a single vote -- anonymous, final. Whoever receives the most votes is gone by the time the sun sets. Only the last one left gets to walk out the front door.",
     "andSoItBegins": "And so it begins...",
+    "next": "Next",
     "continue": "Continue"
   },
   "roundHeader": {

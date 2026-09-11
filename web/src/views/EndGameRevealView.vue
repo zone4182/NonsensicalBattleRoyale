@@ -6,6 +6,7 @@ import { useGameStore } from "../stores/game";
 import { useSessionStore } from "../stores/session";
 import { useApiCall } from "../composables/useApiCall";
 import FullscreenLayout from "../layouts/FullscreenLayout.vue";
+import PlaceholderVisual from "../components/PlaceholderVisual.vue";
 
 const { t } = useI18n();
 const router = useRouter();
@@ -40,7 +41,7 @@ function openGameStats() {
       <p class="placeholder-tag">
         {{ t("common.placeholder") }}
       </p>
-      <p>{{ t(`endGameReveal.epilogue.${epilogueVariant}`) }}</p>
+      <PlaceholderVisual :caption="t(`endGameReveal.epilogue.${epilogueVariant}`)" />
     </section>
 
     <section class="panel pixel-frame">

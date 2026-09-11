@@ -4,6 +4,7 @@ import { useI18n } from "vue-i18n";
 import { useGameStore, type PrologueOption } from "../../stores/game";
 import { useSessionStore } from "../../stores/session";
 import { callFunction, ApiCallError } from "../../lib/api";
+import PlaceholderVisual from "../PlaceholderVisual.vue";
 
 // Round 1's group decision -- not the normal Vote button/modal (submit-vote), a
 // completely separate mechanic (submit-prologue-vote) with its own fixed 3-option
@@ -51,6 +52,7 @@ async function choose(option: PrologueOption) {
       </p>
     </template>
     <template v-else>
+      <PlaceholderVisual :caption="t('prologueDecision.imageCaption')" />
       <p class="prompt">
         {{ t("prologueDecision.prompt") }}
       </p>

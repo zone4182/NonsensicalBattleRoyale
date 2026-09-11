@@ -9,6 +9,7 @@ import { usePoll } from "../composables/usePoll";
 import { useGameFinishedRedirect } from "../composables/useGameFinishedRedirect";
 import { callFunction, ApiCallError } from "../lib/api";
 import FullscreenLayout from "../layouts/FullscreenLayout.vue";
+import PlaceholderVisual from "../components/PlaceholderVisual.vue";
 
 const POLL_INTERVAL_MS = 15_000;
 
@@ -117,7 +118,7 @@ async function pick(doorNumber: number) {
       <p class="placeholder-tag">
         {{ t("common.placeholder") }}
       </p>
-      <p>{{ t("threeDoors.prologuePlaceholder") }}</p>
+      <PlaceholderVisual :caption="t('threeDoors.prologuePlaceholder')" />
     </section>
     <p>{{ t("threeDoors.description") }}</p>
     <p

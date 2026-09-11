@@ -5,6 +5,7 @@ import { useSessionStore } from "../stores/session";
 import { useApiCall } from "../composables/useApiCall";
 import { callFunction } from "../lib/api";
 import FullscreenLayout from "../layouts/FullscreenLayout.vue";
+import PlaceholderVisual from "../components/PlaceholderVisual.vue";
 
 const { t } = useI18n();
 
@@ -28,6 +29,7 @@ async function cast(option: string) {
 <template>
   <FullscreenLayout>
     <h1>{{ t("seance.title") }}</h1>
+    <PlaceholderVisual :caption="t('seance.imageCaption')" />
     <p>{{ t("seance.description") }}</p>
     <section class="panel pixel-frame">
       <ul class="option-list">
