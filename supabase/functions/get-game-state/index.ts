@@ -2,6 +2,7 @@ import { errorResponse, jsonResponse, preflightResponse } from "../_shared/http.
 import { authenticate } from "../_shared/auth.ts";
 import { countActiveVotesForVoter, sql } from "../_shared/db.ts";
 import { publicName } from "../_shared/names.ts";
+import { ALL_ROOM_IDS, type RoomId } from "../_shared/mansion.ts";
 import type { Player, Round } from "../_shared/types.ts";
 
 // Read-only. Queries only players/rounds/power_grants/narration_log -- never votes,
@@ -55,6 +56,70 @@ Deno.serve(async (req) => {
       limit 20
     `;
 
+    // Move-to-Room mini-game. Tiered occupancy only (never an exact per-player
+    // breakdown) -- capped at 3 ("crowded") so a handful of brightness steps is all a
+    // room ever needs, and only alive role='player' rows count (a ghost's last room
+    // shouldn't still show as occupied; the GM never has a meaningful position here).
+    let moveToRoom: Record<string, unknown> | null = null;
+    if (ctx.game.move_to_room_enabled) {
+      const occupancyRows = await db<{ current_room_id: RoomId; count: number }[]>`
+        select pr.current_room_id, count(*)::int as count
+        from battle_royale.player_rooms pr
+        join battle_royale.players p on p.id = pr.player_id
+        where pr.game_id = ${ctx.game.id} and p.status = 'alive' and p.role = 'player'
+        group by pr.current_room_id
+      `;
+      const countByRoom = new Map(occupancyRows.map((r) => [r.current_room_id, r.count]));
+      const occupancy = ALL_ROOM_IDS.map((roomId) => ({
+        room_id: roomId,
+        heat: Math.min(countByRoom.get(roomId) ?? 0, 3),
+      }));
+
+      let yourRoomId: RoomId | null = null;
+      let currentRoundState: Record<string, unknown> | null = null;
+
+      if (ctx.role === "player") {
+        const [yourRoom] = await db<{ current_room_id: RoomId }[]>`
+          select current_room_id from battle_royale.player_rooms
+          where game_id = ${ctx.game.id} and player_id = ${ctx.player.id}
+        `;
+        yourRoomId = yourRoom?.current_room_id ?? null;
+
+        if (openRound && ctx.player.status === "alive") {
+          const [move] = await db<{ target_room_id: RoomId }[]>`
+            select target_room_id from battle_royale.round_room_moves
+            where round_id = ${openRound.id} and player_id = ${ctx.player.id}
+          `;
+          const [assignment] = await db<{ target_player_id: string; display_name: string; chosen_display_name: string | null }[]>`
+            select p.id as target_player_id, p.display_name, p.chosen_display_name
+            from battle_royale.round_guess_assignments a
+            join battle_royale.players p on p.id = a.target_player_id
+            where a.round_id = ${openRound.id} and a.guesser_player_id = ${ctx.player.id}
+          `;
+          const [guess] = await db<{ guessed_room_id: RoomId }[]>`
+            select guessed_room_id from battle_royale.round_room_guesses
+            where round_id = ${openRound.id} and guesser_player_id = ${ctx.player.id}
+          `;
+
+          currentRoundState = {
+            your_move_submitted: move?.target_room_id ?? null,
+            guess_target: assignment
+              ? { player_id: assignment.target_player_id, display_name: publicName(assignment.display_name, assignment.chosen_display_name) }
+              : null,
+            your_guess_submitted: guess?.guessed_room_id ?? null,
+          };
+        }
+      }
+
+      moveToRoom = {
+        enabled: true,
+        your_room_id: yourRoomId,
+        points: ctx.role === "player" ? ctx.player.room_guess_points : 0,
+        occupancy,
+        current_round: currentRoundState,
+      };
+    }
+
     return jsonResponse({
       game_id: ctx.game.id,
       game_name: ctx.game.name,
@@ -78,6 +143,7 @@ Deno.serve(async (req) => {
         vote_locked_this_round: voteLockedThisRound,
       },
       narration_entries: narration.reverse().map((n) => ({ id: n.id, text: n.body, created_at: n.created_at })),
+      move_to_room: moveToRoom,
     });
   } catch (err) {
     return errorResponse(err);

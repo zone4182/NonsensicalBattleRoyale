@@ -1,12 +1,13 @@
 import { errorResponse, HttpError, jsonResponse, preflightResponse, readJsonBody } from "../_shared/http.ts";
 import { pickDoubleVoteHolder, sql } from "../_shared/db.ts";
 import { grantRandomDrop } from "../_shared/powers.ts";
-import { castBotVotes } from "../_shared/bots.ts";
+import { castBotRoomGuesses, castBotRoomMoves, castBotVotes } from "../_shared/bots.ts";
 import { sendPushToPlayers } from "../_shared/push.ts";
 import { enforceRateLimit } from "../_shared/rateLimit.ts";
 import { optionalStringMaxLength, requireString } from "../_shared/validation.ts";
 import { MIN_PLAYERS_TO_START } from "../_shared/constants.ts";
 import { publicName } from "../_shared/names.ts";
+import { assignRoundGuessTargets, initPlayerRoom } from "../_shared/roomMovement.ts";
 import type { Game, Invite } from "../_shared/types.ts";
 
 // Not authenticated via authenticate() -- the invite isn't redeemed yet, so there's no
@@ -49,6 +50,10 @@ Deno.serve(async (req) => {
       const [game] = await tx<Game[]>`
         select * from battle_royale.games where id = ${invite.game_id}
       `;
+
+      if (game.move_to_room_enabled) {
+        await initPlayerRoom(tx, game.id, player.id);
+      }
 
       let gamePhase: string = game.phase;
       let newRoundPlayerIds: string[] | null = null;
@@ -95,6 +100,11 @@ Deno.serve(async (req) => {
             aliveRoster.map((p) => p.id),
           );
           await castBotVotes(tx, game.id, round.id, doubleVotePlayerId);
+          if (game.move_to_room_enabled) {
+            await assignRoundGuessTargets(tx, game.id, round.id);
+            await castBotRoomMoves(tx, game.id, round.id);
+            await castBotRoomGuesses(tx, game.id, round.id);
+          }
           newRoundPlayerIds = aliveRoster.map((p) => p.id);
         }
       }

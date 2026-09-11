@@ -2,9 +2,10 @@ import { errorResponse, HttpError, jsonResponse, preflightResponse } from "../_s
 import { authenticate, requireRole } from "../_shared/auth.ts";
 import { pickDoubleVoteHolder, sql } from "../_shared/db.ts";
 import { grantRandomDrop } from "../_shared/powers.ts";
-import { castBotVotes } from "../_shared/bots.ts";
+import { castBotRoomGuesses, castBotRoomMoves, castBotVotes } from "../_shared/bots.ts";
 import { sendPushToPlayers } from "../_shared/push.ts";
 import { MIN_PLAYERS_TO_START } from "../_shared/constants.ts";
+import { assignRoundGuessTargets } from "../_shared/roomMovement.ts";
 import type { Game } from "../_shared/types.ts";
 
 // GM-only. Creates round 1 for a game still in setup -- used for gm_manual (GM clicks
@@ -68,6 +69,11 @@ Deno.serve(async (req) => {
         aliveRoster.map((p) => p.id),
       );
       await castBotVotes(tx, game.id, round.id, doubleVotePlayerId);
+      if (game.move_to_room_enabled) {
+        await assignRoundGuessTargets(tx, game.id, round.id);
+        await castBotRoomMoves(tx, game.id, round.id);
+        await castBotRoomGuesses(tx, game.id, round.id);
+      }
 
       return {
         roundId: round.id,

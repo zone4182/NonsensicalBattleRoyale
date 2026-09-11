@@ -167,6 +167,52 @@
       "noVoteCast": "Breng eerst een stem uit voordat je die vastzet."
     }
   },
+  "moveToRoom": {
+    "button": "Verplaatsen",
+    "title": "Verplaats je door het landhuis",
+    "description": "Verplaats je één kamer verder, en raad waar een andere gast zich verstopt. Beide zijn volledig optioneel.",
+    "pointsLabel": "Gokpunten: {points}",
+    "showStaircaseHelp": "Hoe werken trappen?",
+    "hideStaircaseHelp": "Trappenhulp verbergen",
+    "staircaseHelp": "De Entreehal en de Overloop zijn trapkamers -- sta je in een van beide, dan kun je direct naar de andere verplaatsen, en zo van de begane grond naar de eerste verdieping (of andersom).",
+    "floors": {
+      "ground": "Begane Grond",
+      "first": "Eerste Verdieping"
+    },
+    "rooms": {
+      "library": "Bibliotheek",
+      "entrance_hall": "Entreehal",
+      "living_room": "Woonkamer",
+      "dining_room": "Eetkamer",
+      "kitchen": "Keuken",
+      "toilet": "Toilet",
+      "guest_bedroom_1": "Logeerkamer 1",
+      "landing": "Overloop",
+      "master_bedroom": "Hoofdslaapkamer",
+      "guest_bedroom_2": "Logeerkamer 2",
+      "bathroom": "Badkamer"
+    },
+    "youMarker": "Jij",
+    "moveOptionalHint": "Alleen de gemarkeerde kamers zijn vanaf jouw positie bereikbaar. Verplaatsen is optioneel -- blijven staan is ook een geldige keuze.",
+    "moveSubmitted": "Verplaatsing ingediend: {room}. Je kunt dit wijzigen tot de ronde wordt afgehandeld.",
+    "moving": "Bezig met verplaatsen...",
+    "confirmMove": "Verplaatsing bevestigen",
+    "guess": {
+      "heading": "Raad een verstopplek",
+      "description": "Waar denk je dat {name} zich nu bevindt?",
+      "optionalHint": "Gokken is optioneel. Een juiste gok levert je een punt op.",
+      "submitted": "Gok ingediend: {room}. Je kunt dit wijzigen tot de ronde wordt afgehandeld.",
+      "guessing": "Bezig met gokken...",
+      "confirmGuess": "Gok bevestigen"
+    },
+    "errors": {
+      "miniGameDisabled": "Dit spel heeft de minigame Verhuis-naar-kamer niet ingeschakeld.",
+      "noOpenRound": "Er is nu geen open ronde om te verplaatsen of te gokken.",
+      "noRoomAssigned": "Je hebt nog geen kamer toegewezen gekregen.",
+      "invalidDestination": "Die kamer grenst niet aan jouw huidige kamer (of een verbonden trapkamer).",
+      "noGuessAssigned": "Je hebt niemand om deze ronde naar te gokken."
+    }
+  },
   "gmNav": {
     "setup": "Instellen",
     "inPlay": "Bezig",
@@ -246,6 +292,11 @@
       "botModeHint": "Vult het spel met door algoritmes bestuurde spelers (voorlopig willekeurige zetten) zodat je solo een volledig spel kunt testen. Je hebt nog steeds minstens één echte speler naast jezelf nodig -- bots vullen een spel aan, ze vervangen het niet.",
       "botCount": "Aantal bots",
       "botCountHint": "Hoeveel bots toe te voegen naast de echte spelers die je uitnodigt (max 19, en bots + echte spelers samen moeten binnen de limiet van 20 spelers blijven)."
+    },
+    "miniGames": {
+      "heading": "Minigames",
+      "moveToRoomEnabled": "Verhuis-naar-kamer inschakelen",
+      "moveToRoomEnabledHint": "Elke ronde mogen levende spelers één stap door het landhuis verplaatsen en raden waar een andere speler zich verstopt. Een juiste gok levert de gokker een punt op."
     },
     "access": {
       "heading": "Toegang",
@@ -339,6 +390,20 @@
       "player": "Speler",
       "door": "Deur",
       "outcome": "Uitkomst",
+      "pending": "in afwachting"
+    },
+    "moveToRoom": {
+      "heading": "Verhuis-naar-kamer",
+      "positionsHint": "Live, echte posities -- nooit op deze manier aan andere spelers getoond.",
+      "player": "Speler",
+      "room": "Kamer",
+      "guessHistoryHeading": "Gokgeschiedenis",
+      "noGuesses": "Nog geen gokken.",
+      "roundNumber": "Ronde",
+      "guesser": "Gokker",
+      "target": "Doelwit",
+      "guessedRoom": "Gegokte kamer",
+      "correct": "Correct",
       "pending": "in afwachting"
     },
     "gamePhase": "Spelfase: {phase}",

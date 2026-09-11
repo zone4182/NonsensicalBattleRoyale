@@ -28,6 +28,7 @@ export interface Game {
   allow_vote_change: boolean;
   tie_break_mode: TieBreakMode;
   three_doors_winning_door: number | null;
+  move_to_room_enabled: boolean;
   gm_player_id: string | null;
   finished_at: string | null;
   created_at: string;
@@ -56,6 +57,7 @@ export interface Player {
   vote_suspended_through_round_number: number | null;
   vote_locked_for_round_number: number | null;
   is_bot: boolean;
+  room_guess_points: number;
 }
 
 export interface Round {

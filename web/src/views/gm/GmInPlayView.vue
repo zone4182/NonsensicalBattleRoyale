@@ -79,6 +79,17 @@ interface GmGameOverview {
     resolved_outcome: "win" | "lose" | "lose_all" | null;
     picked_at: string;
   }[];
+  move_to_room: {
+    enabled: boolean;
+    players: { id: string; display_name: string; room_id: string }[];
+    guess_history: {
+      round_number: number;
+      guesser_display_name: string;
+      target_display_name: string;
+      guessed_room_id: string;
+      correct: boolean | null;
+    }[];
+  } | null;
 }
 
 const ACTION_TYPES = ["tie_break", "grant_power", "narration_edit", "twist"];
@@ -247,6 +258,7 @@ function exportSession() {
     current_round: overview.value.current_round,
     rounds: overview.value.rounds,
     door_picks: overview.value.door_picks,
+    move_to_room: overview.value.move_to_room,
   };
 
   const blob = new Blob([JSON.stringify(snapshot, null, 2)], { type: "application/json" });
@@ -474,6 +486,74 @@ async function submit() {
               <td>{{ pick.player_display_name }}</td>
               <td>{{ pick.door_number }}</td>
               <td>{{ pick.resolved_outcome ?? t("gmInPlay.threeDoors.pending") }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </template>
+
+    <template v-if="overview?.move_to_room?.enabled">
+      <h2>{{ t("gmInPlay.moveToRoom.heading") }}</h2>
+      <p class="field-hint">
+        {{ t("gmInPlay.moveToRoom.positionsHint") }}
+      </p>
+      <div class="table-scroll">
+        <table class="votes-table">
+          <thead>
+            <tr>
+              <th>{{ t("gmInPlay.moveToRoom.player") }}</th>
+              <th>{{ t("gmInPlay.moveToRoom.room") }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              v-for="p in overview.move_to_room.players"
+              :key="p.id"
+            >
+              <td>{{ p.display_name }}</td>
+              <td>{{ t(`moveToRoom.rooms.${p.room_id}`) }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>{{ t("gmInPlay.moveToRoom.guessHistoryHeading") }}</h3>
+      <p v-if="overview.move_to_room.guess_history.length === 0">
+        {{ t("gmInPlay.moveToRoom.noGuesses") }}
+      </p>
+      <div
+        v-else
+        class="table-scroll"
+      >
+        <table class="votes-table">
+          <thead>
+            <tr>
+              <th>{{ t("gmInPlay.moveToRoom.roundNumber") }}</th>
+              <th>{{ t("gmInPlay.moveToRoom.guesser") }}</th>
+              <th>{{ t("gmInPlay.moveToRoom.target") }}</th>
+              <th>{{ t("gmInPlay.moveToRoom.guessedRoom") }}</th>
+              <th>{{ t("gmInPlay.moveToRoom.correct") }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              v-for="(guess, i) in overview.move_to_room.guess_history"
+              :key="i"
+              :class="{ 'eliminated-row': guess.correct === false }"
+            >
+              <td>{{ guess.round_number }}</td>
+              <td>{{ guess.guesser_display_name }}</td>
+              <td>{{ guess.target_display_name }}</td>
+              <td>{{ t(`moveToRoom.rooms.${guess.guessed_room_id}`) }}</td>
+              <td>
+                {{
+                  guess.correct === null
+                    ? t("gmInPlay.moveToRoom.pending")
+                    : guess.correct
+                      ? t("gmInPlay.settings.yes")
+                      : t("gmInPlay.settings.no")
+                }}
+              </td>
             </tr>
           </tbody>
         </table>

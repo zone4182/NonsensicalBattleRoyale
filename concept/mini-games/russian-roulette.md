@@ -18,14 +18,27 @@ to it.
 
 ## Setup (GM-configurable)
 
-- **Player count**: 2-6. The upper bound isn't arbitrary -- it's exactly the cylinder
-  size, so "everyone gets one turn" always fits within a single lap of an unreloaded
-  cylinder with no wraparound needed.
-- **Bullets loaded**: 1-6, out of the 6 chambers. Positions chosen at random and
-  never revealed in advance. Exact GM-setup UI/mechanism is undecided (see Open
-  Questions) -- functionally just a number, same shape as e.g.
+**Resolved: player count/selection is never a pre-game setting -- it can't be.** A
+session only ever involves *currently alive* players at the moment it's triggered,
+and (per "How a session actually starts" below) sessions happen mid-game, on
+demand, after players may already have been eliminated by normal voting. Picking
+"2-6 players" before the game has even started would mean picking people who might
+not survive to the moment a session actually runs. Selection happens live, at
+trigger time, from whoever's alive then -- see below. The 6-chamber-cylinder
+reasoning for the 2-6 range still holds, it's just enforced at trigger time instead
+of at game setup.
+
+What's left as genuinely pre-game configuration -- sensible **defaults** a GM sets
+once so they don't have to re-enter them every time they trigger a session, though
+nothing stops overriding them per-session at trigger time if a later session in the
+same game calls for something different:
+
+- **Bullets loaded (default)**: 1-6, out of the 6 chambers. Positions chosen at
+  random per session and never revealed in advance. Exact GM-setup UI/mechanism is
+  undecided (see Open Questions) -- functionally just a number, same shape as e.g.
   `double_vote_floor_rounds` in the main game's GM setup.
-- **Cylinder reset mode** -- how often the loaded-chamber positions get re-rolled:
+- **Cylinder reset mode (default)** -- how often the loaded-chamber positions get
+  re-rolled:
   1. **Never resets** -- one random arrangement for the entire session. The cylinder
      pointer just keeps advancing, lap after lap if there are multiple, the same
      revolver never re-spun. Closest to the "no re-spin" version of the real game.
@@ -34,7 +47,29 @@ to it.
   3. **Resets every pull** -- a fresh random arrangement before every single turn.
      Closest to the "spin before every shot" version. Reduces every pull to an
      independent `bullets / 6` chance, with zero memory of any previous pull.
-- **End condition**, one of three (see below).
+- **End condition (default)**, one of three (see below).
+
+## How a session actually starts
+
+**Resolves Open Questions #2 and #3 below.** Russian Roulette is fundamentally
+episodic, not continuous the way voting or Move-to-Room are -- it only ever involves
+a subset of the alive roster (2-6), not everyone, so it can't just be tied to the
+round clock the same way a mechanic every player participates in every round can be.
+
+- **GM-triggered on demand, not self-selected by players.** Matches the existing
+  "Human GM retains discretionary authority... can trigger mid-game twists, no
+  category off-limits" stance (GAME-DESIGN.md "Human GM Capabilities") -- this is
+  exactly that kind of twist, not a standing option players opt into themselves the
+  way the old item-triggered version in `items-and-advantanges.md` worked.
+- The GM picks which 2-6 currently-alive players participate, confirms (or
+  overrides) the bullets/reset-mode/end-condition defaults for this specific
+  session, and starts it.
+- **Fully decoupled from the round clock -- a side event, not a round variant.**
+  Doesn't pause, block, or wait for the currently open round's voting window; can
+  be triggered between rounds, or run alongside an open round without interfering
+  with it. This is *why* player count/settings had to move to trigger-time above --
+  a session's context (who's still alive, how far into the game it is) is only
+  known at the moment the GM actually decides to run one.
 
 ## Turn order
 
@@ -94,17 +129,63 @@ configured. See "GM Setup integration" below for where this behavior actually li
 
 ## Consequences of "losing eliminates you from the main game"
 
-A few things this decision pulls in that aren't resolved yet (see Open Questions):
+- ~~Does an elimination here produce the same `alive -> ghost` status transition as
+  a normal vote elimination, narrated the same way?~~ **Resolved** -- see "The
+  elimination hook" below.
+- ~~If this drops the alive player count to exactly 3 mid-session, does it trigger
+  Three Doors the same way a normal round resolving does?~~ **Resolved** -- see
+  "The elimination hook" below.
+- ~~Does this run instead of a normal round, between rounds, or as a GM-triggered
+  side event independent of the round clock?~~ **Resolved** -- see "How a session
+  actually starts" above: a GM-triggered side event, fully independent of the round
+  clock.
 
-- Does an elimination here produce the same `alive -> ghost` status transition as a
-  normal vote elimination, narrated the same way? Presumably yes, but not designed.
-- If this drops the alive player count to exactly 3 mid-session, does it trigger
-  Three Doors the same way a normal round resolving does? Three Doors' trigger
-  today lives entirely inside `resolve-round` (see `three-doors.md`) -- a second
-  elimination path would need its own hook into that same check.
-- Does this run *instead of* a normal round, *between* rounds, or as a GM-triggered
-  side event independent of the round clock? Not decided (see Open Questions #3,
-  now higher-stakes given real eliminations are on the line).
+## The elimination hook
+
+**Resolves Open Question #7 below.** Three Doors' trigger today lives entirely
+inside `resolve-round` -- it's the last step of resolving a normal round's votes:
+tally, eliminate, check `aliveCountAfter`, and if it's exactly 3, flip to
+`three_doors` and pick the secret winning door (see `three-doors.md`). Russian
+Roulette needs to reach that same "check the resulting alive count and transition
+the game phase if needed" behavior without going through any of the vote-specific
+machinery around it.
+
+**Resolved: that check gets pulled out into its own shared step, callable by any
+elimination path, not just `resolve-round`'s.** Concretely, once Russian Roulette
+marks a player `alive -> ghost` for a lost pull, it runs the exact same
+post-elimination phase check `resolve-round` already does:
+
+- **Alive count drops to 1 or 0** -- game ends (`phase = 'ended'`), same as a normal
+  round hitting this outcome.
+- **Alive count is exactly 3** -- flips to `phase = 'three_doors'`, picks the
+  secret winning door the same random way, and runs the same bot-auto-pick step for
+  whichever of the 3 remaining happen to be bots. From the game's perspective,
+  it doesn't matter *how* the count reached 3 -- a vote elimination and a Russian
+  Roulette elimination both end up in exactly the same place afterward.
+- **Anything else** -- nothing special happens; the game (and any currently open
+  round) just continues.
+
+**What it deliberately does *not* reuse**, because none of it makes sense for a
+non-vote elimination: vote tallying, tie-break resolution, Ward/Deflect/Null
+(vote-defensive powers with nothing to defend against here), missed-deadline
+forfeits, or the vote-pattern earn triggers (near-miss, ghost-mode, survival
+streak, etc. -- all specifically about voting behavior, not applicable to losing a
+pull). The only things a Russian Roulette elimination shares with a vote
+elimination are: the `alive -> ghost` status change itself, a narration log entry
+(same "the story so far" feed every other elimination writes to, worded for this
+cause of death rather than a vote outcome), and the shared phase-check above.
+
+**The race condition this creates, now explicit:** since a session runs
+independently of the round clock (see "How a session actually starts" above), it's
+possible for a Russian Roulette elimination to hit the "alive count is exactly 3"
+case *while a normal round is still open and mid-vote*. Resolved the same way
+`three-doors.md` already establishes for the normal path: entering `three_doors`
+phase means voting stops entirely from that point on, full stop -- an open round
+that happens to still be sitting there doesn't need any special cancellation or
+cleanup, it simply stops mattering. Nothing ever resolves it (the GM/player UI
+moves on to the Three Doors screen instead of the vote screen), and no votes
+already cast in it need to be discarded or refunded, since they were never going to
+be tallied for anything once the phase moved on.
 
 ## GM Setup integration
 
@@ -113,11 +194,20 @@ in GM Setup (Random Double Vote, Bot Mode, the not-yet-built Imposter/Assignment
 
 - A general **"Enable mini-games"** toggle in GM Setup. Off by default, doesn't
   clutter setup for a GM who just wants the core game.
-- Once enabled, **each available mini-game gets its own settings block** underneath
-  -- Russian Roulette's block holds player count, bullets, cylinder reset mode, and
-  end condition. Other mini-games that eventually get built (the room-guessing game
-  in `move-to-room-and-guess-random-appointed-guest.md`, etc.) would each get their
+- Once enabled, **each available mini-game gets its own settings block**
+  underneath -- Russian Roulette's pre-game block holds just the
+  `russian_roulette_enabled` toggle plus the bullets/reset-mode/end-condition
+  *defaults* (see "Setup" above -- player count is deliberately **not** in this
+  pre-game block, since it can only ever be chosen live when a session actually
+  starts). Other mini-games that eventually get built (the room-guessing game in
+  `move-to-room-and-guess-random-appointed-guest.md`, etc.) would each get their
   own block the same way, not a shared/generic one.
+- **Triggering an actual session is a separate, in-play GM action** (see "How a
+  session actually starts" above), not part of this pre-game setup screen at all --
+  it's something the GM does mid-game from wherever they administer the live game
+  (alongside things like granting a power or logging a tie-break), picking
+  participants from the currently-alive roster and confirming or overriding that
+  session's settings there.
 - **Russian Roulette's block specifically must enforce the reset-mode/end-condition
   conflict at the UI level** -- selecting one of the two conflicting options
   disables/hides the incompatible choice in the other control, rather than allowing
@@ -140,20 +230,20 @@ separate, self-contained mini-event, not a round variant:
 - Same secrecy shape as Three Doors' `three_doors_winning_door`: loaded positions
   are known server-side from the start (or from each reset) but never returned by
   any API response before each individual chamber is actually fired.
-- An elimination from `was_loaded = true` should reuse whatever the normal
-  vote-elimination path already does to a player's status, rather than duplicating
-  that logic here.
+- An elimination from `was_loaded = true` reuses the normal vote-elimination path's
+  status change, narration entry, and phase-transition check -- see "The
+  elimination hook" above for exactly what's shared and what isn't.
 
 ## Open questions
 
 1. Is the player order randomized once for the whole session (assumed above), or
    re-randomized for every new lap/round?
-2. How does a player actually get into a session -- self-selected (like the old
-   item-triggered version in `items-and-advantanges.md`), GM-triggered, something
-   else? Not addressed at all yet, and now more important given real eliminations
-   are at stake.
-3. When does a session happen relative to the normal round clock -- instead of a
-   round, between rounds, or fully independent/GM-triggered on demand?
+2. ~~How does a player actually get into a session.~~ **Resolved** -- see "How a
+   session actually starts" above: GM-triggered on demand, picking from
+   currently-alive players, not self-selected.
+3. ~~When does a session happen relative to the normal round clock.~~ **Resolved**
+   -- see "How a session actually starts" above: fully decoupled, a side event that
+   never blocks or waits on the round clock.
 4. ~~Whether "all bullets used" should simply be disallowed alongside the two
    resetting cylinder modes.~~ **Resolved** -- see "Reset mode × end condition" and
    "GM Setup integration" above: disallowed at the setup UI level.
@@ -165,5 +255,8 @@ separate, self-contained mini-event, not a round variant:
 6. Whether players are told the bullet count / reset mode in advance, or whether
    that's part of the tension (mirrors Three Doors' "all doors labeled Exit"
    secrecy-by-design choice).
-7. Three Doors integration if this elimination path drops the alive count to
-   exactly 3 mid-session (see "Consequences" above).
+7. ~~Three Doors integration if this elimination path drops the alive count to
+   exactly 3 mid-session.~~ **Resolved** -- see "The elimination hook" above: the
+   phase-transition check is shared between both elimination paths, and the
+   mid-open-round race condition is resolved the same way `three-doors.md` already
+   handles voting stopping entirely once that phase is entered.

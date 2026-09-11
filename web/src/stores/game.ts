@@ -42,6 +42,39 @@ export interface YourStatus {
   voteLockedThisRound: boolean;
 }
 
+// Mirrors supabase/functions/_shared/mansion.ts's RoomId union.
+export type RoomId =
+  | "library"
+  | "entrance_hall"
+  | "living_room"
+  | "dining_room"
+  | "kitchen"
+  | "toilet"
+  | "guest_bedroom_1"
+  | "landing"
+  | "master_bedroom"
+  | "guest_bedroom_2"
+  | "bathroom";
+
+export interface RoomOccupancy {
+  roomId: RoomId;
+  heat: number;
+}
+
+export interface MoveToRoomCurrentRound {
+  yourMoveSubmitted: RoomId | null;
+  guessTarget: { playerId: string; displayName: string } | null;
+  yourGuessSubmitted: RoomId | null;
+}
+
+export interface MoveToRoomState {
+  enabled: boolean;
+  yourRoomId: RoomId | null;
+  points: number;
+  occupancy: RoomOccupancy[];
+  currentRound: MoveToRoomCurrentRound | null;
+}
+
 interface GetGameStateResponse {
   game_id: string;
   game_name: string;
@@ -57,6 +90,17 @@ interface GetGameStateResponse {
     vote_locked_this_round: boolean;
   };
   narration_entries: { id: string; text: string; created_at: string }[];
+  move_to_room: {
+    enabled: boolean;
+    your_room_id: RoomId | null;
+    points: number;
+    occupancy: { room_id: RoomId; heat: number }[];
+    current_round: {
+      your_move_submitted: RoomId | null;
+      guess_target: { player_id: string; display_name: string } | null;
+      your_guess_submitted: RoomId | null;
+    } | null;
+  } | null;
 }
 
 export const useGameStore = defineStore("game", () => {
@@ -69,6 +113,7 @@ export const useGameStore = defineStore("game", () => {
   const players = ref<RosterPlayer[]>([]);
   const yourStatus = ref<YourStatus | null>(null);
   const narrationEntries = ref<NarrationEntry[]>([]);
+  const moveToRoom = ref<MoveToRoomState | null>(null);
 
   // Single source for populating this store -- reused by every screen that needs
   // fresh roster/phase data (main round, vote modal, seance, three doors) rather than
@@ -95,6 +140,26 @@ export const useGameStore = defineStore("game", () => {
       voteLockedThisRound: raw.your_status.vote_locked_this_round,
     };
     narrationEntries.value = raw.narration_entries.map((n) => ({ id: n.id, text: n.text, createdAt: n.created_at }));
+    moveToRoom.value = raw.move_to_room
+      ? {
+          enabled: raw.move_to_room.enabled,
+          yourRoomId: raw.move_to_room.your_room_id,
+          points: raw.move_to_room.points,
+          occupancy: raw.move_to_room.occupancy.map((o) => ({ roomId: o.room_id, heat: o.heat })),
+          currentRound: raw.move_to_room.current_round
+            ? {
+                yourMoveSubmitted: raw.move_to_room.current_round.your_move_submitted,
+                guessTarget: raw.move_to_room.current_round.guess_target
+                  ? {
+                      playerId: raw.move_to_room.current_round.guess_target.player_id,
+                      displayName: raw.move_to_room.current_round.guess_target.display_name,
+                    }
+                  : null,
+                yourGuessSubmitted: raw.move_to_room.current_round.your_guess_submitted,
+              }
+            : null,
+        }
+      : null;
   }
 
   return {
@@ -107,6 +172,7 @@ export const useGameStore = defineStore("game", () => {
     players,
     yourStatus,
     narrationEntries,
+    moveToRoom,
     refresh,
   };
 });

@@ -6,13 +6,14 @@
 // questions" #5 for what's deliberately out of scope: powers, Seance).
 import { castVote, sql } from "./db.ts";
 import { generateInviteToken } from "./tokens.ts";
+import { ALL_ROOM_IDS, STARTING_ROOM, validDestinations, type RoomId } from "./mansion.ts";
 
 type Exec = ReturnType<typeof sql>;
 
 // Bots are `role = 'player'` rows with `is_bot = true`, each backed by a synthetic,
 // already-redeemed invite (players.invite_id is a required FK -- see the migration).
 // Called once, inside create-game's transaction, right after the real game row exists.
-export async function createBotPlayers(exec: Exec, gameId: string, botCount: number): Promise<void> {
+export async function createBotPlayers(exec: Exec, gameId: string, botCount: number, moveToRoomEnabled: boolean): Promise<void> {
   for (let i = 1; i <= botCount; i++) {
     const displayName = `Bot ${i}`;
     const [invite] = await exec`
@@ -20,10 +21,17 @@ export async function createBotPlayers(exec: Exec, gameId: string, botCount: num
       values (${gameId}, ${generateInviteToken()}, ${displayName}, 'player', now())
       returning id
     `;
-    await exec`
+    const [player] = await exec`
       insert into battle_royale.players (game_id, invite_id, role, display_name, is_bot)
       values (${gameId}, ${invite.id}, 'player', ${displayName}, true)
+      returning id
     `;
+    if (moveToRoomEnabled) {
+      await exec`
+        insert into battle_royale.player_rooms (game_id, player_id, current_room_id)
+        values (${gameId}, ${player.id}, ${STARTING_ROOM})
+      `;
+    }
   }
 }
 
@@ -69,6 +77,55 @@ export async function castBotDoorPicks(exec: Exec, gameId: string, aliveBotPlaye
     await exec`
       insert into battle_royale.door_picks (game_id, player_id, door_number)
       values (${gameId}, ${playerId}, ${doorNumber})
+    `;
+  }
+}
+
+// Move-to-Room mini-game. Called once, right after a round is inserted (same moment as
+// castBotVotes), only when the game has the mini-game enabled -- every living bot picks
+// a uniform-random legal destination from wherever it currently is (adjacent room, its
+// own room again as an explicit "stay", or a staircase cell's cross-floor option).
+export async function castBotRoomMoves(exec: Exec, gameId: string, roundId: string): Promise<void> {
+  const bots = await exec<{ id: string }[]>`
+    select id from battle_royale.players where game_id = ${gameId} and status = 'alive' and role = 'player' and is_bot = true
+  `;
+  if (bots.length === 0) return;
+
+  const rooms = await exec<{ player_id: string; current_room_id: RoomId }[]>`
+    select player_id, current_room_id from battle_royale.player_rooms
+    where game_id = ${gameId} and player_id in ${exec(bots.map((b) => b.id))}
+  `;
+
+  for (const room of rooms) {
+    const options = validDestinations(room.current_room_id);
+    const target = options[Math.floor(Math.random() * options.length)];
+    await exec`
+      insert into battle_royale.round_room_moves (round_id, player_id, target_room_id)
+      values (${roundId}, ${room.player_id}, ${target})
+    `;
+  }
+}
+
+// Move-to-Room mini-game. Called once, after assignRoundGuessTargets has run for this
+// round (roomMovement.ts) -- every living bot with a guess assignment submits a
+// uniform-random real room, same "no strategy, just uniform random" convention as
+// every other bot decision in this file.
+export async function castBotRoomGuesses(exec: Exec, gameId: string, roundId: string): Promise<void> {
+  const bots = await exec<{ id: string }[]>`
+    select id from battle_royale.players where game_id = ${gameId} and status = 'alive' and role = 'player' and is_bot = true
+  `;
+  if (bots.length === 0) return;
+
+  const assignments = await exec<{ guesser_player_id: string }[]>`
+    select guesser_player_id from battle_royale.round_guess_assignments
+    where round_id = ${roundId} and guesser_player_id in ${exec(bots.map((b) => b.id))}
+  `;
+
+  for (const assignment of assignments) {
+    const guess = ALL_ROOM_IDS[Math.floor(Math.random() * ALL_ROOM_IDS.length)];
+    await exec`
+      insert into battle_royale.round_room_guesses (round_id, guesser_player_id, guessed_room_id)
+      values (${roundId}, ${assignment.guesser_player_id}, ${guess})
     `;
   }
 }

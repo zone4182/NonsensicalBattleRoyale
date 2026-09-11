@@ -65,13 +65,23 @@ watch(
       <CinematicViewport />
     </div>
     <div class="area-hub pixel-frame">
-      <button
-        type="button"
-        class="settings-button"
-        @click="showSettings = true"
-      >
-        {{ t("playerSettings.button") }}
-      </button>
+      <div class="hub-buttons">
+        <button
+          type="button"
+          class="settings-button"
+          @click="showSettings = true"
+        >
+          {{ t("playerSettings.button") }}
+        </button>
+        <button
+          v-if="game.moveToRoom?.enabled && game.yourStatus?.status === 'alive'"
+          type="button"
+          class="settings-button"
+          @click="router.push({ name: 'move-to-room' })"
+        >
+          {{ t("moveToRoom.button") }}
+        </button>
+      </div>
       <PlayerRoster />
       <YourStatusPanel />
     </div>
@@ -200,6 +210,12 @@ watch(
 }
 .area-action {
   grid-area: action;
+}
+
+.hub-buttons {
+  display: flex;
+  gap: var(--nbr-space-2);
+  flex-wrap: wrap;
 }
 
 .settings-button {

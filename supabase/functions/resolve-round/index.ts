@@ -10,16 +10,17 @@ import {
   tallyVotesForRound,
 } from "../_shared/db.ts";
 import { evaluateEarnTriggers, grantRandomDrop } from "../_shared/powers.ts";
-import { castBotDoorPicks, castBotVotes } from "../_shared/bots.ts";
+import { castBotDoorPicks, castBotRoomGuesses, castBotRoomMoves, castBotVotes } from "../_shared/bots.ts";
 import { sendPushToPlayers } from "../_shared/push.ts";
 import { publicName } from "../_shared/names.ts";
+import { assignRoundGuessTargets, resolveRoomMovesAndGuesses } from "../_shared/roomMovement.ts";
 import type { Game, Player, PowerGrant, Round } from "../_shared/types.ts";
 
 interface Resolution {
   round_id: string;
   round_number: number;
   eliminated_player_ids: string[];
-  tie_break_method: "none" | "random";
+  tie_break_method: "none" | "random" | "no_elimination";
   new_phase: Game["phase"];
 }
 
@@ -244,6 +245,10 @@ Deno.serve(async (req) => {
           values (${game.id}, ${round.id}, ${narration})
         `;
 
+        if (game.move_to_room_enabled) {
+          await resolveRoomMovesAndGuesses(tx, game.id, round.id);
+        }
+
         const aliveIdsAfter = aliveIds.filter((id) => !eliminatedIds.has(id));
         const aliveCountAfter = aliveIdsAfter.length;
 
@@ -277,6 +282,11 @@ Deno.serve(async (req) => {
           `;
           await grantRandomDrop(tx, game.id, newRound.id, aliveIdsAfter);
           await castBotVotes(tx, game.id, newRound.id, doubleVotePlayerId);
+          if (game.move_to_room_enabled) {
+            await assignRoundGuessTargets(tx, game.id, newRound.id);
+            await castBotRoomMoves(tx, game.id, newRound.id);
+            await castBotRoomGuesses(tx, game.id, newRound.id);
+          }
           roundStartNotifications.push({ roundNumber: round.round_number + 1, playerIds: aliveIdsAfter });
         }
 

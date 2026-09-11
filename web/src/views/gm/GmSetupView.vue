@@ -27,6 +27,7 @@ const doubleVoteFloorRounds = ref(2);
 // behavior; 'no_elimination' is new. More tie-break strategies can be added to this
 // list later without touching anything else here.
 const tieBreakMode = ref<"random" | "no_elimination">("random");
+const moveToRoomEnabled = ref(false);
 
 const roundResolutionModeHint = computed(() => t(`gmSetup.rules.roundResolutionHints.${roundResolutionMode.value}`));
 const missedDeadlineModeHint = computed(() => t(`gmSetup.rules.missedDeadlineHints.${missedDeadlineMode.value}`));
@@ -56,6 +57,7 @@ async function createGame() {
         tie_break_mode: tieBreakMode.value,
         double_vote_enabled: doubleVoteEnabled.value,
         double_vote_floor_rounds: doubleVoteEnabled.value ? doubleVoteFloorRounds.value : undefined,
+        move_to_room_enabled: moveToRoomEnabled.value,
       },
       { extraHeaders: { "x-setup-secret": setupSecret.value } },
     );
@@ -218,6 +220,20 @@ async function copyToken() {
             </select>
             <span class="field-hint">{{ t("gmSetup.powers.botCountHint") }}</span>
           </label>
+        </section>
+
+        <section class="panel pixel-frame">
+          <h2>{{ t("gmSetup.miniGames.heading") }}</h2>
+          <label class="checkbox-label">
+            <input
+              v-model="moveToRoomEnabled"
+              type="checkbox"
+            >
+            {{ t("gmSetup.miniGames.moveToRoomEnabled") }}
+          </label>
+          <span class="field-hint">
+            {{ t("gmSetup.miniGames.moveToRoomEnabledHint") }}
+          </span>
         </section>
 
         <section class="panel pixel-frame">

@@ -167,6 +167,52 @@
       "noVoteCast": "Cast a vote before locking it in."
     }
   },
+  "moveToRoom": {
+    "button": "Move",
+    "title": "Move around the mansion",
+    "description": "Move one room over, and take a guess at where another guest is hiding. Both are entirely optional.",
+    "pointsLabel": "Guess points: {points}",
+    "showStaircaseHelp": "How do staircases work?",
+    "hideStaircaseHelp": "Hide staircase help",
+    "staircaseHelp": "The Entrance Hall and the Landing are staircase rooms -- stand in one of them and you can move directly to the other, connecting the ground floor to the first floor.",
+    "floors": {
+      "ground": "Ground Floor",
+      "first": "First Floor"
+    },
+    "rooms": {
+      "library": "Library",
+      "entrance_hall": "Entrance Hall",
+      "living_room": "Living Room",
+      "dining_room": "Dining Room",
+      "kitchen": "Kitchen",
+      "toilet": "Toilet",
+      "guest_bedroom_1": "Guest Bedroom 1",
+      "landing": "Landing",
+      "master_bedroom": "Master Bedroom",
+      "guest_bedroom_2": "Guest Bedroom 2",
+      "bathroom": "Bathroom"
+    },
+    "youMarker": "You",
+    "moveOptionalHint": "Only the highlighted rooms are reachable from where you are. Moving is optional -- staying put is a valid choice too.",
+    "moveSubmitted": "Move submitted: {room}. You can change it until the round resolves.",
+    "moving": "Moving...",
+    "confirmMove": "Confirm move",
+    "guess": {
+      "heading": "Guess a hiding spot",
+      "description": "Where do you think {name} is right now?",
+      "optionalHint": "Guessing is optional. A correct guess earns you a point.",
+      "submitted": "Guess submitted: {room}. You can change it until the round resolves.",
+      "guessing": "Guessing...",
+      "confirmGuess": "Confirm guess"
+    },
+    "errors": {
+      "miniGameDisabled": "This game doesn't have the Move-to-Room mini-game enabled.",
+      "noOpenRound": "There's no open round to move or guess in right now.",
+      "noRoomAssigned": "You don't have a room assigned yet.",
+      "invalidDestination": "That room isn't adjacent to your current room (or a connected staircase cell).",
+      "noGuessAssigned": "You don't have anyone to guess about this round."
+    }
+  },
   "gmNav": {
     "setup": "Setup",
     "inPlay": "In Play",
@@ -246,6 +292,11 @@
       "botModeHint": "Fills the game with algorithm-controlled players (random moves for now) so you can test a full game solo. You still need at least one real player besides yourself -- bots supplement a game, they don't replace it.",
       "botCount": "Number of bots",
       "botCountHint": "How many bots to add alongside the real players you invite (max 19, and bots + real players together should stay within the 20-player ceiling)."
+    },
+    "miniGames": {
+      "heading": "Mini-games",
+      "moveToRoomEnabled": "Enable Move-to-Room",
+      "moveToRoomEnabledHint": "Every round, alive players may move one step through the mansion and guess where another player is hiding. Correct guesses earn the guesser a point."
     },
     "access": {
       "heading": "Access",
@@ -339,6 +390,20 @@
       "player": "Player",
       "door": "Door",
       "outcome": "Outcome",
+      "pending": "pending"
+    },
+    "moveToRoom": {
+      "heading": "Move-to-Room",
+      "positionsHint": "Live, real positions -- never shown to other players this way.",
+      "player": "Player",
+      "room": "Room",
+      "guessHistoryHeading": "Guess history",
+      "noGuesses": "No guesses yet.",
+      "roundNumber": "Round",
+      "guesser": "Guesser",
+      "target": "Target",
+      "guessedRoom": "Guessed room",
+      "correct": "Correct",
       "pending": "pending"
     },
     "gamePhase": "Game phase: {phase}",

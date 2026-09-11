@@ -2,6 +2,7 @@ import { errorResponse, jsonResponse, preflightResponse } from "../_shared/http.
 import { authenticate, requireRole } from "../_shared/auth.ts";
 import { countActiveVotesForVoter, revealVotesForGame, sql, type VoteAttribution } from "../_shared/db.ts";
 import { gmName } from "../_shared/names.ts";
+import type { RoomId } from "../_shared/mansion.ts";
 import type { Round } from "../_shared/types.ts";
 
 // GM-only. Four things live here that never appear anywhere else:
@@ -73,9 +74,51 @@ Deno.serve(async (req) => {
       };
     }
 
+    // Move-to-Room mini-game. GM sees real names on every cell (never anonymized the
+    // way the player-facing occupancy heat is) plus the full guess history -- same
+    // "hidden from other players, never from the GM" principle already applied to
+    // votes and Three Doors picks above.
+    let moveToRoom: Record<string, unknown> | null = null;
+    if (ctx.game.move_to_room_enabled) {
+      const positions = await db<{ player_id: string; current_room_id: RoomId }[]>`
+        select pr.player_id, pr.current_room_id
+        from battle_royale.player_rooms pr
+        join battle_royale.players p on p.id = pr.player_id
+        where pr.game_id = ${ctx.game.id} and p.status = 'alive' and p.role = 'player'
+      `;
+
+      const guesses = await db<
+        { round_number: number; guesser_player_id: string; target_player_id: string; guessed_room_id: RoomId; correct: boolean | null }[]
+      >`
+        select r.round_number, g.guesser_player_id, a.target_player_id, g.guessed_room_id, g.correct
+        from battle_royale.round_room_guesses g
+        join battle_royale.rounds r on r.id = g.round_id
+        join battle_royale.round_guess_assignments a on a.round_id = g.round_id and a.guesser_player_id = g.guesser_player_id
+        where r.game_id = ${ctx.game.id}
+        order by r.round_number asc
+      `;
+
+      moveToRoom = {
+        enabled: true,
+        players: positions.map((p) => ({
+          id: p.player_id,
+          display_name: nameById.get(p.player_id) ?? "unknown",
+          room_id: p.current_room_id,
+        })),
+        guess_history: guesses.map((g) => ({
+          round_number: g.round_number,
+          guesser_display_name: nameById.get(g.guesser_player_id) ?? "unknown",
+          target_display_name: nameById.get(g.target_player_id) ?? "unknown",
+          guessed_room_id: g.guessed_room_id,
+          correct: g.correct,
+        })),
+      };
+    }
+
     return jsonResponse({
       players: players.map((p) => ({ id: p.id, display_name: nameById.get(p.id) ?? p.display_name, status: p.status, role: p.role })),
       current_round: currentRound,
+      move_to_room: moveToRoom,
       game: {
         round_interval_minutes: ctx.game.round_interval_minutes,
         missed_deadline_mode: ctx.game.missed_deadline_mode,
