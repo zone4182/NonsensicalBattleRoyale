@@ -62,6 +62,11 @@ const router = createRouter({
       path: "/gm",
       component: () => import("../layouts/GmLayout.vue"),
       meta: { auth: "gm" },
+      // Bare /gm has never had a route of its own -- redirect to the one child that's
+      // actually reachable without a session, so manually typing /gm (e.g. now that the
+      // landing page's "Host a new game" button is hidden) lands somewhere real instead
+      // of falling through to the catch-all 404.
+      redirect: { name: "gm-setup" },
       children: [
         {
           path: "setup",
