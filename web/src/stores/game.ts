@@ -35,11 +35,18 @@ export interface HeldPower {
   count: number;
 }
 
+export interface ActiveVote {
+  targetPlayerId: string;
+  reason: string | null;
+}
+
 export interface YourStatus {
   status: PlayerStatus;
   heldPowers: HeldPower[];
   votesRemainingThisRound: number | null;
   voteLockedThisRound: boolean;
+  isDoubleVoteHolder: boolean;
+  activeVotes: ActiveVote[];
 }
 
 // Mirrors supabase/functions/_shared/mansion.ts's RoomId union.
@@ -88,6 +95,8 @@ interface GetGameStateResponse {
     held_powers: { power_key: string; category: string; count: number }[];
     votes_remaining_this_round: number | null;
     vote_locked_this_round: boolean;
+    is_double_vote_holder: boolean;
+    your_active_votes: { target_player_id: string; reason: string | null }[];
   };
   narration_entries: { id: string; text: string; created_at: string }[];
   move_to_room: {
@@ -138,6 +147,8 @@ export const useGameStore = defineStore("game", () => {
       })),
       votesRemainingThisRound: raw.your_status.votes_remaining_this_round,
       voteLockedThisRound: raw.your_status.vote_locked_this_round,
+      isDoubleVoteHolder: raw.your_status.is_double_vote_holder,
+      activeVotes: raw.your_status.your_active_votes.map((v) => ({ targetPlayerId: v.target_player_id, reason: v.reason })),
     };
     narrationEntries.value = raw.narration_entries.map((n) => ({ id: n.id, text: n.text, createdAt: n.created_at }));
     moveToRoom.value = raw.move_to_room

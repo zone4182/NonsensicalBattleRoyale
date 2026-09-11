@@ -1,13 +1,15 @@
 import { errorResponse, jsonResponse, preflightResponse } from "../_shared/http.ts";
 import { authenticate } from "../_shared/auth.ts";
-import { countActiveVotesForVoter, sql } from "../_shared/db.ts";
+import { countActiveVotesForVoter, getActiveVoteTargetsForVoter, sql } from "../_shared/db.ts";
 import { publicName } from "../_shared/names.ts";
 import { ALL_ROOM_IDS, type RoomId } from "../_shared/mansion.ts";
 import type { Player, Round } from "../_shared/types.ts";
 
-// Read-only. Queries only players/rounds/power_grants/narration_log -- never votes,
-// consistent with the anonymity hard rule (ARCHITECTURE.md "Critical architectural
-// rule"). No role restriction -- both players and the GM can call this.
+// Read-only. Queries players/rounds/power_grants/narration_log freely, plus -- via the
+// sanctioned getActiveVoteTargetsForVoter -- a player's own vote target(s), never
+// another player's (ARCHITECTURE.md "Critical architectural rule" is about *who voted
+// for whom* being hidden from OTHER players, not a player knowing their own choice). No
+// role restriction -- both players and the GM can call this.
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return preflightResponse();
   try {
@@ -34,11 +36,15 @@ Deno.serve(async (req) => {
     // their own remaining vote count).
     let votesRemainingThisRound: number | null = null;
     let voteLockedThisRound = false;
+    let isDoubleVoteHolder = false;
+    let yourActiveVotes: { targetPlayerId: string; reason: string | null }[] = [];
     if (openRound && ctx.role === "player" && ctx.player.status === "alive") {
-      const entitlement = openRound.double_vote_player_id === ctx.player.id ? 2 : 1;
+      isDoubleVoteHolder = openRound.double_vote_player_id === ctx.player.id;
+      const entitlement = isDoubleVoteHolder ? 2 : 1;
       const alreadyCast = await countActiveVotesForVoter(openRound.id, ctx.player.id);
       votesRemainingThisRound = Math.max(0, entitlement - alreadyCast);
       voteLockedThisRound = ctx.player.vote_locked_for_round_number === openRound.round_number;
+      yourActiveVotes = await getActiveVoteTargetsForVoter(openRound.id, ctx.player.id);
     }
 
     const grants = await db<{ power_key: string; category: string; count: number }[]>`
@@ -141,6 +147,8 @@ Deno.serve(async (req) => {
         held_powers: grants.map((g) => ({ power_key: g.power_key, category: g.category, count: g.count })),
         votes_remaining_this_round: votesRemainingThisRound,
         vote_locked_this_round: voteLockedThisRound,
+        is_double_vote_holder: isDoubleVoteHolder,
+        your_active_votes: yourActiveVotes.map((v) => ({ target_player_id: v.targetPlayerId, reason: v.reason })),
       },
       narration_entries: narration.reverse().map((n) => ({ id: n.id, text: n.body, created_at: n.created_at })),
       move_to_room: moveToRoom,

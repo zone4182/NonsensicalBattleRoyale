@@ -32,8 +32,18 @@ Deno.serve(async (req) => {
       order by round_number asc
     `;
 
-    const players = await db<{ id: string; display_name: string; chosen_display_name: string | null; status: string; role: string }[]>`
-      select id, display_name, chosen_display_name, status, role from battle_royale.players where game_id = ${ctx.game.id}
+    const players = await db<
+      {
+        id: string;
+        display_name: string;
+        chosen_display_name: string | null;
+        status: string;
+        role: string;
+        vote_locked_for_round_number: number | null;
+      }[]
+    >`
+      select id, display_name, chosen_display_name, status, role, vote_locked_for_round_number
+      from battle_royale.players where game_id = ${ctx.game.id}
     `;
     const nameById = new Map(players.map((p) => [p.id, gmName(p.display_name, p.chosen_display_name)]));
 
@@ -64,7 +74,12 @@ Deno.serve(async (req) => {
         aliveRoster.map(async (p) => {
           const entitlement = openRound.double_vote_player_id === p.id ? 2 : 1;
           const cast = await countActiveVotesForVoter(openRound.id, p.id);
-          return { id: p.id, display_name: nameById.get(p.id) ?? p.display_name, voted: cast >= entitlement };
+          return {
+            id: p.id,
+            display_name: nameById.get(p.id) ?? p.display_name,
+            voted: cast >= entitlement,
+            locked: p.vote_locked_for_round_number === openRound.round_number,
+          };
         }),
       );
       currentRound = {

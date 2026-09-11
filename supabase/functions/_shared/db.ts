@@ -17,7 +17,11 @@ export function sql() {
 
 // Anonymity-critical helpers. Every other table can be queried freely with sql()
 // directly from function code, but `battle_royale.votes` must only ever be touched
-// through these two functions -- never add a generic "select from votes" helper here.
+// through the functions in this file -- never add a generic "select from votes" helper
+// elsewhere. Only castVote and revealVotesForGame (further down) ever join to or return
+// another player's identity; every other helper here is scoped to a single voter's own
+// rows (their own count, their own targets, their own revokes), which is a different,
+// much weaker guarantee -- see each function's own comment for why that's still safe.
 
 // Takes the query executor explicitly (a transaction or the module client), same as
 // every other helper below -- a caller inside db.begin() that instead reached for the
@@ -34,9 +38,14 @@ export async function castVote(
     reason?: string | null;
   },
 ): Promise<void> {
+  // cast_at uses clock_timestamp(), not the column's now()-based default -- now() is
+  // fixed for the whole transaction, so two votes cast in the same transaction (a
+  // double-vote holder's pair, submitted together by submit-double-vote) would
+  // otherwise tie exactly and make "order by cast_at" ambiguous for telling Vote 1
+  // apart from Vote 2 when the player reopens the screen.
   await exec`
-    insert into battle_royale.votes (round_id, voter_player_id, target_player_id, is_double_vote, reason)
-    values (${params.roundId}, ${params.voterPlayerId}, ${params.targetPlayerId}, ${params.isDoubleVote}, ${params.reason ?? null})
+    insert into battle_royale.votes (round_id, voter_player_id, target_player_id, is_double_vote, reason, cast_at)
+    values (${params.roundId}, ${params.voterPlayerId}, ${params.targetPlayerId}, ${params.isDoubleVote}, ${params.reason ?? null}, clock_timestamp())
   `;
 }
 
@@ -62,6 +71,19 @@ export async function revokeOldestActiveVotesForVoter(
   `;
 }
 
+// Full-replace support for the double-vote holder's two-slot screen (submit-double-vote):
+// revokes every one of the voter's own active votes in this round, so the caller can
+// then insert exactly the (1 or 2) votes it was just given as a clean "this is my
+// current choice set" rather than reasoning about which single row to replace. Scoped
+// to voter_player_id, same as revokeOldestActiveVotesForVoter above.
+export async function revokeAllActiveVotesForVoter(exec: ReturnType<typeof sql>, roundId: string, voterPlayerId: string): Promise<void> {
+  await exec`
+    update battle_royale.votes
+    set revoked_at = now()
+    where round_id = ${roundId} and voter_player_id = ${voterPlayerId} and revoked_at is null
+  `;
+}
+
 export async function countActiveVotesForVoter(roundId: string, voterPlayerId: string): Promise<number> {
   const rows = await sql()<{ count: number }[]>`
     select count(*)::int as count
@@ -69,6 +91,24 @@ export async function countActiveVotesForVoter(roundId: string, voterPlayerId: s
     where round_id = ${roundId} and voter_player_id = ${voterPlayerId} and revoked_at is null
   `;
   return rows[0]?.count ?? 0;
+}
+
+// A voter reading back their own active vote(s) -- scoped to voter_player_id like
+// countActiveVotesForVoter above, so it never crosses the "who voted for whom stays
+// hidden" boundary (that's about OTHER players' votes, not a player's own). Lets
+// get-game-state tell a returning player what they already chose, instead of the vote
+// screen looking blank/reset every time they reopen it.
+export async function getActiveVoteTargetsForVoter(
+  roundId: string,
+  voterPlayerId: string,
+): Promise<{ targetPlayerId: string; reason: string | null }[]> {
+  const rows = await sql()<{ target_player_id: string; reason: string | null }[]>`
+    select target_player_id, reason
+    from battle_royale.votes
+    where round_id = ${roundId} and voter_player_id = ${voterPlayerId} and revoked_at is null
+    order by cast_at asc
+  `;
+  return rows.map((r) => ({ targetPlayerId: r.target_player_id, reason: r.reason }));
 }
 
 // Joins vote rows to player identity, which is exactly the join the rest of the system

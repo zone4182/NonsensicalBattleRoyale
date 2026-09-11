@@ -23,6 +23,10 @@ const voteLocked = computed(() => game.yourStatus?.voteLockedThisRound ?? false)
 // replace the existing cast rather than being rejected -- see submit-vote/index.ts.
 const canChangeVote = computed(() => votesRemainingRaw.value === 0 && game.allowVoteChange && !voteLocked.value);
 const canVote = computed(() => (votesRemaining.value > 0 && !voteLocked.value) || canChangeVote.value);
+// This round's entitlement, not "has cast a double vote yet" -- stays true for the
+// whole round (win or lose the badge as votes get cast) so the double-vote holder
+// always knows going in, not just while votesRemaining still happens to read 2.
+const isDoubleVoteHolder = computed(() => game.yourStatus?.isDoubleVoteHolder ?? false);
 
 function openVoteModal() {
   if (!canVote.value) return;
@@ -38,6 +42,16 @@ function openVoteModal() {
       </p>
     </template>
     <template v-else>
+      <p
+        v-if="isDoubleVoteHolder"
+        class="double-vote-alert"
+      >
+        <span
+          class="alarm-icon"
+          aria-hidden="true"
+        >⚠</span>
+        {{ t("voteAction.doubleVoteAlert") }}
+      </p>
       <button
         type="button"
         :disabled="!canVote"
@@ -84,6 +98,22 @@ function openVoteModal() {
   color: var(--nbr-muted);
   font-size: 0.85em;
   margin-top: var(--nbr-space-1);
+}
+
+.double-vote-alert {
+  display: flex;
+  align-items: center;
+  gap: var(--nbr-space-1);
+  margin: 0;
+  padding: var(--nbr-space-1) var(--nbr-space-2);
+  color: var(--nbr-danger);
+  border: 1px solid var(--nbr-danger);
+  font-size: 0.85em;
+}
+
+.alarm-icon {
+  font-size: 1.1em;
+  line-height: 1;
 }
 
 .help-link {

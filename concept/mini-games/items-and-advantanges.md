@@ -10,6 +10,8 @@ Items:
         -When at least one player has accepted, the challenged players will be prompted to play a game of Russian Roulette.
         -Concept needs to be finished.
 Advantages:
+-Double Vote
+    -Allows the player to cast two votes instead of one.
 -Lightweight Shoes
     -Allows the player to move two spaces instead of one for the next round.
 -Lightning Reflexes

@@ -1,5 +1,5 @@
 import { errorResponse, HttpError, jsonResponse, preflightResponse, readJsonBody } from "../_shared/http.ts";
-import { pickDoubleVoteHolder, sql } from "../_shared/db.ts";
+import { sql } from "../_shared/db.ts";
 import { grantRandomDrop } from "../_shared/powers.ts";
 import { castBotRoomGuesses, castBotRoomMoves, castBotVotes } from "../_shared/bots.ts";
 import { sendPushToPlayers } from "../_shared/push.ts";
@@ -73,9 +73,9 @@ Deno.serve(async (req) => {
           where game_id = ${game.id} and role = 'player'
         `;
         if (unredeemed_count === 0 && player_count >= MIN_PLAYERS_TO_START) {
-          const doubleVotePlayerId = game.double_vote_enabled
-            ? await pickDoubleVoteHolder(tx, game.id, game.double_vote_floor_rounds)
-            : null;
+          // Round 1 never has a double-vote holder, regardless of games.double_vote_enabled
+          // -- same reasoning as start-round's identical round-1 creation path.
+          const doubleVotePlayerId = null;
           const [round] = await tx`
             insert into battle_royale.rounds (game_id, round_number, opens_at, voting_deadline_at, double_vote_player_id)
             values (

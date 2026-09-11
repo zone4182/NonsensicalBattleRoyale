@@ -1,6 +1,6 @@
 import { errorResponse, HttpError, jsonResponse, preflightResponse } from "../_shared/http.ts";
 import { authenticate, requireRole } from "../_shared/auth.ts";
-import { pickDoubleVoteHolder, sql } from "../_shared/db.ts";
+import { sql } from "../_shared/db.ts";
 import { grantRandomDrop } from "../_shared/powers.ts";
 import { castBotRoomGuesses, castBotRoomMoves, castBotVotes } from "../_shared/bots.ts";
 import { sendPushToPlayers } from "../_shared/push.ts";
@@ -42,9 +42,10 @@ Deno.serve(async (req) => {
         );
       }
 
-      const doubleVotePlayerId = game.double_vote_enabled
-        ? await pickDoubleVoteHolder(tx, game.id, game.double_vote_floor_rounds)
-        : null;
+      // Round 1 never has a double-vote holder, regardless of games.double_vote_enabled
+      // -- no one has proven anything yet, so there's nothing to reward with extra
+      // voting power this early. See the GM Setup screen's own disclaimer.
+      const doubleVotePlayerId = null;
 
       const [round] = await tx`
         insert into battle_royale.rounds (game_id, round_number, opens_at, voting_deadline_at, double_vote_player_id)

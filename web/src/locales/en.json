@@ -102,7 +102,11 @@
     "noneStanding": "No one left standing.",
     "dead": "Dead ({count})",
     "botBadge": "BOT",
-    "botBadgeTitle": "Algorithm-controlled player"
+    "botBadgeTitle": "Algorithm-controlled player",
+    "votedBadge": "VOTED",
+    "votedBadgeTitle": "You voted for this player this round -- only you can see this",
+    "doubleVoteBadge": "2x VOTE",
+    "doubleVoteBadgeTitle": "You have a double vote this round -- only you can see this"
   },
   "narrationLog": {
     "title": "Narration",
@@ -129,6 +133,7 @@
     "votedFinal": "You've cast your vote this round -- it's final.",
     "votedChangeable": "You've voted, but can still change your mind before this round resolves.",
     "votedLocked": "You've locked in your vote for this round -- it's final.",
+    "doubleVoteAlert": "You have a double vote this round!",
     "help": "Need help?"
   },
   "powerUse": {
@@ -156,7 +161,11 @@
     "reasonPlaceholder": "Why this vote?",
     "casting": "Casting...",
     "confirmVote": "Confirm vote",
+    "confirmBothVotes": "Confirm votes",
+    "voteHeading": "Vote {number}",
+    "doubleVoteExplainer": "You have two votes this round. Cast them for two different players, or vote for the same player twice to double down.",
     "lockHint": "Done deciding? You can lock your vote in now so it can't be changed again this round -- even though this game normally allows changing your mind.",
+    "lockHintDouble": "Done deciding? You can lock both your votes in now so neither can be changed again this round -- even though this game normally allows changing your mind.",
     "locking": "Locking in...",
     "lockVote": "Lock in my vote",
     "errors": {
@@ -164,7 +173,8 @@
       "invalidTarget": "That player can't be voted for.",
       "voteEntitlementExhausted": "You've already cast all your votes this round.",
       "voteLocked": "You've locked in your vote for this round -- it can no longer be changed.",
-      "noVoteCast": "Cast a vote before locking it in."
+      "noVoteCast": "Cast a vote before locking it in.",
+      "notDoubleVoteHolder": "You don't hold the double vote this round."
     }
   },
   "moveToRoom": {
@@ -286,6 +296,7 @@
       "heading": "Hidden powers & bots",
       "doubleVoteEnabled": "Random double vote",
       "doubleVoteEnabledHint": "On by default. Each round, one random alive player is secretly given a second vote -- they're told privately and never have to disclose it. This is part of the game's hidden powers system: players are never told it exists, they only discover it by experiencing it.",
+      "doubleVoteRound1Disclaimer": "Never handed out in round 1, regardless of this setting -- no one has proven anything yet, so there's nothing to reward with extra voting power that early. The earliest a double vote can appear is round 2.",
       "doubleVoteFloorRounds": "Double-vote cooldown (rounds)",
       "doubleVoteFloorRoundsHint": "How many recent rounds' holders are excluded when picking who gets it next, so the same player isn't re-picked too soon. Falls back to picking from everyone alive if excluding recent holders would leave no one eligible (e.g. a very small player count). Default 2. Set to -1 for a stricter rule instead: each player can hold the double vote at most once for the entire game -- once everyone's had a turn, no one gets it again for the rest of the game (no fallback).",
       "botMode": "Bot mode",
@@ -368,7 +379,9 @@
     "currentRound": {
       "heading": "Current round ({number}) -- vote status",
       "player": "Player",
-      "voteCast": "Vote cast"
+      "voteCast": "Vote cast",
+      "voteLocked": "Locked in",
+      "lockedBadge": "LOCKED"
     },
     "votes": {
       "heading": "Resolved rounds -- full vote breakdown",

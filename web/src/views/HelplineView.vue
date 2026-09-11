@@ -126,6 +126,12 @@ async function send() {
         {{ t("helpline.awaitingReply") }}
       </p>
     </section>
+
+    <p class="back-link">
+      <RouterLink :to="{ name: 'main-round' }">
+        {{ t("common.back") }}
+      </RouterLink>
+    </p>
   </FullscreenLayout>
 </template>
 
@@ -178,5 +184,9 @@ async function send() {
   margin-top: var(--nbr-space-2);
   color: var(--nbr-muted);
   font-size: 0.85em;
+}
+
+.back-link {
+  margin-top: var(--nbr-space-3);
 }
 </style>

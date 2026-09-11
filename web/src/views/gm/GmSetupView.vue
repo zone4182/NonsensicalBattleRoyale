@@ -187,6 +187,12 @@ async function copyToken() {
           <span class="field-hint">
             {{ t("gmSetup.powers.doubleVoteEnabledHint") }}
           </span>
+          <span
+            v-if="doubleVoteEnabled"
+            class="field-hint disclaimer"
+          >
+            {{ t("gmSetup.powers.doubleVoteRound1Disclaimer") }}
+          </span>
           <label v-if="doubleVoteEnabled">
             {{ t("gmSetup.powers.doubleVoteFloorRounds") }}
             <input
@@ -345,6 +351,10 @@ async function copyToken() {
   font-size: 0.85em;
   font-weight: normal;
   margin-top: var(--nbr-space-1);
+}
+
+.field-hint.disclaimer {
+  color: var(--nbr-danger);
 }
 
 .error {

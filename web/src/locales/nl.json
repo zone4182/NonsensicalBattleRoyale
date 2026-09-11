@@ -102,7 +102,11 @@
     "noneStanding": "Niemand meer over.",
     "dead": "Dood ({count})",
     "botBadge": "BOT",
-    "botBadgeTitle": "Door een algoritme bestuurde speler"
+    "botBadgeTitle": "Door een algoritme bestuurde speler",
+    "votedBadge": "GESTEMD",
+    "votedBadgeTitle": "Je hebt deze ronde op deze speler gestemd -- alleen jij ziet dit",
+    "doubleVoteBadge": "2x STEM",
+    "doubleVoteBadgeTitle": "Je hebt deze ronde een dubbele stem -- alleen jij ziet dit"
   },
   "narrationLog": {
     "title": "Verhaal",
@@ -129,6 +133,7 @@
     "votedFinal": "Je hebt deze ronde je stem uitgebracht -- die staat vast.",
     "votedChangeable": "Je hebt gestemd, maar kunt nog van gedachten veranderen voordat deze ronde wordt afgehandeld.",
     "votedLocked": "Je hebt je stem voor deze ronde vastgezet -- die staat vast.",
+    "doubleVoteAlert": "Je hebt deze ronde een dubbele stem!",
     "help": "Hulp nodig?"
   },
   "powerUse": {
@@ -156,7 +161,11 @@
     "reasonPlaceholder": "Waarom deze stem?",
     "casting": "Bezig met uitbrengen...",
     "confirmVote": "Stem bevestigen",
+    "confirmBothVotes": "Stemmen bevestigen",
+    "voteHeading": "Stem {number}",
+    "doubleVoteExplainer": "Je hebt deze ronde twee stemmen. Breng ze uit op twee verschillende spelers, of stem twee keer op dezelfde speler om extra nadruk te leggen.",
     "lockHint": "Klaar met beslissen? Je kunt je stem nu vastzetten zodat die deze ronde niet meer gewijzigd kan worden -- ook al staat dit spel normaal toe dat je van gedachten verandert.",
+    "lockHintDouble": "Klaar met beslissen? Je kunt beide stemmen nu vastzetten zodat geen van beide deze ronde nog gewijzigd kan worden -- ook al staat dit spel normaal toe dat je van gedachten verandert.",
     "locking": "Bezig met vastzetten...",
     "lockVote": "Stem vastzetten",
     "errors": {
@@ -164,7 +173,8 @@
       "invalidTarget": "Op deze speler kan niet gestemd worden.",
       "voteEntitlementExhausted": "Je hebt deze ronde al al je stemmen uitgebracht.",
       "voteLocked": "Je hebt je stem voor deze ronde vastgezet -- die kan niet meer gewijzigd worden.",
-      "noVoteCast": "Breng eerst een stem uit voordat je die vastzet."
+      "noVoteCast": "Breng eerst een stem uit voordat je die vastzet.",
+      "notDoubleVoteHolder": "Je hebt deze ronde geen dubbele stem."
     }
   },
   "moveToRoom": {
@@ -286,6 +296,7 @@
       "heading": "Verborgen krachten & bots",
       "doubleVoteEnabled": "Willekeurige dubbele stem",
       "doubleVoteEnabledHint": "Standaard aan. Elke ronde krijgt willekeurig één levende speler in het geheim een tweede stem -- ze worden privé geïnformeerd en hoeven dit nooit bekend te maken. Dit maakt deel uit van het verborgen-krachtensysteem van het spel: spelers krijgen nooit te horen dat dit bestaat, ze ontdekken het alleen door het zelf mee te maken.",
+      "doubleVoteRound1Disclaimer": "Wordt nooit uitgedeeld in ronde 1, ongeacht deze instelling -- niemand heeft dan nog iets bewezen, dus er is niets om zo vroeg al met extra stemkracht te belonen. De vroegst mogelijke ronde voor een dubbele stem is ronde 2.",
       "doubleVoteFloorRounds": "Afkoelperiode dubbele stem (rondes)",
       "doubleVoteFloorRoundsHint": "Hoeveel recente rondes se houders worden uitgesloten bij het kiezen van de volgende, zodat dezelfde speler niet te snel opnieuw wordt gekozen. Valt terug op kiezen uit alle levende spelers als het uitsluiten van recente houders niemand geschikt zou overlaten (bijv. bij een heel klein aantal spelers). Standaard 2. Zet op -1 voor een strengere regel: elke speler kan de dubbele stem hooguit één keer per spel krijgen -- zodra iedereen aan de beurt is geweest, krijgt niemand deze meer voor de rest van het spel (geen terugval).",
       "botMode": "Botmodus",
@@ -368,7 +379,9 @@
     "currentRound": {
       "heading": "Huidige ronde ({number}) -- stemstatus",
       "player": "Speler",
-      "voteCast": "Stem uitgebracht"
+      "voteCast": "Stem uitgebracht",
+      "voteLocked": "Vastgezet",
+      "lockedBadge": "VASTGEZET"
     },
     "votes": {
       "heading": "Afgehandelde rondes -- volledige stemverdeling",

@@ -389,6 +389,8 @@ verify_jwt = false
 verify_jwt = false
 [functions.submit-vote]
 verify_jwt = false
+[functions.submit-double-vote]
+verify_jwt = false
 [functions.lock-vote]
 verify_jwt = false
 [functions.submit-room-move]

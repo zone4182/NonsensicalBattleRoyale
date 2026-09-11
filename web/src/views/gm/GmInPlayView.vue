@@ -44,6 +44,7 @@ interface GmGameOverview {
       id: string;
       display_name: string;
       voted: boolean;
+      locked: boolean;
     }[];
   } | null;
   game: {
@@ -406,6 +407,7 @@ async function submit() {
             <tr>
               <th>{{ t("gmInPlay.currentRound.player") }}</th>
               <th>{{ t("gmInPlay.currentRound.voteCast") }}</th>
+              <th>{{ t("gmInPlay.currentRound.voteLocked") }}</th>
             </tr>
           </thead>
           <tbody>
@@ -415,6 +417,13 @@ async function submit() {
             >
               <td>{{ p.display_name }}</td>
               <td>{{ p.voted ? t("gmInPlay.settings.yes") : t("gmInPlay.settings.no") }}</td>
+              <td>
+                <span
+                  v-if="p.locked"
+                  class="locked-badge"
+                >{{ t("gmInPlay.currentRound.lockedBadge") }}</span>
+                <span v-else>{{ t("gmInPlay.settings.no") }}</span>
+              </td>
             </tr>
           </tbody>
         </table>
@@ -762,6 +771,14 @@ async function submit() {
 
 .eliminated-row td {
   color: var(--nbr-danger);
+}
+
+.locked-badge {
+  display: inline-block;
+  padding: 0 4px;
+  font-size: 0.85em;
+  color: var(--nbr-bg);
+  background: var(--nbr-accent);
 }
 
 .round-votes-block {
