@@ -261,12 +261,11 @@
   "gmNav": {
     "setup": "Instellen",
     "inPlay": "Bezig",
-    "invites": "Uitnodigingen",
     "helplineInbox": "Hulplijn Inbox"
   },
   "gmSetup": {
     "title": "GM Instellingen",
-    "description": "Maak het spel aan en nodig daarna spelers uit via hun eigen uitnodigingslinks (nog niet gebouwd in deze mijlpaal).",
+    "description": "Een korte wizard doorloopt elke instelling en laat je daarna spelers uitnodigen -- het spel zelf wordt pas aangemaakt aan het einde, zodra alles is besloten.",
     "minPlayersHint": "Ronde 1 kan pas starten als minstens 5 spelers hun uitnodiging hebben geaccepteerd, ongeacht welke startmodus je hieronder kiest.",
     "manualResolveHint": "Ongeacht de afhandelingsmodus kun je altijd zelf een ronde vroegtijdig afhandelen zodra elke levende speler heeft gestemd.",
     "basics": {
@@ -351,28 +350,28 @@
       "setupSecret": "Installatiegeheim",
       "setupSecretHint": "Een gedeeld geheim dat bewijst dat jij een spel mag aanmaken -- los van de uitnodigingslinks die je naar spelers stuurt."
     },
-    "creating": "Bezig met aanmaken...",
-    "createGame": "Spel aanmaken",
-    "created": "Spel aangemaakt. GM-uitnodigingstoken (eenmalig getoond):",
-    "copy": "Kopiëren"
-  },
-  "gmInvites": {
-    "title": "GM: Uitnodigingen",
-    "description": "Maak een spelersuitnodiging aan, kopieer dan de link en stuur deze zelf -- er is geen verzending binnen de app.",
-    "create": {
-      "heading": "Uitnodiging aanmaken",
+    "invites": {
+      "heading": "Uitnodigingen",
+      "description": "Stel de lijst samen met spelers die je wilt uitnodigen. Er wordt nog niets echt aangemaakt -- dit worden pas echte uitnodigingen zodra je hieronder het spel aanmaakt.",
       "namePlaceholder": "weergavenaam speler",
-      "creating": "Bezig met aanmaken...",
-      "createInvite": "Uitnodiging aanmaken",
-      "setupOnly": "Uitnodigingen kunnen alleen worden aangemaakt terwijl het spel in de installatiefase is."
+      "addInvite": "Toevoegen",
+      "remove": "Verwijderen",
+      "noneYetHint": "Nog geen uitnodigingen samengesteld -- dat kan (bijv. een test-spel met alleen bots), of voeg er hieronder een toe."
     },
-    "list": {
-      "heading": "Uitnodigingen ({count})",
-      "empty": "Nog geen uitnodigingen aangemaakt.",
-      "redeemed": "Ingewisseld",
-      "pending": "In afwachting",
-      "copyLink": "Link kopiëren"
-    }
+    "wizard": {
+      "stepLabels": {
+        "secret": "Toegang",
+        "basics": "Spelbasis",
+        "rules": "Rondes",
+        "powers": "Verborgen krachten & bots",
+        "miniGames": "Minigames",
+        "invites": "Uitnodigingen"
+      },
+      "back": "Terug",
+      "next": "Volgende"
+    },
+    "creating": "Bezig met aanmaken...",
+    "createGame": "Spel aanmaken"
   },
   "gmHelplineInbox": {
     "title": "GM: Hulplijn Inbox",
@@ -389,6 +388,17 @@
   "gmInPlay": {
     "title": "GM: Bezig",
     "unnamedGame": "Naamloos spel",
+    "gmToken": {
+      "heading": "Jouw GM-token",
+      "hint": "Dit is jouw eigen inloggegeven voor dit spel -- bewaar het om vanaf een ander apparaat of na het wissen van je browsergegevens weer in te loggen. Deel dit nooit met spelers.",
+      "copy": "Kopiëren",
+      "copied": "Gekopieerd!"
+    },
+    "justCreatedInvites": {
+      "heading": "Zojuist aangemaakte uitnodigingen",
+      "hint": "Eenmalig getoond, direct na het aanmaken van het spel -- kopieer deze links nu en stuur ze naar je spelers. Deze pagina herladen brengt deze lijst niet terug.",
+      "copyLink": "Link kopiëren"
+    },
     "settings": {
       "heading": "Instellingen",
       "roundInterval": "Rondeinterval",

@@ -1,0 +1,612 @@
+{
+  "exported_at": "2026-09-10T14:21:07.783Z",
+  "game_id": "5b185fba-9d5f-437c-9f77-46126e7b3e13",
+  "game_name": "MyFirstTestGameWithBots",
+  "phase": "ended",
+  "settings": {
+    "round_interval_minutes": 10,
+    "missed_deadline_mode": "no_consequence",
+    "round1_start_mode": "gm_manual",
+    "round_resolution_mode": "manual",
+    "allow_vote_change": false,
+    "double_vote_enabled": true,
+    "double_vote_floor_rounds": 2,
+    "survival_streak_threshold": 3,
+    "created_at": "2026-09-09T09:38:16.417Z",
+    "finished_at": null
+  },
+  "players": [
+    {
+      "id": "4a022a37-6964-4747-bfa1-77cadccd1213",
+      "display_name": "Bot 2",
+      "status": "alive",
+      "role": "player"
+    },
+    {
+      "id": "e084acf1-4b06-46b0-91a7-69cec10ff4db",
+      "display_name": "Bot 6",
+      "status": "alive",
+      "role": "player"
+    },
+    {
+      "id": "1d903159-414d-4f44-9226-25dea12a3f46",
+      "display_name": "Bot 8",
+      "status": "alive",
+      "role": "player"
+    },
+    {
+      "id": "ba98ee5e-99bd-4dec-bfdd-ab893083a862",
+      "display_name": "Zone4182",
+      "status": "alive",
+      "role": "gm"
+    },
+    {
+      "id": "40dc6d58-e390-491e-963d-15e6a03c59d7",
+      "display_name": "Bart",
+      "status": "ghost",
+      "role": "player"
+    },
+    {
+      "id": "442085e7-6676-48a8-8c51-64f1cde96123",
+      "display_name": "Bot 3",
+      "status": "ghost",
+      "role": "player"
+    },
+    {
+      "id": "00c413ca-ae2c-48bd-87bf-da5191b8dbcd",
+      "display_name": "Bot 5",
+      "status": "ghost",
+      "role": "player"
+    },
+    {
+      "id": "9eebd63e-2bb1-48a4-854d-1ded06d0831a",
+      "display_name": "Bot 1",
+      "status": "ghost",
+      "role": "player"
+    },
+    {
+      "id": "7fae3911-ef7f-4e36-be2e-c7dfa7ce5c4a",
+      "display_name": "Bot 9",
+      "status": "ghost",
+      "role": "player"
+    },
+    {
+      "id": "0c65c6d2-e8ac-473c-af4c-a68c53d5e631",
+      "display_name": "Bot 4",
+      "status": "ghost",
+      "role": "player"
+    },
+    {
+      "id": "924aba2c-356f-40a1-b537-899f5afe0e42",
+      "display_name": "Bot 7",
+      "status": "ghost",
+      "role": "player"
+    }
+  ],
+  "rounds": [
+    {
+      "round_number": 1,
+      "eliminated_player_display_name": "Bart",
+      "tie_break_method": "random",
+      "resolved_at": "2026-09-09T11:08:33.626Z",
+      "votes": [
+        {
+          "voter_display_name": "Bot 1",
+          "target_display_name": "Bot 8",
+          "target_vote_count": 2,
+          "is_double_vote": false,
+          "reason": null,
+          "cast_at": "2026-09-09T10:37:22.802Z"
+        },
+        {
+          "voter_display_name": "Bot 2",
+          "target_display_name": "Bot 6",
+          "target_vote_count": 1,
+          "is_double_vote": false,
+          "reason": null,
+          "cast_at": "2026-09-09T10:37:22.802Z"
+        },
+        {
+          "voter_display_name": "Bot 3",
+          "target_display_name": "Bart",
+          "target_vote_count": 2,
+          "is_double_vote": false,
+          "reason": null,
+          "cast_at": "2026-09-09T10:37:22.802Z"
+        },
+        {
+          "voter_display_name": "Bot 4",
+          "target_display_name": "Bot 1",
+          "target_vote_count": 1,
+          "is_double_vote": false,
+          "reason": null,
+          "cast_at": "2026-09-09T10:37:22.802Z"
+        },
+        {
+          "voter_display_name": "Bot 5",
+          "target_display_name": "Bot 2",
+          "target_vote_count": 2,
+          "is_double_vote": false,
+          "reason": null,
+          "cast_at": "2026-09-09T10:37:22.802Z"
+        },
+        {
+          "voter_display_name": "Bot 6",
+          "target_display_name": "Bot 8",
+          "target_vote_count": 2,
+          "is_double_vote": false,
+          "reason": null,
+          "cast_at": "2026-09-09T10:37:22.802Z"
+        },
+        {
+          "voter_display_name": "Bot 7",
+          "target_display_name": "Bot 5",
+          "target_vote_count": 2,
+          "is_double_vote": false,
+          "reason": null,
+          "cast_at": "2026-09-09T10:37:22.802Z"
+        },
+        {
+          "voter_display_name": "Bot 7",
+          "target_display_name": "Bot 2",
+          "target_vote_count": 2,
+          "is_double_vote": true,
+          "reason": null,
+          "cast_at": "2026-09-09T10:37:22.802Z"
+        },
+        {
+          "voter_display_name": "Bot 8",
+          "target_display_name": "Bot 4",
+          "target_vote_count": 1,
+          "is_double_vote": false,
+          "reason": null,
+          "cast_at": "2026-09-09T10:37:22.802Z"
+        },
+        {
+          "voter_display_name": "Bot 9",
+          "target_display_name": "Bart",
+          "target_vote_count": 2,
+          "is_double_vote": false,
+          "reason": null,
+          "cast_at": "2026-09-09T10:37:22.802Z"
+        },
+        {
+          "voter_display_name": "Bart",
+          "target_display_name": "Bot 5",
+          "target_vote_count": 2,
+          "is_double_vote": false,
+          "reason": null,
+          "cast_at": "2026-09-09T11:02:55.546Z"
+        }
+      ]
+    },
+    {
+      "round_number": 2,
+      "eliminated_player_display_name": "Bot 3",
+      "tie_break_method": "random",
+      "resolved_at": "2026-09-09T11:54:46.977Z",
+      "votes": [
+        {
+          "voter_display_name": "Bot 1",
+          "target_display_name": "Bot 5",
+          "target_vote_count": 1,
+          "is_double_vote": false,
+          "reason": null,
+          "cast_at": "2026-09-09T11:08:33.626Z"
+        },
+        {
+          "voter_display_name": "Bot 1",
+          "target_display_name": "Bot 2",
+          "target_vote_count": 2,
+          "is_double_vote": true,
+          "reason": null,
+          "cast_at": "2026-09-09T11:08:33.626Z"
+        },
+        {
+          "voter_display_name": "Bot 2",
+          "target_display_name": "Bot 6",
+          "target_vote_count": 1,
+          "is_double_vote": false,
+          "reason": null,
+          "cast_at": "2026-09-09T11:08:33.626Z"
+        },
+        {
+          "voter_display_name": "Bot 3",
+          "target_display_name": "Bot 9",
+          "target_vote_count": 1,
+          "is_double_vote": false,
+          "reason": null,
+          "cast_at": "2026-09-09T11:08:33.626Z"
+        },
+        {
+          "voter_display_name": "Bot 4",
+          "target_display_name": "Bot 3",
+          "target_vote_count": 2,
+          "is_double_vote": false,
+          "reason": null,
+          "cast_at": "2026-09-09T11:08:33.626Z"
+        },
+        {
+          "voter_display_name": "Bot 5",
+          "target_display_name": "Bot 4",
+          "target_vote_count": 1,
+          "is_double_vote": false,
+          "reason": null,
+          "cast_at": "2026-09-09T11:08:33.626Z"
+        },
+        {
+          "voter_display_name": "Bot 6",
+          "target_display_name": "Bot 7",
+          "target_vote_count": 1,
+          "is_double_vote": false,
+          "reason": null,
+          "cast_at": "2026-09-09T11:08:33.626Z"
+        },
+        {
+          "voter_display_name": "Bot 7",
+          "target_display_name": "Bot 3",
+          "target_vote_count": 2,
+          "is_double_vote": false,
+          "reason": null,
+          "cast_at": "2026-09-09T11:08:33.626Z"
+        },
+        {
+          "voter_display_name": "Bot 8",
+          "target_display_name": "Bot 2",
+          "target_vote_count": 2,
+          "is_double_vote": false,
+          "reason": null,
+          "cast_at": "2026-09-09T11:08:33.626Z"
+        },
+        {
+          "voter_display_name": "Bot 9",
+          "target_display_name": "Bot 1",
+          "target_vote_count": 1,
+          "is_double_vote": false,
+          "reason": null,
+          "cast_at": "2026-09-09T11:08:33.626Z"
+        }
+      ]
+    },
+    {
+      "round_number": 3,
+      "eliminated_player_display_name": "Bot 5",
+      "tie_break_method": "random",
+      "resolved_at": "2026-09-09T12:25:01.478Z",
+      "votes": [
+        {
+          "voter_display_name": "Bot 1",
+          "target_display_name": "Bot 9",
+          "target_vote_count": 2,
+          "is_double_vote": false,
+          "reason": null,
+          "cast_at": "2026-09-09T11:54:46.977Z"
+        },
+        {
+          "voter_display_name": "Bot 2",
+          "target_display_name": "Bot 5",
+          "target_vote_count": 2,
+          "is_double_vote": false,
+          "reason": null,
+          "cast_at": "2026-09-09T11:54:46.977Z"
+        },
+        {
+          "voter_display_name": "Bot 4",
+          "target_display_name": "Bot 7",
+          "target_vote_count": 1,
+          "is_double_vote": false,
+          "reason": null,
+          "cast_at": "2026-09-09T11:54:46.977Z"
+        },
+        {
+          "voter_display_name": "Bot 5",
+          "target_display_name": "Bot 9",
+          "target_vote_count": 2,
+          "is_double_vote": false,
+          "reason": null,
+          "cast_at": "2026-09-09T11:54:46.977Z"
+        },
+        {
+          "voter_display_name": "Bot 6",
+          "target_display_name": "Bot 8",
+          "target_vote_count": 1,
+          "is_double_vote": false,
+          "reason": null,
+          "cast_at": "2026-09-09T11:54:46.977Z"
+        },
+        {
+          "voter_display_name": "Bot 7",
+          "target_display_name": "Bot 6",
+          "target_vote_count": 1,
+          "is_double_vote": false,
+          "reason": null,
+          "cast_at": "2026-09-09T11:54:46.977Z"
+        },
+        {
+          "voter_display_name": "Bot 8",
+          "target_display_name": "Bot 1",
+          "target_vote_count": 2,
+          "is_double_vote": false,
+          "reason": null,
+          "cast_at": "2026-09-09T11:54:46.977Z"
+        },
+        {
+          "voter_display_name": "Bot 9",
+          "target_display_name": "Bot 5",
+          "target_vote_count": 2,
+          "is_double_vote": false,
+          "reason": null,
+          "cast_at": "2026-09-09T11:54:46.977Z"
+        },
+        {
+          "voter_display_name": "Bot 9",
+          "target_display_name": "Bot 1",
+          "target_vote_count": 2,
+          "is_double_vote": true,
+          "reason": null,
+          "cast_at": "2026-09-09T11:54:46.977Z"
+        }
+      ]
+    },
+    {
+      "round_number": 4,
+      "eliminated_player_display_name": "Bot 1",
+      "tie_break_method": "random",
+      "resolved_at": "2026-09-09T12:58:06.930Z",
+      "votes": [
+        {
+          "voter_display_name": "Bot 1",
+          "target_display_name": "Bot 4",
+          "target_vote_count": 3,
+          "is_double_vote": false,
+          "reason": null,
+          "cast_at": "2026-09-09T12:25:01.478Z"
+        },
+        {
+          "voter_display_name": "Bot 2",
+          "target_display_name": "Bot 1",
+          "target_vote_count": 3,
+          "is_double_vote": false,
+          "reason": null,
+          "cast_at": "2026-09-09T12:25:01.478Z"
+        },
+        {
+          "voter_display_name": "Bot 2",
+          "target_display_name": "Bot 1",
+          "target_vote_count": 3,
+          "is_double_vote": true,
+          "reason": null,
+          "cast_at": "2026-09-09T12:25:01.478Z"
+        },
+        {
+          "voter_display_name": "Bot 4",
+          "target_display_name": "Bot 8",
+          "target_vote_count": 1,
+          "is_double_vote": false,
+          "reason": null,
+          "cast_at": "2026-09-09T12:25:01.478Z"
+        },
+        {
+          "voter_display_name": "Bot 6",
+          "target_display_name": "Bot 9",
+          "target_vote_count": 1,
+          "is_double_vote": false,
+          "reason": null,
+          "cast_at": "2026-09-09T12:25:01.478Z"
+        },
+        {
+          "voter_display_name": "Bot 7",
+          "target_display_name": "Bot 4",
+          "target_vote_count": 3,
+          "is_double_vote": false,
+          "reason": null,
+          "cast_at": "2026-09-09T12:25:01.478Z"
+        },
+        {
+          "voter_display_name": "Bot 8",
+          "target_display_name": "Bot 1",
+          "target_vote_count": 3,
+          "is_double_vote": false,
+          "reason": null,
+          "cast_at": "2026-09-09T12:25:01.478Z"
+        },
+        {
+          "voter_display_name": "Bot 9",
+          "target_display_name": "Bot 4",
+          "target_vote_count": 3,
+          "is_double_vote": false,
+          "reason": null,
+          "cast_at": "2026-09-09T12:25:01.478Z"
+        }
+      ]
+    },
+    {
+      "round_number": 5,
+      "eliminated_player_display_name": "Bot 9",
+      "tie_break_method": "none",
+      "resolved_at": "2026-09-09T13:11:36.967Z",
+      "votes": [
+        {
+          "voter_display_name": "Bot 2",
+          "target_display_name": "Bot 6",
+          "target_vote_count": 1,
+          "is_double_vote": false,
+          "reason": null,
+          "cast_at": "2026-09-09T12:58:06.930Z"
+        },
+        {
+          "voter_display_name": "Bot 4",
+          "target_display_name": "Bot 9",
+          "target_vote_count": 3,
+          "is_double_vote": false,
+          "reason": null,
+          "cast_at": "2026-09-09T12:58:06.930Z"
+        },
+        {
+          "voter_display_name": "Bot 4",
+          "target_display_name": "Bot 9",
+          "target_vote_count": 3,
+          "is_double_vote": true,
+          "reason": null,
+          "cast_at": "2026-09-09T12:58:06.930Z"
+        },
+        {
+          "voter_display_name": "Bot 6",
+          "target_display_name": "Bot 8",
+          "target_vote_count": 1,
+          "is_double_vote": false,
+          "reason": null,
+          "cast_at": "2026-09-09T12:58:06.930Z"
+        },
+        {
+          "voter_display_name": "Bot 7",
+          "target_display_name": "Bot 2",
+          "target_vote_count": 1,
+          "is_double_vote": false,
+          "reason": null,
+          "cast_at": "2026-09-09T12:58:06.930Z"
+        },
+        {
+          "voter_display_name": "Bot 8",
+          "target_display_name": "Bot 9",
+          "target_vote_count": 3,
+          "is_double_vote": false,
+          "reason": null,
+          "cast_at": "2026-09-09T12:58:06.930Z"
+        },
+        {
+          "voter_display_name": "Bot 9",
+          "target_display_name": "Bot 4",
+          "target_vote_count": 1,
+          "is_double_vote": false,
+          "reason": null,
+          "cast_at": "2026-09-09T12:58:06.930Z"
+        }
+      ]
+    },
+    {
+      "round_number": 6,
+      "eliminated_player_display_name": "Bot 4",
+      "tie_break_method": "random",
+      "resolved_at": "2026-09-09T13:12:48.244Z",
+      "votes": [
+        {
+          "voter_display_name": "Bot 2",
+          "target_display_name": "Bot 8",
+          "target_vote_count": 2,
+          "is_double_vote": false,
+          "reason": null,
+          "cast_at": "2026-09-09T13:11:36.967Z"
+        },
+        {
+          "voter_display_name": "Bot 4",
+          "target_display_name": "Bot 7",
+          "target_vote_count": 1,
+          "is_double_vote": false,
+          "reason": null,
+          "cast_at": "2026-09-09T13:11:36.967Z"
+        },
+        {
+          "voter_display_name": "Bot 6",
+          "target_display_name": "Bot 8",
+          "target_vote_count": 2,
+          "is_double_vote": false,
+          "reason": null,
+          "cast_at": "2026-09-09T13:11:36.967Z"
+        },
+        {
+          "voter_display_name": "Bot 7",
+          "target_display_name": "Bot 4",
+          "target_vote_count": 2,
+          "is_double_vote": false,
+          "reason": null,
+          "cast_at": "2026-09-09T13:11:36.967Z"
+        },
+        {
+          "voter_display_name": "Bot 7",
+          "target_display_name": "Bot 4",
+          "target_vote_count": 2,
+          "is_double_vote": true,
+          "reason": null,
+          "cast_at": "2026-09-09T13:11:36.967Z"
+        },
+        {
+          "voter_display_name": "Bot 8",
+          "target_display_name": "Bot 6",
+          "target_vote_count": 1,
+          "is_double_vote": false,
+          "reason": null,
+          "cast_at": "2026-09-09T13:11:36.967Z"
+        }
+      ]
+    },
+    {
+      "round_number": 7,
+      "eliminated_player_display_name": "Bot 7",
+      "tie_break_method": "random",
+      "resolved_at": "2026-09-09T13:12:55.769Z",
+      "votes": [
+        {
+          "voter_display_name": "Bot 2",
+          "target_display_name": "Bot 7",
+          "target_vote_count": 2,
+          "is_double_vote": false,
+          "reason": null,
+          "cast_at": "2026-09-09T13:12:48.244Z"
+        },
+        {
+          "voter_display_name": "Bot 6",
+          "target_display_name": "Bot 7",
+          "target_vote_count": 2,
+          "is_double_vote": false,
+          "reason": null,
+          "cast_at": "2026-09-09T13:12:48.244Z"
+        },
+        {
+          "voter_display_name": "Bot 7",
+          "target_display_name": "Bot 2",
+          "target_vote_count": 1,
+          "is_double_vote": false,
+          "reason": null,
+          "cast_at": "2026-09-09T13:12:48.244Z"
+        },
+        {
+          "voter_display_name": "Bot 8",
+          "target_display_name": "Bot 6",
+          "target_vote_count": 2,
+          "is_double_vote": false,
+          "reason": null,
+          "cast_at": "2026-09-09T13:12:48.244Z"
+        },
+        {
+          "voter_display_name": "Bot 8",
+          "target_display_name": "Bot 6",
+          "target_vote_count": 2,
+          "is_double_vote": true,
+          "reason": null,
+          "cast_at": "2026-09-09T13:12:48.244Z"
+        }
+      ]
+    }
+  ],
+  "door_picks": [
+    {
+      "player_display_name": "Bot 2",
+      "door_number": 1,
+      "resolved_outcome": "lose_all",
+      "picked_at": "2026-09-09T13:12:55.769Z"
+    },
+    {
+      "player_display_name": "Bot 6",
+      "door_number": 1,
+      "resolved_outcome": "lose_all",
+      "picked_at": "2026-09-09T13:12:55.769Z"
+    },
+    {
+      "player_display_name": "Bot 8",
+      "door_number": 3,
+      "resolved_outcome": "lose_all",
+      "picked_at": "2026-09-09T13:12:55.769Z"
+    }
+  ]
+}

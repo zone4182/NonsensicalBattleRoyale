@@ -74,11 +74,14 @@ const router = createRouter({
       path: "/gm",
       component: () => import("../layouts/GmLayout.vue"),
       meta: { auth: "gm" },
-      // Bare /gm has never had a route of its own -- redirect to the one child that's
-      // actually reachable without a session, so manually typing /gm (e.g. now that the
-      // landing page's "Host a new game" button is hidden) lands somewhere real instead
-      // of falling through to the catch-all 404.
-      redirect: { name: "gm-setup" },
+      // Bare /gm has never had a route of its own -- redirect to whichever child
+      // actually applies: the management hub if a GM session already exists (creating
+      // a game and managing one are detached, so a GM who already created their game
+      // has no business back in the wizard), otherwise the setup wizard.
+      redirect: () => {
+        const session = useSessionStore();
+        return session.token && session.role === "gm" ? { name: "gm-in-play" } : { name: "gm-setup" };
+      },
       children: [
         {
           path: "setup",
@@ -90,12 +93,6 @@ const router = createRouter({
           meta: { auth: "public" },
         },
         { path: "play", name: "gm-in-play", component: () => import("../views/gm/GmInPlayView.vue"), meta: { auth: "gm" } },
-        {
-          path: "invites",
-          name: "gm-invites",
-          component: () => import("../views/gm/GmInvitesView.vue"),
-          meta: { auth: "gm" },
-        },
         {
           path: "helpline",
           name: "gm-helpline-inbox",

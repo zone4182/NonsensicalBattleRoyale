@@ -1,0 +1,380 @@
+{
+  "exported_at": "2026-09-11T10:58:39.594Z",
+  "game_id": "3b109724-ab2c-4ad2-9c2e-798322614c03",
+  "game_name": "GameTestFriday",
+  "phase": "ended",
+  "settings": {
+    "round_interval_minutes": 30,
+    "missed_deadline_mode": "no_consequence",
+    "round1_start_mode": "gm_manual",
+    "round_resolution_mode": "manual",
+    "allow_vote_change": true,
+    "tie_break_mode": "no_elimination",
+    "double_vote_enabled": true,
+    "double_vote_floor_rounds": -1,
+    "survival_streak_threshold": 3,
+    "created_at": "2026-09-11T09:12:51.017Z",
+    "finished_at": null
+  },
+  "players": [
+    {
+      "id": "5d7d4adb-5fec-4bdf-b843-fe1d6e0ed359",
+      "display_name": "Bot 5",
+      "status": "alive",
+      "role": "player"
+    },
+    {
+      "id": "280a52eb-5bb7-4162-b3e0-b876b6af361e",
+      "display_name": "TheGM (GameMaster)",
+      "status": "alive",
+      "role": "gm"
+    },
+    {
+      "id": "9e42ee75-cc93-4bdc-a78e-a0b6d3cae8f8",
+      "display_name": "LenovoTab (Lenovoooh)",
+      "status": "alive",
+      "role": "player"
+    },
+    {
+      "id": "fad8a254-f9bd-4fc9-a019-6c880b07c76e",
+      "display_name": "Pixel9a",
+      "status": "alive",
+      "role": "player"
+    },
+    {
+      "id": "0c3296e3-6004-4b7e-b119-fa4b3f93b083",
+      "display_name": "Bot 1",
+      "status": "ghost",
+      "role": "player"
+    },
+    {
+      "id": "223e2fd1-c6d1-4dac-9616-be24f2a8380f",
+      "display_name": "Bot 2",
+      "status": "ghost",
+      "role": "player"
+    },
+    {
+      "id": "53159cf7-78ae-47a9-8faf-098345f15abd",
+      "display_name": "Bot 3",
+      "status": "ghost",
+      "role": "player"
+    },
+    {
+      "id": "274d0d1b-0979-4af0-aad4-8a8a023d68a7",
+      "display_name": "Bot 4",
+      "status": "ghost",
+      "role": "player"
+    }
+  ],
+  "current_round": null,
+  "rounds": [
+    {
+      "round_number": 1,
+      "eliminated_player_display_name": "Bot 1",
+      "tie_break_method": "none",
+      "resolved_at": "2026-09-11T09:27:36.541Z",
+      "votes": [
+        {
+          "voter_display_name": "Bot 1",
+          "target_display_name": "Bot 3",
+          "target_vote_count": 1,
+          "is_double_vote": false,
+          "reason": null,
+          "cast_at": "2026-09-11T09:20:37.652Z"
+        },
+        {
+          "voter_display_name": "Bot 2",
+          "target_display_name": "Bot 5",
+          "target_vote_count": 1,
+          "is_double_vote": false,
+          "reason": null,
+          "cast_at": "2026-09-11T09:20:37.652Z"
+        },
+        {
+          "voter_display_name": "Bot 2",
+          "target_display_name": "LenovoTab (Lenovoooh)",
+          "target_vote_count": 1,
+          "is_double_vote": true,
+          "reason": null,
+          "cast_at": "2026-09-11T09:20:37.652Z"
+        },
+        {
+          "voter_display_name": "Bot 3",
+          "target_display_name": "Bot 1",
+          "target_vote_count": 3,
+          "is_double_vote": false,
+          "reason": null,
+          "cast_at": "2026-09-11T09:20:37.652Z"
+        },
+        {
+          "voter_display_name": "Bot 4",
+          "target_display_name": "Bot 2",
+          "target_vote_count": 1,
+          "is_double_vote": false,
+          "reason": null,
+          "cast_at": "2026-09-11T09:20:37.652Z"
+        },
+        {
+          "voter_display_name": "Bot 5",
+          "target_display_name": "Bot 4",
+          "target_vote_count": 1,
+          "is_double_vote": false,
+          "reason": null,
+          "cast_at": "2026-09-11T09:20:37.652Z"
+        },
+        {
+          "voter_display_name": "Pixel9a",
+          "target_display_name": "Bot 1",
+          "target_vote_count": 3,
+          "is_double_vote": false,
+          "reason": "Because",
+          "cast_at": "2026-09-11T09:23:13.699Z"
+        },
+        {
+          "voter_display_name": "LenovoTab (Lenovoooh)",
+          "target_display_name": "Bot 1",
+          "target_vote_count": 3,
+          "is_double_vote": false,
+          "reason": null,
+          "cast_at": "2026-09-11T09:25:20.775Z"
+        }
+      ]
+    },
+    {
+      "round_number": 2,
+      "eliminated_player_display_name": "Bot 2",
+      "tie_break_method": "none",
+      "resolved_at": "2026-09-11T09:29:32.256Z",
+      "votes": [
+        {
+          "voter_display_name": "Bot 2",
+          "target_display_name": "Bot 4",
+          "target_vote_count": 1,
+          "is_double_vote": false,
+          "reason": null,
+          "cast_at": "2026-09-11T09:27:36.541Z"
+        },
+        {
+          "voter_display_name": "Bot 3",
+          "target_display_name": "Pixel9a",
+          "target_vote_count": 1,
+          "is_double_vote": false,
+          "reason": null,
+          "cast_at": "2026-09-11T09:27:36.541Z"
+        },
+        {
+          "voter_display_name": "Bot 4",
+          "target_display_name": "Bot 3",
+          "target_vote_count": 1,
+          "is_double_vote": false,
+          "reason": null,
+          "cast_at": "2026-09-11T09:27:36.541Z"
+        },
+        {
+          "voter_display_name": "Bot 5",
+          "target_display_name": "LenovoTab (Lenovoooh)",
+          "target_vote_count": 1,
+          "is_double_vote": false,
+          "reason": null,
+          "cast_at": "2026-09-11T09:27:36.541Z"
+        },
+        {
+          "voter_display_name": "LenovoTab (Lenovoooh)",
+          "target_display_name": "Bot 2",
+          "target_vote_count": 3,
+          "is_double_vote": false,
+          "reason": null,
+          "cast_at": "2026-09-11T09:28:50.948Z"
+        },
+        {
+          "voter_display_name": "Pixel9a",
+          "target_display_name": "Bot 2",
+          "target_vote_count": 3,
+          "is_double_vote": false,
+          "reason": null,
+          "cast_at": "2026-09-11T09:28:55.538Z"
+        },
+        {
+          "voter_display_name": "Pixel9a",
+          "target_display_name": "Bot 2",
+          "target_vote_count": 3,
+          "is_double_vote": true,
+          "reason": null,
+          "cast_at": "2026-09-11T09:29:25.619Z"
+        }
+      ]
+    },
+    {
+      "round_number": 3,
+      "eliminated_player_display_name": "Bot 3",
+      "tie_break_method": "none",
+      "resolved_at": "2026-09-11T09:32:02.431Z",
+      "votes": [
+        {
+          "voter_display_name": "Bot 3",
+          "target_display_name": "LenovoTab (Lenovoooh)",
+          "target_vote_count": 1,
+          "is_double_vote": false,
+          "reason": null,
+          "cast_at": "2026-09-11T09:29:32.256Z"
+        },
+        {
+          "voter_display_name": "Bot 4",
+          "target_display_name": "Bot 5",
+          "target_vote_count": 1,
+          "is_double_vote": false,
+          "reason": null,
+          "cast_at": "2026-09-11T09:29:32.256Z"
+        },
+        {
+          "voter_display_name": "Bot 5",
+          "target_display_name": "Bot 3",
+          "target_vote_count": 4,
+          "is_double_vote": false,
+          "reason": null,
+          "cast_at": "2026-09-11T09:29:32.256Z"
+        },
+        {
+          "voter_display_name": "LenovoTab (Lenovoooh)",
+          "target_display_name": "Bot 3",
+          "target_vote_count": 4,
+          "is_double_vote": false,
+          "reason": null,
+          "cast_at": "2026-09-11T09:30:25.100Z"
+        },
+        {
+          "voter_display_name": "Pixel9a",
+          "target_display_name": "Bot 3",
+          "target_vote_count": 4,
+          "is_double_vote": false,
+          "reason": null,
+          "cast_at": "2026-09-11T09:30:26.475Z"
+        },
+        {
+          "voter_display_name": "LenovoTab (Lenovoooh)",
+          "target_display_name": "Bot 3",
+          "target_vote_count": 4,
+          "is_double_vote": true,
+          "reason": null,
+          "cast_at": "2026-09-11T09:31:01.353Z"
+        }
+      ]
+    },
+    {
+      "round_number": 4,
+      "eliminated_player_display_name": null,
+      "tie_break_method": "no_elimination",
+      "resolved_at": "2026-09-11T09:35:27.926Z",
+      "votes": [
+        {
+          "voter_display_name": "Bot 4",
+          "target_display_name": "Pixel9a",
+          "target_vote_count": 2,
+          "is_double_vote": false,
+          "reason": null,
+          "cast_at": "2026-09-11T09:32:02.431Z"
+        },
+        {
+          "voter_display_name": "Bot 5",
+          "target_display_name": "LenovoTab (Lenovoooh)",
+          "target_vote_count": 1,
+          "is_double_vote": false,
+          "reason": null,
+          "cast_at": "2026-09-11T09:32:02.431Z"
+        },
+        {
+          "voter_display_name": "Bot 5",
+          "target_display_name": "Pixel9a",
+          "target_vote_count": 2,
+          "is_double_vote": true,
+          "reason": null,
+          "cast_at": "2026-09-11T09:32:02.431Z"
+        },
+        {
+          "voter_display_name": "Pixel9a",
+          "target_display_name": "Bot 4",
+          "target_vote_count": 2,
+          "is_double_vote": false,
+          "reason": null,
+          "cast_at": "2026-09-11T09:35:15.486Z"
+        },
+        {
+          "voter_display_name": "LenovoTab (Lenovoooh)",
+          "target_display_name": "Bot 4",
+          "target_vote_count": 2,
+          "is_double_vote": false,
+          "reason": null,
+          "cast_at": "2026-09-11T09:35:19.874Z"
+        }
+      ]
+    },
+    {
+      "round_number": 5,
+      "eliminated_player_display_name": "Bot 4",
+      "tie_break_method": "none",
+      "resolved_at": "2026-09-11T09:36:03.139Z",
+      "votes": [
+        {
+          "voter_display_name": "Bot 4",
+          "target_display_name": "Bot 5",
+          "target_vote_count": 2,
+          "is_double_vote": false,
+          "reason": null,
+          "cast_at": "2026-09-11T09:35:27.926Z"
+        },
+        {
+          "voter_display_name": "Bot 4",
+          "target_display_name": "Bot 5",
+          "target_vote_count": 2,
+          "is_double_vote": true,
+          "reason": null,
+          "cast_at": "2026-09-11T09:35:27.926Z"
+        },
+        {
+          "voter_display_name": "Bot 5",
+          "target_display_name": "Bot 4",
+          "target_vote_count": 3,
+          "is_double_vote": false,
+          "reason": null,
+          "cast_at": "2026-09-11T09:35:27.926Z"
+        },
+        {
+          "voter_display_name": "LenovoTab (Lenovoooh)",
+          "target_display_name": "Bot 4",
+          "target_vote_count": 3,
+          "is_double_vote": false,
+          "reason": null,
+          "cast_at": "2026-09-11T09:35:55.819Z"
+        },
+        {
+          "voter_display_name": "Pixel9a",
+          "target_display_name": "Bot 4",
+          "target_vote_count": 3,
+          "is_double_vote": false,
+          "reason": null,
+          "cast_at": "2026-09-11T09:35:56.922Z"
+        }
+      ]
+    }
+  ],
+  "door_picks": [
+    {
+      "player_display_name": "Bot 5",
+      "door_number": 3,
+      "resolved_outcome": "win",
+      "picked_at": "2026-09-11T09:36:03.139Z"
+    },
+    {
+      "player_display_name": "Pixel9a",
+      "door_number": 1,
+      "resolved_outcome": "lose",
+      "picked_at": "2026-09-11T09:37:23.117Z"
+    },
+    {
+      "player_display_name": "LenovoTab (Lenovoooh)",
+      "door_number": 2,
+      "resolved_outcome": "lose",
+      "picked_at": "2026-09-11T09:37:23.394Z"
+    }
+  ]
+}

@@ -261,12 +261,11 @@
   "gmNav": {
     "setup": "Setup",
     "inPlay": "In Play",
-    "invites": "Invites",
     "helplineInbox": "Helpline Inbox"
   },
   "gmSetup": {
     "title": "GM Setup",
-    "description": "Create the game, then invite players using their own invite links (not built yet in this milestone).",
+    "description": "A short wizard walks through every setting, then lets you draft player invites -- the game itself is only created at the very end, once everything is decided.",
     "minPlayersHint": "Round 1 can't start until at least 5 players have accepted their invite, whichever start mode you pick below.",
     "manualResolveHint": "Regardless of resolution mode, you can always resolve a round early yourself once every alive player has voted.",
     "basics": {
@@ -351,28 +350,28 @@
       "setupSecret": "Setup secret",
       "setupSecretHint": "A shared secret that proves you're allowed to create a game -- separate from the invite links you'll send players."
     },
-    "creating": "Creating...",
-    "createGame": "Create game",
-    "created": "Game created. GM invite token (shown once):",
-    "copy": "Copy"
-  },
-  "gmInvites": {
-    "title": "GM: Invites",
-    "description": "Create a player invite, then copy the link and send it yourself -- there's no in-app sending.",
-    "create": {
-      "heading": "Create invite",
+    "invites": {
+      "heading": "Invites",
+      "description": "Draft the players you want to invite. Nothing is actually created yet -- these become real invites only once you create the game below.",
       "namePlaceholder": "player display name",
-      "creating": "Creating...",
-      "createInvite": "Create invite",
-      "setupOnly": "Invites can only be created while the game is in setup."
+      "addInvite": "Add",
+      "remove": "Remove",
+      "noneYetHint": "No invites drafted yet -- that's fine (e.g. a bot-only test game), or add one below."
     },
-    "list": {
-      "heading": "Invites ({count})",
-      "empty": "No invites created yet.",
-      "redeemed": "Redeemed",
-      "pending": "Pending",
-      "copyLink": "Copy link"
-    }
+    "wizard": {
+      "stepLabels": {
+        "secret": "Access",
+        "basics": "Game basics",
+        "rules": "Round rules",
+        "powers": "Hidden powers & bots",
+        "miniGames": "Mini-games",
+        "invites": "Invites"
+      },
+      "back": "Back",
+      "next": "Next"
+    },
+    "creating": "Creating...",
+    "createGame": "Create game"
   },
   "gmHelplineInbox": {
     "title": "GM: Helpline Inbox",
@@ -389,6 +388,17 @@
   "gmInPlay": {
     "title": "GM: In Play",
     "unnamedGame": "Unnamed game",
+    "gmToken": {
+      "heading": "Your GM token",
+      "hint": "This is your own credential for this game -- keep it to sign back in from another device or after clearing your browser data. Never share it with players.",
+      "copy": "Copy",
+      "copied": "Copied!"
+    },
+    "justCreatedInvites": {
+      "heading": "Invites just created",
+      "hint": "Shown once, right after creating the game -- copy these links now and send them to your players. Reloading this page won't bring this list back.",
+      "copyLink": "Copy link"
+    },
     "settings": {
       "heading": "Settings",
       "roundInterval": "Round interval",

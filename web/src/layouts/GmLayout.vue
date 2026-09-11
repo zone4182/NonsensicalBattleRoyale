@@ -1,16 +1,24 @@
 <script setup lang="ts">
+import { computed } from "vue";
 import { useI18n } from "vue-i18n";
+import { useSessionStore } from "../stores/session";
 import LocaleSwitcher from "../components/LocaleSwitcher.vue";
 
-// GM setup / in-play / helpline inbox are three distinct concerns that share this
-// nav, without forcing the same chrome onto the 8 non-GM screens.
+// Creating a game and managing one are deliberately detached: no session yet means
+// still in the setup wizard (the only thing reachable), and once a game exists the
+// wizard itself is behind it -- these two tab sets never show together. Invites has no
+// standalone tab of its own anymore; drafting and sending them is a step inside the
+// wizard now, not an ongoing management screen.
 const { t } = useI18n();
-const tabs = [
-  { to: { name: "gm-setup" }, key: "setup" },
-  { to: { name: "gm-in-play" }, key: "inPlay" },
-  { to: { name: "gm-invites" }, key: "invites" },
-  { to: { name: "gm-helpline-inbox" }, key: "helplineInbox" },
-];
+const session = useSessionStore();
+const tabs = computed(() =>
+  session.token && session.role === "gm"
+    ? [
+        { to: { name: "gm-in-play" }, key: "inPlay" },
+        { to: { name: "gm-helpline-inbox" }, key: "helplineInbox" },
+      ]
+    : [{ to: { name: "gm-setup" }, key: "setup" }],
+);
 </script>
 
 <template>

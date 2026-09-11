@@ -5,6 +5,7 @@ import { useRouter } from "vue-router";
 import { useSessionStore } from "../../stores/session";
 import { useGameStore } from "../../stores/game";
 import { callFunction, ApiCallError } from "../../lib/api";
+import { takeJustCreatedInvites, type JustCreatedInvite } from "../../lib/justCreatedInvites";
 import RoundHeader from "../../components/round/RoundHeader.vue";
 
 interface GmActionResponse {
@@ -134,6 +135,27 @@ onMounted(() => {
   if (session.token) game.refresh(session.token);
   loadOverview();
 });
+
+// The GM token IS session.token (invite tokens are the bearer credential itself, no
+// separate JWT -- ARCHITECTURE.md "Auth/identity"), so it's already sitting in the
+// store; this just makes it permanently visible here rather than the one-time reveal
+// the old single-page setup form used to show right after creation.
+const gmTokenCopied = ref(false);
+async function copyGmToken() {
+  if (!session.token) return;
+  await navigator.clipboard.writeText(session.token);
+  gmTokenCopied.value = true;
+  setTimeout(() => (gmTokenCopied.value = false), 2000);
+}
+
+// The setup wizard's very last step creates every drafted player invite and stashes
+// their one-time tokens for exactly this moment -- read once on first arrival here,
+// then gone (see lib/justCreatedInvites.ts). A reload of this screen won't show them
+// again, same "shown once" precedent as the GM's own token used to have.
+const justCreatedInvites = ref<JustCreatedInvite[]>(takeJustCreatedInvites());
+async function copyInviteLink(token: string) {
+  await navigator.clipboard.writeText(`${window.location.origin}/invite/${token}`);
+}
 
 // --- Start Round 1 ---
 const startPending = ref(false);
@@ -328,6 +350,47 @@ async function submit() {
       {{ game.gameName ?? t("gmInPlay.unnamedGame") }}
       <span class="game-id">({{ game.gameId ?? "–" }})</span>
     </p>
+
+    <section class="gm-token-block pixel-frame">
+      <h2>{{ t("gmInPlay.gmToken.heading") }}</h2>
+      <p class="field-hint">
+        {{ t("gmInPlay.gmToken.hint") }}
+      </p>
+      <div class="token-row">
+        <code>{{ session.token }}</code>
+        <button
+          type="button"
+          @click="copyGmToken"
+        >
+          {{ gmTokenCopied ? t("gmInPlay.gmToken.copied") : t("gmInPlay.gmToken.copy") }}
+        </button>
+      </div>
+    </section>
+
+    <section
+      v-if="justCreatedInvites.length > 0"
+      class="just-created-invites pixel-frame"
+    >
+      <h2>{{ t("gmInPlay.justCreatedInvites.heading") }}</h2>
+      <p class="field-hint">
+        {{ t("gmInPlay.justCreatedInvites.hint") }}
+      </p>
+      <ul>
+        <li
+          v-for="invite in justCreatedInvites"
+          :key="invite.token"
+        >
+          {{ invite.display_name }}
+          <button
+            type="button"
+            @click="copyInviteLink(invite.token)"
+          >
+            {{ t("gmInPlay.justCreatedInvites.copyLink") }}
+          </button>
+        </li>
+      </ul>
+    </section>
+
     <h2>{{ t("gmInPlay.settings.heading") }}</h2>
     <div
       v-if="overview"
@@ -740,6 +803,39 @@ async function submit() {
 
 .game-id {
   font-size: 0.85em;
+}
+
+.gm-token-block,
+.just-created-invites {
+  padding: var(--nbr-space-3);
+  margin: var(--nbr-space-3) 0;
+}
+
+.token-row {
+  display: flex;
+  align-items: center;
+  gap: var(--nbr-space-2);
+  flex-wrap: wrap;
+}
+
+.token-row code {
+  word-break: break-all;
+}
+
+.just-created-invites ul {
+  list-style: none;
+  padding: 0;
+  margin: var(--nbr-space-2) 0 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--nbr-space-2);
+}
+
+.just-created-invites li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--nbr-space-2);
 }
 
 .table-scroll {
