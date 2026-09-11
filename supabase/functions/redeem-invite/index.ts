@@ -1,13 +1,13 @@
 import { errorResponse, HttpError, jsonResponse, preflightResponse, readJsonBody } from "../_shared/http.ts";
 import { sql } from "../_shared/db.ts";
-import { grantRandomDrop } from "../_shared/powers.ts";
-import { castBotRoomGuesses, castBotRoomMoves, castBotVotes } from "../_shared/bots.ts";
+import { castBotPrologueVotes } from "../_shared/bots.ts";
 import { sendPushToPlayers } from "../_shared/push.ts";
 import { enforceRateLimit } from "../_shared/rateLimit.ts";
 import { optionalStringMaxLength, requireString } from "../_shared/validation.ts";
 import { MIN_PLAYERS_TO_START } from "../_shared/constants.ts";
 import { publicName } from "../_shared/names.ts";
-import { assignRoundGuessTargets, initPlayerRoom } from "../_shared/roomMovement.ts";
+import { initPlayerRoom } from "../_shared/roomMovement.ts";
+import { PROLOGUE_KITCHEN_NARRATION } from "../_shared/story.ts";
 import type { Game, Invite } from "../_shared/types.ts";
 
 // Not authenticated via authenticate() -- the invite isn't redeemed yet, so there's no
@@ -73,38 +73,32 @@ Deno.serve(async (req) => {
           where game_id = ${game.id} and role = 'player'
         `;
         if (unredeemed_count === 0 && player_count >= MIN_PLAYERS_TO_START) {
-          // Round 1 never has a double-vote holder, regardless of games.double_vote_enabled
-          // -- same reasoning as start-round's identical round-1 creation path.
-          const doubleVotePlayerId = null;
+          // Round 1 is always the "prologue round" now -- see start-round's identical
+          // comment. No double vote, no power grants, no Move-to-Room until round 2.
           const [round] = await tx`
-            insert into battle_royale.rounds (game_id, round_number, opens_at, voting_deadline_at, double_vote_player_id)
+            insert into battle_royale.rounds (game_id, round_number, opens_at, voting_deadline_at, double_vote_player_id, is_prologue)
             values (
               ${game.id},
               1,
               now(),
               now() + (${game.round_interval_minutes} || ' minutes')::interval,
-              ${doubleVotePlayerId}
+              null,
+              true
             )
             returning id
           `;
           await tx`update battle_royale.games set phase = 'active' where id = ${game.id}`;
           gamePhase = "active";
 
+          await tx`
+            insert into battle_royale.narration_log (game_id, round_id, body)
+            values (${game.id}, ${round.id}, ${PROLOGUE_KITCHEN_NARRATION})
+          `;
+
           const aliveRoster = await tx<{ id: string }[]>`
             select id from battle_royale.players where game_id = ${game.id} and status = 'alive' and role = 'player'
           `;
-          await grantRandomDrop(
-            tx,
-            game.id,
-            round.id,
-            aliveRoster.map((p) => p.id),
-          );
-          await castBotVotes(tx, game.id, round.id, doubleVotePlayerId);
-          if (game.move_to_room_enabled) {
-            await assignRoundGuessTargets(tx, game.id, round.id);
-            await castBotRoomMoves(tx, game.id, round.id);
-            await castBotRoomGuesses(tx, game.id, round.id);
-          }
+          await castBotPrologueVotes(tx, game.id, round.id);
           newRoundPlayerIds = aliveRoster.map((p) => p.id);
         }
       }

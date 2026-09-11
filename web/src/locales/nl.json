@@ -125,7 +125,34 @@
     "storyPart2b": "Een van jullie loopt naar het toilet -- en vindt hen daar. Dood. Nog half op de bril, broek rond de enkels. Een diepe steekwond gaapt in hun nek; het bloed heeft zich verspreid tot een brede, donkere plas over de tegels, tot aan de muren en de wastafel. Hun ogen staan wijd open, bevroren in angst. De geur van bloed hangt dik en zoet in de kleine, muffe ruimte. Geen twijfel mogelijk: dit was geen ongeluk -- en wie het ook deed, bevindt zich nog ergens in dit huis.",
     "gmFallbackName": "de Game Master",
     "continue": "Doorgaan",
-    "waiting": "Wachten tot de rest van het huis is aangekomen voordat het spel kan beginnen..."
+    "waiting": "Wachten tot de rest van het huis is aangekomen voordat het spel kan beginnen...",
+    "slideProgress": "{current} / {total}"
+  },
+  "prologueDecision": {
+    "prompt": "Wat moeten jullie doen?",
+    "options": {
+      "call_police": "Bel de politie",
+      "get_help": "Ga naar buiten om hulp te halen",
+      "drink_whisky": "Open een fles whisky en begin te drinken"
+    },
+    "chosen": "Je koos: {option}. Wachten op de anderen...",
+    "errors": {
+      "noOpenRound": "Er valt momenteel niets te beslissen.",
+      "notPrologueRound": "Die beslissing is al genomen."
+    }
+  },
+  "prologueOutcome": {
+    "acknowledgment": {
+      "call_police": "Uiteindelijk beslist de groep: bel de politie. Telefoons komen tevoorschijn, met trillende handen ingetoetst -- maar de oproepen komen niet door. Nergens in huis is er bereik.",
+      "get_help": "Uiteindelijk beslist de groep: naar buiten voor hulp. Jullie lopen samen naar de voordeur -- om te ontdekken dat die op slot zit. Elke deur is dat. Elk raam zit muurvast, hoe hard er ook aan getrokken wordt.",
+      "drink_whisky": "Uiteindelijk beslist de groep dat niemand toch helder kan nadenken. Iemand opent een fles whisky uit de kast, en die gaat rond. Het maakt niets beter. Het maakt ook niets slechter.",
+      "fallback": "Uiteindelijk doet de groep... iets. Het maakt uiteindelijk niet veel uit."
+    },
+    "searchingHouse": "Op zoek naar een uitweg -- een sleutel, een vergeten telefoon, wat dan ook -- keert de groep het huis binnenstebuiten.",
+    "theLetter": "In de studeerkamer, op het bureau, ligt een verzegelde envelop met ieders naam erop, in pijnlijk herkenbaar handschrift. Het is een brief -- geschreven voor de moord.",
+    "theRules": "De regels zijn eenvoudig, staat er. Elke ronde brengt iedereen één stem uit -- anoniem, definitief. Wie de meeste stemmen krijgt, is weg zodra de zon ondergaat. Alleen wie als laatste overblijft, mag door de voordeur naar buiten.",
+    "andSoItBegins": "En zo begint het...",
+    "continue": "Doorgaan"
   },
   "roundHeader": {
     "round": "Ronde {number}",
@@ -435,13 +462,15 @@
       "player": "Speler",
       "voteCast": "Stem uitgebracht",
       "voteLocked": "Vastgezet",
-      "lockedBadge": "VASTGEZET"
+      "lockedBadge": "VASTGEZET",
+      "prologueOption": "Keuze"
     },
     "votes": {
       "heading": "Afgehandelde rondes -- volledige stemverdeling",
       "hint": "Alleen voor de GM. Spelers zien nooit wie op wie stemde totdat het spel eindigt -- deze weergave is een uitzondering speciaal voor jou, geen verandering in wat spelers te zien krijgen.",
       "none": "Nog geen rondes afgehandeld.",
       "round": "Ronde {number}",
+      "prologueOutcome": "De groep besloot: {option}",
       "eliminated": "Geëlimineerd: {name}",
       "noOne": "niemand",
       "randomTieBreak": "(willekeurige gelijkspelbeslissing)",

@@ -27,7 +27,12 @@ export interface NarrationEntry {
 export interface CurrentRound {
   roundNumber: number;
   votingDeadlineAt: string | null;
+  isPrologue: boolean;
 }
+
+// Mirrors supabase/functions/_shared/types.ts's PrologueOption union -- round 1's fixed
+// three-way group decision. Real branching content deferred (per the user).
+export type PrologueOption = "call_police" | "get_help" | "drink_whisky";
 
 export interface ThreeDoorsState {
   deadlineAt: string | null;
@@ -53,6 +58,7 @@ export interface YourStatus {
   isDoubleVoteHolder: boolean;
   activeVotes: ActiveVote[];
   outcome: "win" | "lose" | null;
+  prologueVote: PrologueOption | null;
 }
 
 // Mirrors supabase/functions/_shared/mansion.ts's RoomId union.
@@ -96,7 +102,8 @@ interface GetGameStateResponse {
   three_doors: { deadline_at: string | null; your_pick: number | null } | null;
   round_resolution_mode: RoundResolutionMode;
   allow_vote_change: boolean;
-  current_round: { round_number: number; voting_deadline_at: string | null } | null;
+  current_round: { round_number: number; voting_deadline_at: string | null; is_prologue: boolean } | null;
+  previous_prologue_outcome: PrologueOption | null;
   players: { id: string; display_name: string; status: PlayerStatus; role: RosterPlayerRole; is_bot: boolean }[];
   your_status: {
     status: PlayerStatus;
@@ -106,6 +113,7 @@ interface GetGameStateResponse {
     is_double_vote_holder: boolean;
     your_active_votes: { target_player_id: string; reason: string | null }[];
     your_outcome: "win" | "lose" | null;
+    your_prologue_vote: PrologueOption | null;
   };
   narration_entries: { id: string; text: string; created_at: string }[];
   move_to_room: {
@@ -134,6 +142,7 @@ export const useGameStore = defineStore("game", () => {
   const narrationEntries = ref<NarrationEntry[]>([]);
   const moveToRoom = ref<MoveToRoomState | null>(null);
   const threeDoors = ref<ThreeDoorsState | null>(null);
+  const previousPrologueOutcome = ref<PrologueOption | null>(null);
 
   // Single source for populating this store -- reused by every screen that needs
   // fresh roster/phase data (main round, vote modal, seance, three doors) rather than
@@ -148,8 +157,13 @@ export const useGameStore = defineStore("game", () => {
     roundResolutionMode.value = raw.round_resolution_mode;
     allowVoteChange.value = raw.allow_vote_change;
     currentRound.value = raw.current_round
-      ? { roundNumber: raw.current_round.round_number, votingDeadlineAt: raw.current_round.voting_deadline_at }
+      ? {
+          roundNumber: raw.current_round.round_number,
+          votingDeadlineAt: raw.current_round.voting_deadline_at,
+          isPrologue: raw.current_round.is_prologue,
+        }
       : null;
+    previousPrologueOutcome.value = raw.previous_prologue_outcome;
     players.value = raw.players.map((p) => ({ id: p.id, displayName: p.display_name, status: p.status, role: p.role, isBot: p.is_bot }));
     yourStatus.value = {
       status: raw.your_status.status,
@@ -163,6 +177,7 @@ export const useGameStore = defineStore("game", () => {
       isDoubleVoteHolder: raw.your_status.is_double_vote_holder,
       activeVotes: raw.your_status.your_active_votes.map((v) => ({ targetPlayerId: v.target_player_id, reason: v.reason })),
       outcome: raw.your_status.your_outcome,
+      prologueVote: raw.your_status.your_prologue_vote,
     };
     narrationEntries.value = raw.narration_entries.map((n) => ({ id: n.id, text: n.text, createdAt: n.created_at }));
     moveToRoom.value = raw.move_to_room
@@ -200,6 +215,7 @@ export const useGameStore = defineStore("game", () => {
     narrationEntries,
     moveToRoom,
     threeDoors,
+    previousPrologueOutcome,
     refresh,
   };
 });

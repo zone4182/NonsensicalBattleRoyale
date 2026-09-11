@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref, watch } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import { useRouter } from "vue-router";
 import RoundHeader from "../components/round/RoundHeader.vue";
@@ -9,6 +9,8 @@ import PlayerRoster from "../components/round/PlayerRoster.vue";
 import YourStatusPanel from "../components/round/YourStatusPanel.vue";
 import NarrationLog from "../components/round/NarrationLog.vue";
 import VoteActionPanel from "../components/round/VoteActionPanel.vue";
+import PrologueDecisionPanel from "../components/round/PrologueDecisionPanel.vue";
+import PrologueOutcomeGate from "../components/round/PrologueOutcomeGate.vue";
 import PlayerSettingsModal from "../components/PlayerSettingsModal.vue";
 import { useGameStore } from "../stores/game";
 import { useSessionStore } from "../stores/session";
@@ -16,6 +18,7 @@ import { useUiStore } from "../stores/ui";
 import { useApiCall } from "../composables/useApiCall";
 import { usePoll } from "../composables/usePoll";
 import { useGameFinishedRedirect } from "../composables/useGameFinishedRedirect";
+import { hasSeenPrologueOutcome, markPrologueOutcomeSeen } from "../lib/prologueOutcomeSeen";
 
 // 15s keeps a fast-round game feeling responsive without hammering get-game-state; a
 // background poll never shows the loading spinner (only the initial mount fetch does,
@@ -31,6 +34,22 @@ const { pending, run } = useApiCall();
 const showSettings = ref(false);
 
 useGameFinishedRedirect();
+
+// The one-time "letter in the study" transition beat between round 1 (the group's
+// decision) and round 2 (the real first vote) -- see PrologueOutcomeGate.vue. Round 1
+// has no eliminations, so there's no ghost/alive split to worry about here: everyone
+// who reaches round 2 sees this exactly once.
+const prologueGateDismissedThisSession = ref(false);
+const showPrologueGate = computed(
+  () =>
+    game.currentRound?.roundNumber === 2 &&
+    !prologueGateDismissedThisSession.value &&
+    !hasSeenPrologueOutcome(game.gameId ?? ""),
+);
+function continuePastPrologueGate() {
+  if (game.gameId) markPrologueOutcomeSeen(game.gameId);
+  prologueGateDismissedThisSession.value = true;
+}
 
 onMounted(() => {
   if (session.token) run(() => game.refresh(session.token as string));
@@ -77,7 +96,7 @@ watch(
           {{ t("playerSettings.button") }}
         </button>
         <button
-          v-if="game.moveToRoom?.enabled && game.yourStatus?.status === 'alive'"
+          v-if="game.moveToRoom?.enabled && game.yourStatus?.status === 'alive' && !game.currentRound?.isPrologue"
           type="button"
           class="settings-button"
           @click="router.push({ name: 'move-to-room' })"
@@ -96,7 +115,12 @@ watch(
       <NarrationLog />
     </div>
     <div class="area-action">
-      <VoteActionPanel />
+      <PrologueDecisionPanel v-if="game.currentRound?.isPrologue" />
+      <PrologueOutcomeGate
+        v-else-if="showPrologueGate"
+        @continue="continuePastPrologueGate"
+      />
+      <VoteActionPanel v-else />
       <p
         v-if="pending"
         class="loading"

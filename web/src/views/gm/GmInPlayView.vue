@@ -41,11 +41,13 @@ interface GmGameOverview {
   current_round: {
     round_number: number;
     voting_deadline_at: string;
+    is_prologue: boolean;
     players: {
       id: string;
       display_name: string;
       voted: boolean;
       locked: boolean;
+      option: string | null;
     }[];
   } | null;
   game: {
@@ -67,6 +69,10 @@ interface GmGameOverview {
     eliminated_player_display_name: string | null;
     tie_break_method: string | null;
     resolved_at: string;
+    is_prologue: boolean;
+    prologue_outcome: string | null;
+    prologue_tie_break: boolean;
+    prologue_votes: { voter_display_name: string; option: string }[];
     votes: {
       voter_display_name: string;
       target_display_name: string;
@@ -476,7 +482,12 @@ async function submit() {
             <tr>
               <th>{{ t("gmInPlay.currentRound.player") }}</th>
               <th>{{ t("gmInPlay.currentRound.voteCast") }}</th>
-              <th>{{ t("gmInPlay.currentRound.voteLocked") }}</th>
+              <th v-if="overview.current_round.is_prologue">
+                {{ t("gmInPlay.currentRound.prologueOption") }}
+              </th>
+              <th v-else>
+                {{ t("gmInPlay.currentRound.voteLocked") }}
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -486,7 +497,10 @@ async function submit() {
             >
               <td>{{ p.display_name }}</td>
               <td>{{ p.voted ? t("gmInPlay.settings.yes") : t("gmInPlay.settings.no") }}</td>
-              <td>
+              <td v-if="overview.current_round.is_prologue">
+                {{ p.option ? t(`prologueDecision.options.${p.option}`) : "" }}
+              </td>
+              <td v-else>
                 <span
                   v-if="p.locked"
                   class="locked-badge"
@@ -512,37 +526,64 @@ async function submit() {
       class="round-votes-block"
     >
       <h3>{{ t("gmInPlay.votes.round", { number: round.round_number }) }}</h3>
-      <p>
-        {{ t("gmInPlay.votes.eliminated", { name: round.eliminated_player_display_name ?? t("gmInPlay.votes.noOne") }) }}
-        <span v-if="round.tie_break_method === 'random'">{{ t("gmInPlay.votes.randomTieBreak") }}</span>
-        <span v-else-if="round.tie_break_method === 'no_elimination'">{{ t("gmInPlay.votes.noEliminationTieBreak") }}</span>
-      </p>
-      <div class="table-scroll">
-        <table class="votes-table">
-          <thead>
-            <tr>
-              <th>{{ t("gmInPlay.votes.voter") }}</th>
-              <th>{{ t("gmInPlay.votes.target") }}</th>
-              <th>{{ t("gmInPlay.votes.votesReceived") }}</th>
-              <th>{{ t("gmInPlay.votes.doubleVote") }}</th>
-              <th>{{ t("gmInPlay.votes.reason") }}</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr
-              v-for="(vote, i) in round.votes"
-              :key="i"
-              :class="{ 'eliminated-row': vote.target_display_name === round.eliminated_player_display_name }"
-            >
-              <td>{{ vote.voter_display_name }}</td>
-              <td>{{ vote.target_display_name }}</td>
-              <td>{{ vote.target_vote_count }}</td>
-              <td>{{ vote.is_double_vote ? t("gmInPlay.settings.yes") : "" }}</td>
-              <td>{{ vote.reason ?? "" }}</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+      <template v-if="round.is_prologue">
+        <p>
+          {{ t("gmInPlay.votes.prologueOutcome", { option: round.prologue_outcome ? t(`prologueDecision.options.${round.prologue_outcome}`) : "?" }) }}
+          <span v-if="round.prologue_tie_break">{{ t("gmInPlay.votes.randomTieBreak") }}</span>
+        </p>
+        <div class="table-scroll">
+          <table class="votes-table">
+            <thead>
+              <tr>
+                <th>{{ t("gmInPlay.votes.voter") }}</th>
+                <th>{{ t("gmInPlay.currentRound.prologueOption") }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr
+                v-for="(vote, i) in round.prologue_votes"
+                :key="i"
+              >
+                <td>{{ vote.voter_display_name }}</td>
+                <td>{{ t(`prologueDecision.options.${vote.option}`) }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </template>
+      <template v-else>
+        <p>
+          {{ t("gmInPlay.votes.eliminated", { name: round.eliminated_player_display_name ?? t("gmInPlay.votes.noOne") }) }}
+          <span v-if="round.tie_break_method === 'random'">{{ t("gmInPlay.votes.randomTieBreak") }}</span>
+          <span v-else-if="round.tie_break_method === 'no_elimination'">{{ t("gmInPlay.votes.noEliminationTieBreak") }}</span>
+        </p>
+        <div class="table-scroll">
+          <table class="votes-table">
+            <thead>
+              <tr>
+                <th>{{ t("gmInPlay.votes.voter") }}</th>
+                <th>{{ t("gmInPlay.votes.target") }}</th>
+                <th>{{ t("gmInPlay.votes.votesReceived") }}</th>
+                <th>{{ t("gmInPlay.votes.doubleVote") }}</th>
+                <th>{{ t("gmInPlay.votes.reason") }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr
+                v-for="(vote, i) in round.votes"
+                :key="i"
+                :class="{ 'eliminated-row': vote.target_display_name === round.eliminated_player_display_name }"
+              >
+                <td>{{ vote.voter_display_name }}</td>
+                <td>{{ vote.target_display_name }}</td>
+                <td>{{ vote.target_vote_count }}</td>
+                <td>{{ vote.is_double_vote ? t("gmInPlay.settings.yes") : "" }}</td>
+                <td>{{ vote.reason ?? "" }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </template>
     </section>
 
     <template v-if="overview && overview.door_picks.length > 0">

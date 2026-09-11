@@ -14,7 +14,8 @@ import { castBotDoorPicks, castBotRoomGuesses, castBotRoomMoves, castBotVotes } 
 import { sendPushToPlayers } from "../_shared/push.ts";
 import { publicName } from "../_shared/names.ts";
 import { assignRoundGuessTargets, resolveRoomMovesAndGuesses } from "../_shared/roomMovement.ts";
-import type { Game, Player, PowerGrant, Round } from "../_shared/types.ts";
+import { PROLOGUE_OPTIONS, PROLOGUE_OUTCOME_NARRATION, ROUND_TWO_RECAP_NARRATION } from "../_shared/story.ts";
+import type { Game, Player, PowerGrant, PrologueOption, Round } from "../_shared/types.ts";
 
 interface Resolution {
   round_id: string;
@@ -45,6 +46,17 @@ async function getDueRoundsForGame(db: ReturnType<typeof sql>, gameId: string): 
       select id from battle_royale.players where game_id = ${gameId} and status = 'alive' and role = 'player'
     `;
     if (aliveRoster.length === 0) continue;
+
+    // Round 1's group decision lives in prologue_votes, not votes -- no entitlement
+    // concept (always exactly 1 pick per player, no double vote is ever assigned this
+    // early -- see start-round's comment), just "has everyone picked something."
+    if (round.is_prologue) {
+      const [{ voted_count }] = await db<{ voted_count: number }[]>`
+        select count(*)::int as voted_count from battle_royale.prologue_votes where round_id = ${round.id}
+      `;
+      if (voted_count >= aliveRoster.length) due.push(round);
+      continue;
+    }
 
     let allVoted = true;
     for (const player of aliveRoster) {
@@ -87,6 +99,77 @@ Deno.serve(async (req) => {
     for (const round of dueRounds) {
       const resolution = await db.begin(async (tx) => {
         const [game] = await tx<Game[]>`select * from battle_royale.games where id = ${round.game_id}`;
+
+        // Round 1's group decision -- entirely separate resolution shape from the real
+        // elimination vote below (no target tally, no ward/deflect/null powers, no
+        // Three Doors, nobody dies), so it's simplest and safest handled as its own
+        // early-return branch rather than threading "is this the prologue round"
+        // through every step of the elimination logic that follows.
+        if (round.is_prologue) {
+          const aliveRoster = await tx<{ id: string }[]>`
+            select id from battle_royale.players where game_id = ${game.id} and status = 'alive' and role = 'player'
+          `;
+          const aliveIds = aliveRoster.map((p) => p.id);
+
+          const tally = await tx<{ option: PrologueOption; count: number }[]>`
+            select option, count(*)::int as count from battle_royale.prologue_votes
+            where round_id = ${round.id} group by option
+          `;
+
+          let outcome: PrologueOption;
+          let tieBreak = false;
+          if (tally.length === 0) {
+            // Nobody picked anything at all -- the story still has to move forward, so
+            // pick uniformly at random. Not really a "tie" in the GM-visible sense.
+            outcome = PROLOGUE_OPTIONS[Math.floor(Math.random() * PROLOGUE_OPTIONS.length)];
+          } else {
+            const maxCount = Math.max(...tally.map((t) => t.count));
+            const topOptions = tally.filter((t) => t.count === maxCount).map((t) => t.option);
+            outcome = topOptions[Math.floor(Math.random() * topOptions.length)];
+            tieBreak = topOptions.length > 1;
+          }
+
+          await tx`
+            update battle_royale.rounds
+            set resolved_at = now(), prologue_outcome = ${outcome}, prologue_tie_break = ${tieBreak}
+            where id = ${round.id}
+          `;
+          await tx`
+            insert into battle_royale.narration_log (game_id, round_id, body)
+            values (${game.id}, ${round.id}, ${PROLOGUE_OUTCOME_NARRATION[outcome]})
+          `;
+
+          // Round 2: the first *real* voting round. Still no double vote here either
+          // (see start-round's comment -- "this first traditional round" the user means
+          // is round 2, so double vote only starts becoming eligible from round 3).
+          const [newRound] = await tx`
+            insert into battle_royale.rounds (game_id, round_number, opens_at, voting_deadline_at, double_vote_player_id, is_prologue)
+            values (
+              ${game.id}, 2, now(), now() + (${game.round_interval_minutes} || ' minutes')::interval, null, false
+            )
+            returning id
+          `;
+          await tx`
+            insert into battle_royale.narration_log (game_id, round_id, body)
+            values (${game.id}, ${newRound.id}, ${ROUND_TWO_RECAP_NARRATION})
+          `;
+          await grantRandomDrop(tx, game.id, newRound.id, aliveIds);
+          await castBotVotes(tx, game.id, newRound.id, null);
+          if (game.move_to_room_enabled) {
+            await assignRoundGuessTargets(tx, game.id, newRound.id);
+            await castBotRoomMoves(tx, game.id, newRound.id);
+            await castBotRoomGuesses(tx, game.id, newRound.id);
+          }
+          roundStartNotifications.push({ roundNumber: 2, playerIds: aliveIds });
+
+          return {
+            round_id: round.id,
+            round_number: round.round_number,
+            eliminated_player_ids: [],
+            tie_break_method: "none",
+            new_phase: "active",
+          } satisfies Resolution;
+        }
 
         const aliveRoster = await tx<Player[]>`
           select * from battle_royale.players

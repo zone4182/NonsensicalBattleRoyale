@@ -3,7 +3,7 @@ import { authenticate } from "../_shared/auth.ts";
 import { countActiveVotesForVoter, getActiveVoteTargetsForVoter, sql } from "../_shared/db.ts";
 import { publicName } from "../_shared/names.ts";
 import { ALL_ROOM_IDS, type RoomId } from "../_shared/mansion.ts";
-import type { Player, Round } from "../_shared/types.ts";
+import type { Player, PrologueOption, Round } from "../_shared/types.ts";
 
 // Read-only. Queries players/rounds/power_grants/narration_log freely, plus -- via the
 // sanctioned getActiveVoteTargetsForVoter -- a player's own vote target(s), never
@@ -23,7 +23,7 @@ Deno.serve(async (req) => {
     `;
 
     const rounds = await db<Round[]>`
-      select id, round_number, voting_deadline_at, double_vote_player_id from battle_royale.rounds
+      select id, round_number, voting_deadline_at, double_vote_player_id, is_prologue from battle_royale.rounds
       where game_id = ${ctx.game.id} and resolved_at is null
       order by round_number desc
       limit 1
@@ -38,7 +38,7 @@ Deno.serve(async (req) => {
     let voteLockedThisRound = false;
     let isDoubleVoteHolder = false;
     let yourActiveVotes: { targetPlayerId: string; reason: string | null }[] = [];
-    if (openRound && ctx.role === "player" && ctx.player.status === "alive") {
+    if (openRound && !openRound.is_prologue && ctx.role === "player" && ctx.player.status === "alive") {
       isDoubleVoteHolder = openRound.double_vote_player_id === ctx.player.id;
       const entitlement = isDoubleVoteHolder ? 2 : 1;
       const alreadyCast = await countActiveVotesForVoter(openRound.id, ctx.player.id);
@@ -46,6 +46,25 @@ Deno.serve(async (req) => {
       voteLockedThisRound = ctx.player.vote_locked_for_round_number === openRound.round_number;
       yourActiveVotes = await getActiveVoteTargetsForVoter(openRound.id, ctx.player.id);
     }
+
+    // Round 1's group decision -- own choice only, same "tell a returning visitor what
+    // they already chose" reasoning as yourActiveVotes above.
+    let yourPrologueVote: PrologueOption | null = null;
+    if (openRound && openRound.is_prologue && ctx.role === "player" && ctx.player.status === "alive") {
+      const [vote] = await db<{ option: PrologueOption }[]>`
+        select option from battle_royale.prologue_votes where round_id = ${openRound.id} and voter_player_id = ${ctx.player.id}
+      `;
+      yourPrologueVote = vote?.option ?? null;
+    }
+
+    // Once round 1 has resolved, every player needs to know the outcome to render the
+    // one-time "letter in the study" transition beat before round 2's real vote screen
+    // -- see web/src/components/round/PrologueOutcomeGate.vue.
+    const [prologueRound] = await db<{ prologue_outcome: PrologueOption | null }[]>`
+      select prologue_outcome from battle_royale.rounds
+      where game_id = ${ctx.game.id} and round_number = 1 and is_prologue and resolved_at is not null
+    `;
+    const previousPrologueOutcome = prologueRound?.prologue_outcome ?? null;
 
     const grants = await db<{ power_key: string; category: string; count: number }[]>`
       select pg.power_key, pc.category, count(*)::int as count
@@ -173,8 +192,9 @@ Deno.serve(async (req) => {
       round_resolution_mode: ctx.game.round_resolution_mode,
       allow_vote_change: ctx.game.allow_vote_change,
       current_round: openRound
-        ? { round_number: openRound.round_number, voting_deadline_at: openRound.voting_deadline_at }
+        ? { round_number: openRound.round_number, voting_deadline_at: openRound.voting_deadline_at, is_prologue: openRound.is_prologue }
         : null,
+      previous_prologue_outcome: previousPrologueOutcome,
       players: roster.map((p) => ({
         id: p.id,
         display_name: publicName(p.display_name, p.chosen_display_name),
@@ -190,6 +210,7 @@ Deno.serve(async (req) => {
         is_double_vote_holder: isDoubleVoteHolder,
         your_active_votes: yourActiveVotes.map((v) => ({ target_player_id: v.targetPlayerId, reason: v.reason })),
         your_outcome: yourOutcome,
+        your_prologue_vote: yourPrologueVote,
       },
       narration_entries: narration.reverse().map((n) => ({ id: n.id, text: n.body, created_at: n.created_at })),
       move_to_room: moveToRoom,

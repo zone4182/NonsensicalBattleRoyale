@@ -26,11 +26,27 @@ Deno.serve(async (req) => {
     const db = sql();
 
     const rounds = await db<Round[]>`
-      select id, round_number, eliminated_player_id, tie_break_method, voting_deadline_at, resolved_at
+      select id, round_number, eliminated_player_id, tie_break_method, voting_deadline_at, resolved_at,
+        is_prologue, prologue_outcome, prologue_tie_break
       from battle_royale.rounds
       where game_id = ${ctx.game.id} and resolved_at is not null
       order by round_number asc
     `;
+
+    // Round 1's group decision -- who picked what, live and de-anonymized, same
+    // reasoning as revealVotesForGame's own GM-only exception (prologue_votes was never
+    // anonymity-gated like `votes` to begin with, so this is a plain read either way).
+    const prologueVotes = await db<{ round_id: string; voter_player_id: string; option: string }[]>`
+      select round_id, voter_player_id, option from battle_royale.prologue_votes where round_id in (
+        select id from battle_royale.rounds where game_id = ${ctx.game.id}
+      )
+    `;
+    const prologueVotesByRoundId = new Map<string, { voter_player_id: string; option: string }[]>();
+    for (const v of prologueVotes) {
+      const list = prologueVotesByRoundId.get(v.round_id) ?? [];
+      list.push(v);
+      prologueVotesByRoundId.set(v.round_id, list);
+    }
 
     const players = await db<
       {
@@ -68,7 +84,22 @@ Deno.serve(async (req) => {
     `;
 
     let currentRound = null;
-    if (openRound) {
+    if (openRound && openRound.is_prologue) {
+      const aliveRoster = players.filter((p) => p.status === "alive" && p.role === "player");
+      const optionByVoter = new Map((prologueVotesByRoundId.get(openRound.id) ?? []).map((v) => [v.voter_player_id, v.option]));
+      currentRound = {
+        round_number: openRound.round_number,
+        voting_deadline_at: openRound.voting_deadline_at,
+        is_prologue: true,
+        players: aliveRoster.map((p) => ({
+          id: p.id,
+          display_name: nameById.get(p.id) ?? p.display_name,
+          voted: optionByVoter.has(p.id),
+          locked: false,
+          option: optionByVoter.get(p.id) ?? null,
+        })),
+      };
+    } else if (openRound) {
       const aliveRoster = players.filter((p) => p.status === "alive" && p.role === "player");
       const voteStatuses = await Promise.all(
         aliveRoster.map(async (p) => {
@@ -79,12 +110,14 @@ Deno.serve(async (req) => {
             display_name: nameById.get(p.id) ?? p.display_name,
             voted: cast >= entitlement,
             locked: p.vote_locked_for_round_number === openRound.round_number,
+            option: null,
           };
         }),
       );
       currentRound = {
         round_number: openRound.round_number,
         voting_deadline_at: openRound.voting_deadline_at,
+        is_prologue: false,
         players: voteStatuses,
       };
     }
@@ -157,11 +190,23 @@ Deno.serve(async (req) => {
           countByTarget.set(v.target_player_id, (countByTarget.get(v.target_player_id) ?? 0) + 1);
         }
 
+        const roundPrologueVotes = prologueVotesByRoundId.get(r.id) ?? [];
+
         return {
           round_number: r.round_number,
           eliminated_player_display_name: r.eliminated_player_id ? (nameById.get(r.eliminated_player_id) ?? null) : null,
           tie_break_method: r.tie_break_method,
           resolved_at: r.resolved_at,
+          is_prologue: r.is_prologue,
+          prologue_outcome: r.prologue_outcome,
+          // Never shown to players (submit-prologue-vote/resolve-round never reveal
+          // this) -- exactly the "don't tell them it was a coin flip" ask, surfaced
+          // only here.
+          prologue_tie_break: r.prologue_tie_break,
+          prologue_votes: roundPrologueVotes.map((v) => ({
+            voter_display_name: nameById.get(v.voter_player_id) ?? "unknown",
+            option: v.option,
+          })),
           votes: roundVotes.map((v) => ({
             voter_display_name: gmName(v.voter_display_name, v.voter_chosen_display_name),
             target_display_name: gmName(v.target_display_name, v.target_chosen_display_name),

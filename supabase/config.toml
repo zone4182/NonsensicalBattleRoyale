@@ -411,6 +411,8 @@ verify_jwt = false
 verify_jwt = false
 [functions.submit-door-pick]
 verify_jwt = false
+[functions.submit-prologue-vote]
+verify_jwt = false
 [functions.resolve-round]
 verify_jwt = false
 [functions.start-round]

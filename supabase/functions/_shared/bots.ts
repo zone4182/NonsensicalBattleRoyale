@@ -7,6 +7,7 @@
 import { castVote, sql } from "./db.ts";
 import { generateInviteToken } from "./tokens.ts";
 import { ALL_ROOM_IDS, STARTING_ROOM, validDestinations, type RoomId } from "./mansion.ts";
+import { PROLOGUE_OPTIONS } from "./story.ts";
 
 type Exec = ReturnType<typeof sql>;
 
@@ -173,6 +174,25 @@ export async function castBotRoomGuesses(exec: Exec, gameId: string, roundId: st
     await exec`
       insert into battle_royale.round_room_guesses (round_id, guesser_player_id, guessed_room_id)
       values (${roundId}, ${assignment.guesser_player_id}, ${guess})
+    `;
+  }
+}
+
+// Round 1's group decision (see resolve-round's prologue branch) -- called once, right
+// after round 1 is inserted, same "instantly, uniform random" convention as every other
+// bot decision. Not castVote/votes-table based at all -- this is prologue_votes, a
+// separate mechanic from the real elimination vote.
+export async function castBotPrologueVotes(exec: Exec, gameId: string, roundId: string): Promise<void> {
+  const bots = await exec<{ id: string }[]>`
+    select id from battle_royale.players where game_id = ${gameId} and status = 'alive' and role = 'player' and is_bot = true
+  `;
+  if (bots.length === 0) return;
+
+  for (const bot of bots) {
+    const option = PROLOGUE_OPTIONS[Math.floor(Math.random() * PROLOGUE_OPTIONS.length)];
+    await exec`
+      insert into battle_royale.prologue_votes (round_id, voter_player_id, option)
+      values (${roundId}, ${bot.id}, ${option})
     `;
   }
 }

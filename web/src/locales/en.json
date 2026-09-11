@@ -125,7 +125,34 @@
     "storyPart2b": "One of you walks to the toilet -- and finds them there. Dead. Still half on the seat, pants around their ankles. A deep stab wound gapes in their neck; the blood has spread into a wide, dark pool across the tiles, reaching the walls and the sink. Their eyes are wide open, frozen in terror. The smell of blood hangs thick and sweet in the small, airless room. No doubt about it: this was no accident -- and whoever did it is still somewhere in this house.",
     "gmFallbackName": "the Game Master",
     "continue": "Continue",
-    "waiting": "Waiting for the rest of the house to arrive before the game can begin..."
+    "waiting": "Waiting for the rest of the house to arrive before the game can begin...",
+    "slideProgress": "{current} / {total}"
+  },
+  "prologueDecision": {
+    "prompt": "What should you do?",
+    "options": {
+      "call_police": "Call the police",
+      "get_help": "Go outside to get help",
+      "drink_whisky": "Open a bottle of whisky and start drinking"
+    },
+    "chosen": "You chose: {option}. Waiting for the others...",
+    "errors": {
+      "noOpenRound": "There's nothing to decide right now.",
+      "notPrologueRound": "That decision has already been made."
+    }
+  },
+  "prologueOutcome": {
+    "acknowledgment": {
+      "call_police": "In the end, the group decides: call the police. Phones come out, dialed with shaking hands -- but the calls won't connect. No signal, anywhere in the house.",
+      "get_help": "In the end, the group decides: go outside for help. You march for the front door together -- only to find it locked. Every door is. Every window is stuck fast, no matter how hard anyone pulls.",
+      "drink_whisky": "In the end, the group decides nobody's thinking straight anyway. Someone cracks open a bottle of whisky from the cabinet, and it goes around the room. It doesn't make anything better. It doesn't make anything worse, either.",
+      "fallback": "In the end, the group does... something. It doesn't matter much, in the end."
+    },
+    "searchingHouse": "Searching for any way out -- a key, a forgotten phone, anything -- the group turns the house upside down.",
+    "theLetter": "In the study, on the desk, lies a sealed envelope with everyone's name on it, written in painfully familiar handwriting. It's a letter -- written before the murder.",
+    "theRules": "The rules are simple, it says. Each round, everyone casts a single vote -- anonymous, final. Whoever receives the most votes is gone by the time the sun sets. Only the last one left gets to walk out the front door.",
+    "andSoItBegins": "And so it begins...",
+    "continue": "Continue"
   },
   "roundHeader": {
     "round": "Round {number}",
@@ -435,13 +462,15 @@
       "player": "Player",
       "voteCast": "Vote cast",
       "voteLocked": "Locked in",
-      "lockedBadge": "LOCKED"
+      "lockedBadge": "LOCKED",
+      "prologueOption": "Choice"
     },
     "votes": {
       "heading": "Resolved rounds -- full vote breakdown",
       "hint": "GM-only. Players never see who voted for whom until the game ends -- this view is an exception made specifically for you, not a change to what players are shown.",
       "none": "No rounds resolved yet.",
       "round": "Round {number}",
+      "prologueOutcome": "The group decided: {option}",
       "eliminated": "Eliminated: {name}",
       "noOne": "no one",
       "randomTieBreak": "(random tie-break)",

@@ -74,7 +74,16 @@ export interface Round {
   double_vote_player_id: string | null;
   deadline_reminder_sent_at: string | null;
   created_at: string;
+  is_prologue: boolean;
+  prologue_outcome: PrologueOption | null;
+  prologue_tie_break: boolean;
 }
+
+// The three fixed options for round 1's group decision (see
+// supabase/functions/submit-prologue-vote/index.ts and resolve-round's prologue
+// branch). Real branching story content is deferred -- this union is deliberately
+// small and fixed for now.
+export type PrologueOption = "call_police" | "get_help" | "drink_whisky";
 
 export interface PowerGrant {
   id: string;
