@@ -3,7 +3,8 @@
     "back": "← back",
     "loading": "Loading...",
     "somethingWentWrong": "Something went wrong.",
-    "close": "Close"
+    "close": "Close",
+    "placeholder": "PLACEHOLDER"
   },
   "home": {
     "title": "Nonsensical Battle Royale",
@@ -60,7 +61,11 @@
   },
   "threeDoors": {
     "title": "The Three Doors",
+    "prologuePlaceholder": "A short cinematic beat will set the scene here before the choice itself -- the corridor, the three doors, the sense that only one way out is real. Not written yet.",
     "description": "Three numbered doors, all labeled \"Exit.\" Pick a door. If any two of you pick the same one, everyone loses. If all three picks are different, only one door was ever actually open -- whoever picked it is the sole survivor.",
+    "deadlineWarning": "If not everyone has picked a door by the deadline, everyone still standing loses -- same as if two of you had picked the same door.",
+    "countdown": "{hours}h {minutes}m {seconds}s remaining",
+    "deadlinePassed": "Deadline passed -- waiting for this to resolve.",
     "door": "Door {number}",
     "picked": "You picked door {number}. Waiting for the reveal.",
     "errors": {
@@ -70,7 +75,37 @@
   },
   "endGameReveal": {
     "title": "End-of-Game Reveal",
-    "body": "Unlocks the Vote Tree, Power Log, and GM Action Log for everyone once the game ends. The Vote Tree (a branching diagram that must stay legible at 3-20+ players) is a hard problem deferred to a later milestone -- this is a placeholder only. See GAME-DESIGN.md §End-of-Game Reveal."
+    "epilogue": {
+      "win": "A dramatic closing scene for the survivors will go here -- the mansion falls quiet, and you're still standing. Not written yet.",
+      "lose": "A dramatic closing scene for the ones who didn't make it will go here -- the mansion falls quiet, and you're not among the survivors. Not written yet.",
+      "neutral": "A dramatic closing scene will go here once the game has run its course. Not written yet."
+    },
+    "showGameStats": "Show game stats",
+    "body": "Full round-by-round vote breakdown below, including reasons -- votes stay anonymous only for the duration of the game, not after it ends. The branching Vote Tree diagram from GAME-DESIGN.md §End-of-Game Reveal (which must stay legible at 3-20+ players) is a hard problem deferred to a later milestone; this is the flat list version instead."
+  },
+  "gameStats": {
+    "title": "Game stats",
+    "hint": "Every vote cast this game, with reasons -- and how each round resolved. The full branching Vote Tree visualization is deferred to a later milestone; this is the flat list version.",
+    "noRounds": "No rounds were resolved this game.",
+    "round": "Round {number}",
+    "eliminated": "Eliminated: {name}",
+    "noOne": "no one",
+    "randomTieBreak": "(random tie-break)",
+    "noEliminationTieBreak": "(tied -- no one eliminated)",
+    "voter": "Voter",
+    "target": "Target",
+    "votesReceived": "Votes received",
+    "doubleVote": "Double vote",
+    "reason": "Reason",
+    "yes": "Yes",
+    "threeDoorsHeading": "Three Doors",
+    "player": "Player",
+    "door": "Door",
+    "outcome": "Outcome",
+    "pending": "pending",
+    "errors": {
+      "gameNotEnded": "Game stats aren't available until the game has ended."
+    }
   },
   "notFound": {
     "title": "404",
@@ -290,7 +325,9 @@
         "automatic": "Rounds resolve on their own the moment the deadline passes -- no need to have the app open."
       },
       "allowVoteChange": "Allow players to change their vote",
-      "allowVoteChangeHint": "If off (default), a vote is final the moment it's cast. If on, a player can re-vote as many times as they want before the round resolves -- only their latest vote(s) count."
+      "allowVoteChangeHint": "If off (default), a vote is final the moment it's cast. If on, a player can re-vote as many times as they want before the round resolves -- only their latest vote(s) count.",
+      "threeDoorsDeadlineMinutes": "Three Doors deadline (minutes)",
+      "threeDoorsDeadlineMinutesHint": "How long the Three Doors endgame stays open once it starts. If not every remaining player has picked a door by this deadline, everyone still standing loses -- same as a collision."
     },
     "powers": {
       "heading": "Hidden powers & bots",
@@ -372,6 +409,7 @@
       "onceEver": "Once per player, ever",
       "roundsSuffix": "{count} round(s)",
       "survivalStreakThreshold": "Survival streak threshold",
+      "threeDoorsDeadlineMinutes": "Three Doors deadline",
       "created": "Created",
       "loadError": "Couldn't load settings: {error}",
       "loading": "Loading settings..."

@@ -57,6 +57,7 @@ interface GmGameOverview {
     double_vote_enabled: boolean;
     double_vote_floor_rounds: number;
     survival_streak_threshold: number;
+    three_doors_deadline_minutes: number;
     created_at: string;
     finished_at: string | null;
   };
@@ -381,6 +382,10 @@ async function submit() {
           <tr>
             <th>{{ t("gmInPlay.settings.survivalStreakThreshold") }}</th>
             <td>{{ overview.game.survival_streak_threshold }}</td>
+          </tr>
+          <tr>
+            <th>{{ t("gmInPlay.settings.threeDoorsDeadlineMinutes") }}</th>
+            <td>{{ t("gmInPlay.settings.minutesSuffix", { minutes: overview.game.three_doors_deadline_minutes }) }}</td>
           </tr>
           <tr>
             <th>{{ t("gmInPlay.settings.created") }}</th>

@@ -28,6 +28,7 @@ const doubleVoteFloorRounds = ref(2);
 // list later without touching anything else here.
 const tieBreakMode = ref<"random" | "no_elimination">("random");
 const moveToRoomEnabled = ref(false);
+const threeDoorsDeadlineMinutes = ref(10);
 
 const roundResolutionModeHint = computed(() => t(`gmSetup.rules.roundResolutionHints.${roundResolutionMode.value}`));
 const missedDeadlineModeHint = computed(() => t(`gmSetup.rules.missedDeadlineHints.${missedDeadlineMode.value}`));
@@ -58,6 +59,7 @@ async function createGame() {
         double_vote_enabled: doubleVoteEnabled.value,
         double_vote_floor_rounds: doubleVoteEnabled.value ? doubleVoteFloorRounds.value : undefined,
         move_to_room_enabled: moveToRoomEnabled.value,
+        three_doors_deadline_minutes: threeDoorsDeadlineMinutes.value,
       },
       { extraHeaders: { "x-setup-secret": setupSecret.value } },
     );
@@ -173,6 +175,16 @@ async function copyToken() {
           <span class="field-hint">
             {{ t("gmSetup.rules.allowVoteChangeHint") }}
           </span>
+          <label>
+            {{ t("gmSetup.rules.threeDoorsDeadlineMinutes") }}
+            <input
+              v-model.number="threeDoorsDeadlineMinutes"
+              type="number"
+              min="1"
+              required
+            >
+            <span class="field-hint">{{ t("gmSetup.rules.threeDoorsDeadlineMinutesHint") }}</span>
+          </label>
         </section>
 
         <section class="panel pixel-frame">

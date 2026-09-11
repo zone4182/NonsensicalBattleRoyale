@@ -126,10 +126,46 @@ Deno.serve(async (req) => {
       };
     }
 
+    // Three Doors' own deadline, mirroring current_round.voting_deadline_at -- and,
+    // for a player, their own already-made pick, same "tell a returning visitor what
+    // they already chose" reasoning as your_active_votes above (never another
+    // player's pick; door_picks are only ever revealed for OTHERS via the end-of-game
+    // reveal or the GM's own overview).
+    let threeDoors: { deadline_at: string | null; your_pick: number | null } | null = null;
+    if (ctx.game.phase === "three_doors") {
+      const deadlineAt = ctx.game.three_doors_phase_started_at
+        ? new Date(
+            new Date(ctx.game.three_doors_phase_started_at).getTime() + ctx.game.three_doors_deadline_minutes * 60_000,
+          ).toISOString()
+        : null;
+      let yourPick: number | null = null;
+      if (ctx.role === "player") {
+        const [pick] = await db<{ door_number: number }[]>`
+          select door_number from battle_royale.door_picks where game_id = ${ctx.game.id} and player_id = ${ctx.player.id}
+        `;
+        yourPick = pick?.door_number ?? null;
+      }
+      threeDoors = { deadline_at: deadlineAt, your_pick: yourPick };
+    }
+
+    // Drives the epilogue placeholder's win/lose branch once the game has ended. A
+    // Three Doors pick's own resolved_outcome is authoritative when one exists
+    // (resolve-doors never flips players.status the way resolve-round's vote-off does);
+    // otherwise this is a normal vote-off ending, where surviving to the end IS the win
+    // condition. GM has no personal win/lose outcome -- stays null.
+    let yourOutcome: "win" | "lose" | null = null;
+    if (ctx.game.phase === "ended" && ctx.role === "player") {
+      const [doorPick] = await db<{ resolved_outcome: string | null }[]>`
+        select resolved_outcome from battle_royale.door_picks where game_id = ${ctx.game.id} and player_id = ${ctx.player.id}
+      `;
+      yourOutcome = doorPick ? (doorPick.resolved_outcome === "win" ? "win" : "lose") : ctx.player.status === "alive" ? "win" : "lose";
+    }
+
     return jsonResponse({
       game_id: ctx.game.id,
       game_name: ctx.game.name,
       phase: ctx.game.phase,
+      three_doors: threeDoors,
       round_resolution_mode: ctx.game.round_resolution_mode,
       allow_vote_change: ctx.game.allow_vote_change,
       current_round: openRound
@@ -149,6 +185,7 @@ Deno.serve(async (req) => {
         vote_locked_this_round: voteLockedThisRound,
         is_double_vote_holder: isDoubleVoteHolder,
         your_active_votes: yourActiveVotes.map((v) => ({ target_player_id: v.targetPlayerId, reason: v.reason })),
+        your_outcome: yourOutcome,
       },
       narration_entries: narration.reverse().map((n) => ({ id: n.id, text: n.body, created_at: n.created_at })),
       move_to_room: moveToRoom,

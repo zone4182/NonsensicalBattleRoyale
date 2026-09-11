@@ -50,6 +50,7 @@ Deno.serve(async (req) => {
     const doubleVoteFloorRounds = optionalIntInRangeOrSentinel(body, "double_vote_floor_rounds", 1, 20, -1) ?? 2;
     const tieBreakMode = optionalOneOf(body, "tie_break_mode", TIE_BREAK_MODES) ?? "random";
     const moveToRoomEnabled = optionalBoolean(body, "move_to_room_enabled") ?? false;
+    const threeDoorsDeadlineMinutes = optionalIntInRange(body, "three_doors_deadline_minutes", 1, 1440) ?? 10;
 
     const db = sql();
 
@@ -57,11 +58,12 @@ Deno.serve(async (req) => {
       const [game] = await tx`
         insert into battle_royale.games
           (name, round_interval_minutes, missed_deadline_mode, round1_start_mode, round_resolution_mode,
-           allow_vote_change, double_vote_enabled, double_vote_floor_rounds, tie_break_mode, move_to_room_enabled)
+           allow_vote_change, double_vote_enabled, double_vote_floor_rounds, tie_break_mode, move_to_room_enabled,
+           three_doors_deadline_minutes)
         values (
           ${name}, ${roundIntervalMinutes}, ${missedDeadlineMode}, ${round1StartMode},
           ${roundResolutionMode}, ${allowVoteChange}, ${doubleVoteEnabled}, ${doubleVoteFloorRounds}, ${tieBreakMode},
-          ${moveToRoomEnabled}
+          ${moveToRoomEnabled}, ${threeDoorsDeadlineMinutes}
         )
         returning id
       `;

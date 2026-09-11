@@ -29,6 +29,11 @@ export interface CurrentRound {
   votingDeadlineAt: string | null;
 }
 
+export interface ThreeDoorsState {
+  deadlineAt: string | null;
+  yourPick: number | null;
+}
+
 export interface HeldPower {
   powerKey: string;
   category: string;
@@ -47,6 +52,7 @@ export interface YourStatus {
   voteLockedThisRound: boolean;
   isDoubleVoteHolder: boolean;
   activeVotes: ActiveVote[];
+  outcome: "win" | "lose" | null;
 }
 
 // Mirrors supabase/functions/_shared/mansion.ts's RoomId union.
@@ -86,6 +92,7 @@ interface GetGameStateResponse {
   game_id: string;
   game_name: string;
   phase: GamePhase;
+  three_doors: { deadline_at: string | null; your_pick: number | null } | null;
   round_resolution_mode: RoundResolutionMode;
   allow_vote_change: boolean;
   current_round: { round_number: number; voting_deadline_at: string | null } | null;
@@ -97,6 +104,7 @@ interface GetGameStateResponse {
     vote_locked_this_round: boolean;
     is_double_vote_holder: boolean;
     your_active_votes: { target_player_id: string; reason: string | null }[];
+    your_outcome: "win" | "lose" | null;
   };
   narration_entries: { id: string; text: string; created_at: string }[];
   move_to_room: {
@@ -123,6 +131,7 @@ export const useGameStore = defineStore("game", () => {
   const yourStatus = ref<YourStatus | null>(null);
   const narrationEntries = ref<NarrationEntry[]>([]);
   const moveToRoom = ref<MoveToRoomState | null>(null);
+  const threeDoors = ref<ThreeDoorsState | null>(null);
 
   // Single source for populating this store -- reused by every screen that needs
   // fresh roster/phase data (main round, vote modal, seance, three doors) rather than
@@ -132,6 +141,7 @@ export const useGameStore = defineStore("game", () => {
     gameId.value = raw.game_id;
     gameName.value = raw.game_name;
     phase.value = raw.phase;
+    threeDoors.value = raw.three_doors ? { deadlineAt: raw.three_doors.deadline_at, yourPick: raw.three_doors.your_pick } : null;
     roundResolutionMode.value = raw.round_resolution_mode;
     allowVoteChange.value = raw.allow_vote_change;
     currentRound.value = raw.current_round
@@ -149,6 +159,7 @@ export const useGameStore = defineStore("game", () => {
       voteLockedThisRound: raw.your_status.vote_locked_this_round,
       isDoubleVoteHolder: raw.your_status.is_double_vote_holder,
       activeVotes: raw.your_status.your_active_votes.map((v) => ({ targetPlayerId: v.target_player_id, reason: v.reason })),
+      outcome: raw.your_status.your_outcome,
     };
     narrationEntries.value = raw.narration_entries.map((n) => ({ id: n.id, text: n.text, createdAt: n.created_at }));
     moveToRoom.value = raw.move_to_room
@@ -184,6 +195,7 @@ export const useGameStore = defineStore("game", () => {
     yourStatus,
     narrationEntries,
     moveToRoom,
+    threeDoors,
     refresh,
   };
 });

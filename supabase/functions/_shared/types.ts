@@ -28,6 +28,8 @@ export interface Game {
   allow_vote_change: boolean;
   tie_break_mode: TieBreakMode;
   three_doors_winning_door: number | null;
+  three_doors_deadline_minutes: number;
+  three_doors_phase_started_at: string | null;
   move_to_room_enabled: boolean;
   gm_player_id: string | null;
   finished_at: string | null;

@@ -144,6 +144,7 @@ Deno.serve(async (req) => {
         double_vote_enabled: ctx.game.double_vote_enabled,
         double_vote_floor_rounds: ctx.game.double_vote_floor_rounds,
         survival_streak_threshold: ctx.game.survival_streak_threshold,
+        three_doors_deadline_minutes: ctx.game.three_doors_deadline_minutes,
         created_at: ctx.game.created_at,
         finished_at: ctx.game.finished_at,
       },

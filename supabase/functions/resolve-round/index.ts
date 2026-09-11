@@ -262,7 +262,11 @@ Deno.serve(async (req) => {
           // never exposed anywhere before resolve-doors uses it. All three doors are
           // labeled "Exit" in the UI specifically so this stays hidden.
           const winningDoor = 1 + Math.floor(Math.random() * 3);
-          await tx`update battle_royale.games set phase = 'three_doors', three_doors_winning_door = ${winningDoor} where id = ${game.id}`;
+          await tx`
+            update battle_royale.games
+            set phase = 'three_doors', three_doors_winning_door = ${winningDoor}, three_doors_phase_started_at = now()
+            where id = ${game.id}
+          `;
           const aliveBotIdsAfter = aliveRoster.filter((p) => p.is_bot && aliveIdsAfter.includes(p.id)).map((p) => p.id);
           await castBotDoorPicks(tx, game.id, aliveBotIdsAfter);
         } else {

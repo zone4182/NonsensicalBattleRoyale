@@ -3,7 +3,8 @@
     "back": "← terug",
     "loading": "Laden...",
     "somethingWentWrong": "Er is iets misgegaan.",
-    "close": "Sluiten"
+    "close": "Sluiten",
+    "placeholder": "PLACEHOLDER"
   },
   "home": {
     "title": "Nonsensical Battle Royale",
@@ -60,7 +61,11 @@
   },
   "threeDoors": {
     "title": "De Drie Deuren",
+    "prologuePlaceholder": "Hier komt straks een korte filmische scène die de sfeer zet voordat de keuze zelf begint -- de gang, de drie deuren, het gevoel dat maar één uitweg echt is. Nog niet geschreven.",
     "description": "Drie genummerde deuren, allemaal gelabeld \"Uitgang.\" Kies een deur. Als twee van jullie dezelfde deur kiezen, verliest iedereen. Kiest iedereen een andere deur, dan stond er maar één écht open -- wie die koos is de enige overlevende.",
+    "deadlineWarning": "Als niet iedereen voor de deadline een deur heeft gekozen, verliest iedereen die nog over is -- net als wanneer twee van jullie dezelfde deur zouden kiezen.",
+    "countdown": "{hours}u {minutes}m {seconds}s resterend",
+    "deadlinePassed": "Deadline verstreken -- wachten tot dit wordt afgehandeld.",
     "door": "Deur {number}",
     "picked": "Je koos deur {number}. Wachten op de onthulling.",
     "errors": {
@@ -70,7 +75,37 @@
   },
   "endGameReveal": {
     "title": "Onthulling aan het einde van het spel",
-    "body": "Ontgrendelt de Stemboom, het Krachtenlog en het GM-actielog voor iedereen zodra het spel eindigt. De Stemboom (een vertakkend diagram dat leesbaar moet blijven bij 3-20+ spelers) is een lastig probleem dat naar een latere mijlpaal is verschoven -- dit is alleen een placeholder. Zie GAME-DESIGN.md §End-of-Game Reveal."
+    "epilogue": {
+      "win": "Hier komt straks een dramatische slotscène voor de overlevenden -- het landhuis valt stil, en jij staat er nog. Nog niet geschreven.",
+      "lose": "Hier komt straks een dramatische slotscène voor wie het niet heeft gered -- het landhuis valt stil, en jij hoort niet bij de overlevenden. Nog niet geschreven.",
+      "neutral": "Hier komt straks een dramatische slotscène zodra het spel is afgelopen. Nog niet geschreven."
+    },
+    "showGameStats": "Spelstatistieken tonen",
+    "body": "Volledige stembreakdown per ronde hieronder, inclusief redenen -- stemmen bleven alleen anoniem voor de duur van het spel, niet erna. Het vertakkende Stemboom-diagram uit GAME-DESIGN.md §End-of-Game Reveal (dat leesbaar moet blijven bij 3-20+ spelers) is een lastig probleem dat naar een latere mijlpaal is verschoven; dit is in plaats daarvan de platte lijstversie."
+  },
+  "gameStats": {
+    "title": "Spelstatistieken",
+    "hint": "Elke stem die dit spel is uitgebracht, met redenen -- en hoe elke ronde is afgehandeld. De volledige vertakkende Stemboom-visualisatie is verschoven naar een latere mijlpaal; dit is de platte lijstversie.",
+    "noRounds": "Er zijn geen rondes afgehandeld in dit spel.",
+    "round": "Ronde {number}",
+    "eliminated": "Geëlimineerd: {name}",
+    "noOne": "niemand",
+    "randomTieBreak": "(willekeurige tie-break)",
+    "noEliminationTieBreak": "(gelijkspel -- niemand geëlimineerd)",
+    "voter": "Stemmer",
+    "target": "Doelwit",
+    "votesReceived": "Stemmen ontvangen",
+    "doubleVote": "Dubbele stem",
+    "reason": "Reden",
+    "yes": "Ja",
+    "threeDoorsHeading": "Drie Deuren",
+    "player": "Speler",
+    "door": "Deur",
+    "outcome": "Uitkomst",
+    "pending": "in afwachting",
+    "errors": {
+      "gameNotEnded": "Spelstatistieken zijn niet beschikbaar totdat het spel is afgelopen."
+    }
   },
   "notFound": {
     "title": "404",
@@ -290,7 +325,9 @@
         "automatic": "Rondes worden automatisch afgehandeld zodra de deadline verstrijkt -- de app hoeft niet open te staan."
       },
       "allowVoteChange": "Spelers mogen hun stem wijzigen",
-      "allowVoteChangeHint": "Indien uit (standaard), staat een stem vast zodra deze is uitgebracht. Indien aan, kan een speler zo vaak opnieuw stemmen als gewenst voordat de ronde wordt afgehandeld -- alleen de laatste stem(men) telt/tellen."
+      "allowVoteChangeHint": "Indien uit (standaard), staat een stem vast zodra deze is uitgebracht. Indien aan, kan een speler zo vaak opnieuw stemmen als gewenst voordat de ronde wordt afgehandeld -- alleen de laatste stem(men) telt/tellen.",
+      "threeDoorsDeadlineMinutes": "Deadline Drie Deuren (minuten)",
+      "threeDoorsDeadlineMinutesHint": "Hoe lang de eindspel-fase Drie Deuren open blijft zodra die begint. Als niet elke overgebleven speler voor deze deadline een deur heeft gekozen, verliest iedereen die nog over is -- net als bij een botsing."
     },
     "powers": {
       "heading": "Verborgen krachten & bots",
@@ -372,6 +409,7 @@
       "onceEver": "Eén keer per speler, ooit",
       "roundsSuffix": "{count} ronde(s)",
       "survivalStreakThreshold": "Drempel overlevingsreeks",
+      "threeDoorsDeadlineMinutes": "Deadline Drie Deuren",
       "created": "Aangemaakt",
       "loadError": "Instellingen konden niet worden geladen: {error}",
       "loading": "Instellingen laden..."
