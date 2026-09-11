@@ -15,10 +15,14 @@ const isGhost = computed(() => game.yourStatus?.status === "ghost");
 // this for a ghost -- exactly the isGhost case above) reads as "nothing to vote on yet."
 const votesRemainingRaw = computed(() => game.yourStatus?.votesRemainingThisRound ?? null);
 const votesRemaining = computed(() => votesRemainingRaw.value ?? 0);
+// A player can lock their own vote in early (lock-vote), which overrides
+// games.allow_vote_change for them specifically -- see submit-vote/index.ts's matching
+// check. Locked always wins over the game-wide setting.
+const voteLocked = computed(() => game.yourStatus?.voteLockedThisRound ?? false);
 // Entitlement exhausted, but games.allow_vote_change lets a fresh submit-vote call
 // replace the existing cast rather than being rejected -- see submit-vote/index.ts.
-const canChangeVote = computed(() => votesRemainingRaw.value === 0 && game.allowVoteChange);
-const canVote = computed(() => votesRemaining.value > 0 || canChangeVote.value);
+const canChangeVote = computed(() => votesRemainingRaw.value === 0 && game.allowVoteChange && !voteLocked.value);
+const canVote = computed(() => (votesRemaining.value > 0 && !voteLocked.value) || canChangeVote.value);
 
 function openVoteModal() {
   if (!canVote.value) return;
@@ -42,7 +46,13 @@ function openVoteModal() {
         {{ canChangeVote ? t("voteAction.changeVote") : canVote ? t("voteAction.vote") : t("voteAction.voteCast") }}
       </button>
       <p
-        v-if="!votesRemaining && !canChangeVote"
+        v-if="voteLocked"
+        class="vote-status"
+      >
+        {{ t("voteAction.votedLocked") }}
+      </p>
+      <p
+        v-else-if="!votesRemaining && !canChangeVote"
         class="vote-status"
       >
         {{ t("voteAction.votedFinal") }}

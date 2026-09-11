@@ -35,6 +35,13 @@ Deno.serve(async (req) => {
       throw new HttpError(403, "vote_suspended", "You missed the last deadline and are sitting out this round.");
     }
 
+    // A player can lock their own vote in early (lock-vote/index.ts), regardless of
+    // games.allow_vote_change -- an explicit per-round opt-out of that flexibility,
+    // not something the game-wide setting can override.
+    if (ctx.player.vote_locked_for_round_number === round.round_number) {
+      throw new HttpError(409, "vote_locked", "You've locked in your vote for this round -- it can no longer be changed.");
+    }
+
     const targets = await db<Player[]>`
       select * from battle_royale.players where id = ${targetPlayerId} and game_id = ${ctx.game.id}
     `;

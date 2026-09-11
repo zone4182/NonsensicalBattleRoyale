@@ -76,7 +76,7 @@ interface GmGameOverview {
   door_picks: {
     player_display_name: string;
     door_number: number;
-    resolved_outcome: "win" | "lose_all" | null;
+    resolved_outcome: "win" | "lose" | "lose_all" | null;
     picked_at: string;
   }[];
 }

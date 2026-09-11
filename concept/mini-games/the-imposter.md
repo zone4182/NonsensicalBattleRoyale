@@ -86,6 +86,21 @@ tools, nothing that needs new win-condition plumbing.
 eligibility check, no combination logic. See that file's own "Interaction with the
 Imposter role" section for the full reasoning.
 
+## GM Setup integration
+
+Same pattern established in `russian-roulette.md`: GM Setup gets a general **"Enable
+mini-games"** toggle, and each opted-in mini-game/optional-system gets its own
+settings block underneath rather than a pile of loose fields at the top level. The
+Imposter's block holds just `imposter_enabled` and `imposter_assignment_mode`.
+
+Unlike Russian Roulette, there's no cross-field conflict to prevent here today --
+`imposter_assignment_mode` is a plain dependent field (only meaningful, and only
+shown, when `imposter_enabled` is on), not two settings that can contradict each
+other. Noted anyway so the principle stays consistent across every settings block:
+**if a future addition to this block ever creates a conflicting combination, it must
+be prevented at the GM Setup UI itself** (the option becomes unselectable), never
+saved as an invalid state and discovered later.
+
 ## Data model sketch (not yet implemented)
 
 - `games.imposter_enabled boolean not null default false`

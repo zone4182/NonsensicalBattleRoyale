@@ -20,11 +20,19 @@ const candidates = computed(() => game.players.filter((p) => p.role === "player"
 // as votable so the guard below doesn't bounce someone out before their real status has
 // even loaded. It only ever comes from get-game-state as an explicit number once loaded.
 const votesRemaining = computed(() => game.yourStatus?.votesRemainingThisRound ?? null);
+const voteLocked = computed(() => game.yourStatus?.voteLockedThisRound ?? false);
 // Entitlement exhausted (0, not null/unknown) is still votable when the game allows
 // changing a vote -- submit-vote replaces the existing cast instead of rejecting it.
+// Locking always wins over allow_vote_change, same as VoteActionPanel's gate.
 const canVote = computed(
-  () => votesRemaining.value === null || votesRemaining.value > 0 || (votesRemaining.value === 0 && game.allowVoteChange),
+  () =>
+    !voteLocked.value &&
+    (votesRemaining.value === null || votesRemaining.value > 0 || (votesRemaining.value === 0 && game.allowVoteChange)),
 );
+// Shown whenever change is even possible for this player -- lock-vote itself rejects
+// with `no_vote_cast` if nothing's been cast yet, surfaced as a normal error below
+// rather than trying to infer "has cast at least one" purely client-side.
+const canOfferLock = computed(() => game.allowVoteChange && !voteLocked.value);
 
 const REASON_MAX_LENGTH = 100;
 
@@ -32,11 +40,19 @@ const selectedId = ref<string | null>(null);
 const reason = ref("");
 const pending = ref(false);
 const errorMessage = ref<string | null>(null);
+const lockPending = ref(false);
+const lockErrorMessage = ref<string | null>(null);
 
 const VOTE_ERROR_MESSAGES: Record<string, string> = {
   no_open_round: t("privateVote.errors.noOpenRound"),
   invalid_target: t("privateVote.errors.invalidTarget"),
   vote_entitlement_exhausted: t("privateVote.errors.voteEntitlementExhausted"),
+  vote_locked: t("privateVote.errors.voteLocked"),
+};
+
+const LOCK_ERROR_MESSAGES: Record<string, string> = {
+  no_open_round: t("privateVote.errors.noOpenRound"),
+  no_vote_cast: t("privateVote.errors.noVoteCast"),
 };
 
 onMounted(() => {
@@ -75,6 +91,22 @@ async function confirmVote() {
 
 function close() {
   router.push({ name: "main-round" });
+}
+
+async function lockVote() {
+  const token = session.token;
+  if (!token) return;
+  lockPending.value = true;
+  lockErrorMessage.value = null;
+  try {
+    await callFunction("lock-vote", {}, { token });
+    await game.refresh(token);
+    router.push({ name: "main-round" });
+  } catch (err) {
+    lockErrorMessage.value = err instanceof ApiCallError ? (LOCK_ERROR_MESSAGES[err.code] ?? err.message) : t("common.somethingWentWrong");
+  } finally {
+    lockPending.value = false;
+  }
 }
 </script>
 
@@ -138,6 +170,29 @@ function close() {
         {{ t("common.close") }}
       </button>
     </div>
+
+    <div
+      v-if="canOfferLock"
+      class="lock-block"
+    >
+      <p class="field-hint">
+        {{ t("privateVote.lockHint") }}
+      </p>
+      <button
+        type="button"
+        class="lock-button"
+        :disabled="lockPending"
+        @click="lockVote"
+      >
+        {{ lockPending ? t("privateVote.locking") : t("privateVote.lockVote") }}
+      </button>
+      <p
+        v-if="lockErrorMessage"
+        class="error"
+      >
+        {{ lockErrorMessage }}
+      </p>
+    </div>
   </section>
 </template>
 
@@ -178,5 +233,22 @@ function close() {
 .actions {
   display: flex;
   gap: var(--nbr-space-2);
+}
+
+.lock-block {
+  margin-top: var(--nbr-space-4);
+  padding-top: var(--nbr-space-3);
+  border-top: 1px solid var(--nbr-border);
+}
+
+.lock-button {
+  border-color: var(--nbr-danger);
+  color: var(--nbr-danger);
+}
+
+.field-hint {
+  color: var(--nbr-muted);
+  font-size: 0.85em;
+  margin: 0 0 var(--nbr-space-2) 0;
 }
 </style>

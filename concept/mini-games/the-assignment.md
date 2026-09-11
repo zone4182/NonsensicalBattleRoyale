@@ -108,6 +108,22 @@ hints that assignments exist ahead of time. An assignee is told their own assign
 once, privately, and only ever sees it — never anyone else's, never whether anyone
 else has one at all.
 
+## GM Setup integration
+
+Same pattern established in `russian-roulette.md`: GM Setup gets a general **"Enable
+mini-games"** toggle, and each opted-in mini-game/optional-system gets its own
+settings block underneath. Assignments' block holds `assignments_enabled`,
+`assignment_coverage`, and `assignment_count`.
+
+No cross-field conflict to prevent today -- `assignment_count` is a plain dependent
+field (only meaningful, and only shown, when coverage is `"some"`), not two settings
+that can contradict each other. Noted anyway for consistency: **if the still-pending
+Reward & Punishment decision above ends up introducing a setting that can conflict
+with another (e.g. a reward type that doesn't make sense for "all" coverage), that
+conflict must be prevented at the GM Setup UI itself**, the same way Russian
+Roulette's reset-mode/end-condition conflict is -- never a state that can be saved
+and only discovered as broken later.
+
 ## Data model sketch (not yet implemented)
 
 - `games.assignments_enabled boolean not null default false`

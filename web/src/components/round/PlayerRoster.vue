@@ -38,6 +38,11 @@ const dead = computed(() => game.players.filter((p) => p.role === "player" && p.
             :key="player.id"
           >
             {{ player.displayName }}
+            <span
+              v-if="player.isBot"
+              class="bot-badge"
+              :title="t('playerRoster.botBadgeTitle')"
+            >{{ t("playerRoster.botBadge") }}</span>
           </li>
         </ul>
       </section>
@@ -49,6 +54,11 @@ const dead = computed(() => game.players.filter((p) => p.role === "player" && p.
             :key="player.id"
           >
             {{ player.displayName }}
+            <span
+              v-if="player.isBot"
+              class="bot-badge"
+              :title="t('playerRoster.botBadgeTitle')"
+            >{{ t("playerRoster.botBadge") }}</span>
           </li>
         </ul>
       </section>
@@ -71,5 +81,16 @@ const dead = computed(() => game.players.filter((p) => p.role === "player" && p.
   list-style: none;
   padding: 0;
   margin: 0;
+}
+
+.bot-badge {
+  display: inline-block;
+  margin-left: var(--nbr-space-1);
+  padding: 0 4px;
+  font-size: 0.7em;
+  line-height: 1.4;
+  color: var(--nbr-accent);
+  border: 1px solid var(--nbr-accent);
+  vertical-align: middle;
 }
 </style>

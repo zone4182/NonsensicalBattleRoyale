@@ -60,7 +60,7 @@
   },
   "threeDoors": {
     "title": "The Three Doors",
-    "description": "Three numbered doors, all labeled \"Exit.\" Pick a unique number. Two players picking the same number means everyone loses.",
+    "description": "Three numbered doors, all labeled \"Exit.\" Pick a door. If any two of you pick the same one, everyone loses. If all three picks are different, only one door was ever actually open -- whoever picked it is the sole survivor.",
     "door": "Door {number}",
     "picked": "You picked door {number}. Waiting for the reveal.",
     "errors": {
@@ -100,7 +100,9 @@
     "noGm": "No Game Master.",
     "guests": "Guests ({count})",
     "noneStanding": "No one left standing.",
-    "dead": "Dead ({count})"
+    "dead": "Dead ({count})",
+    "botBadge": "BOT",
+    "botBadgeTitle": "Algorithm-controlled player"
   },
   "narrationLog": {
     "title": "Narration",
@@ -126,6 +128,7 @@
     "voteCast": "Vote cast",
     "votedFinal": "You've cast your vote this round -- it's final.",
     "votedChangeable": "You've voted, but can still change your mind before this round resolves.",
+    "votedLocked": "You've locked in your vote for this round -- it's final.",
     "help": "Need help?"
   },
   "powerUse": {
@@ -153,10 +156,15 @@
     "reasonPlaceholder": "Why this vote?",
     "casting": "Casting...",
     "confirmVote": "Confirm vote",
+    "lockHint": "Done deciding? You can lock your vote in now so it can't be changed again this round -- even though this game normally allows changing your mind.",
+    "locking": "Locking in...",
+    "lockVote": "Lock in my vote",
     "errors": {
       "noOpenRound": "There's no open round to vote in right now.",
       "invalidTarget": "That player can't be voted for.",
-      "voteEntitlementExhausted": "You've already cast all your votes this round."
+      "voteEntitlementExhausted": "You've already cast all your votes this round.",
+      "voteLocked": "You've locked in your vote for this round -- it can no longer be changed.",
+      "noVoteCast": "Cast a vote before locking it in."
     }
   },
   "gmNav": {

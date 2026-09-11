@@ -15,6 +15,7 @@ export interface RosterPlayer {
   displayName: string;
   status: PlayerStatus;
   role: RosterPlayerRole;
+  isBot: boolean;
 }
 
 export interface NarrationEntry {
@@ -38,6 +39,7 @@ export interface YourStatus {
   status: PlayerStatus;
   heldPowers: HeldPower[];
   votesRemainingThisRound: number | null;
+  voteLockedThisRound: boolean;
 }
 
 interface GetGameStateResponse {
@@ -47,11 +49,12 @@ interface GetGameStateResponse {
   round_resolution_mode: RoundResolutionMode;
   allow_vote_change: boolean;
   current_round: { round_number: number; voting_deadline_at: string | null } | null;
-  players: { id: string; display_name: string; status: PlayerStatus; role: RosterPlayerRole }[];
+  players: { id: string; display_name: string; status: PlayerStatus; role: RosterPlayerRole; is_bot: boolean }[];
   your_status: {
     status: PlayerStatus;
     held_powers: { power_key: string; category: string; count: number }[];
     votes_remaining_this_round: number | null;
+    vote_locked_this_round: boolean;
   };
   narration_entries: { id: string; text: string; created_at: string }[];
 }
@@ -80,7 +83,7 @@ export const useGameStore = defineStore("game", () => {
     currentRound.value = raw.current_round
       ? { roundNumber: raw.current_round.round_number, votingDeadlineAt: raw.current_round.voting_deadline_at }
       : null;
-    players.value = raw.players.map((p) => ({ id: p.id, displayName: p.display_name, status: p.status, role: p.role }));
+    players.value = raw.players.map((p) => ({ id: p.id, displayName: p.display_name, status: p.status, role: p.role, isBot: p.is_bot }));
     yourStatus.value = {
       status: raw.your_status.status,
       heldPowers: raw.your_status.held_powers.map((p) => ({
@@ -89,6 +92,7 @@ export const useGameStore = defineStore("game", () => {
         count: p.count,
       })),
       votesRemainingThisRound: raw.your_status.votes_remaining_this_round,
+      voteLockedThisRound: raw.your_status.vote_locked_this_round,
     };
     narrationEntries.value = raw.narration_entries.map((n) => ({ id: n.id, text: n.text, createdAt: n.created_at }));
   }

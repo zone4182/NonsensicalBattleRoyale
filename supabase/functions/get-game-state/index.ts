@@ -14,7 +14,7 @@ Deno.serve(async (req) => {
     const db = sql();
 
     const roster = await db<Player[]>`
-      select id, display_name, chosen_display_name, status, role from battle_royale.players
+      select id, display_name, chosen_display_name, status, role, is_bot from battle_royale.players
       where game_id = ${ctx.game.id}
       order by joined_at asc
     `;
@@ -32,10 +32,12 @@ Deno.serve(async (req) => {
     // "Critical architectural rule" is about *who voted for whom*, not a player knowing
     // their own remaining vote count).
     let votesRemainingThisRound: number | null = null;
+    let voteLockedThisRound = false;
     if (openRound && ctx.role === "player" && ctx.player.status === "alive") {
       const entitlement = openRound.double_vote_player_id === ctx.player.id ? 2 : 1;
       const alreadyCast = await countActiveVotesForVoter(openRound.id, ctx.player.id);
       votesRemainingThisRound = Math.max(0, entitlement - alreadyCast);
+      voteLockedThisRound = ctx.player.vote_locked_for_round_number === openRound.round_number;
     }
 
     const grants = await db<{ power_key: string; category: string; count: number }[]>`
@@ -62,11 +64,18 @@ Deno.serve(async (req) => {
       current_round: openRound
         ? { round_number: openRound.round_number, voting_deadline_at: openRound.voting_deadline_at }
         : null,
-      players: roster.map((p) => ({ id: p.id, display_name: publicName(p.display_name, p.chosen_display_name), status: p.status, role: p.role })),
+      players: roster.map((p) => ({
+        id: p.id,
+        display_name: publicName(p.display_name, p.chosen_display_name),
+        status: p.status,
+        role: p.role,
+        is_bot: p.is_bot,
+      })),
       your_status: {
         status: ctx.player.status,
         held_powers: grants.map((g) => ({ power_key: g.power_key, category: g.category, count: g.count })),
         votes_remaining_this_round: votesRemainingThisRound,
+        vote_locked_this_round: voteLockedThisRound,
       },
       narration_entries: narration.reverse().map((n) => ({ id: n.id, text: n.body, created_at: n.created_at })),
     });

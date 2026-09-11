@@ -60,6 +60,11 @@ async function redeem() {
 
 <template>
   <FullscreenLayout>
+    <img
+      src="/img/the_invitation.png"
+      alt=""
+      class="invitation-image pixel-frame"
+    >
     <h1>{{ t("join.heading") }}</h1>
     <p>{{ t("join.subheading") }}</p>
     <section class="panel pixel-frame">
@@ -106,6 +111,14 @@ async function redeem() {
 </template>
 
 <style scoped>
+.invitation-image {
+  display: block;
+  width: 100%;
+  height: auto;
+  image-rendering: pixelated;
+  margin-bottom: var(--nbr-space-3);
+}
+
 .panel {
   margin-top: var(--nbr-space-3);
   padding: var(--nbr-space-3);

@@ -44,15 +44,23 @@ Deno.serve(async (req) => {
 
       await db.begin(async (tx) => {
         if (hasCollision) {
+          // Any collision at all -- two picking the same door, or all three -- kills
+          // everyone. Which door was actually correct never matters in this case.
           await tx`
             update battle_royale.door_picks set resolved_outcome = 'lose_all'
             where game_id = ${game.id} and resolved_outcome is null
           `;
         } else {
-          await tx`
-            update battle_royale.door_picks set resolved_outcome = 'win'
-            where game_id = ${game.id} and resolved_outcome is null
-          `;
+          // All three picks unique: only whoever picked the one door chosen as
+          // correct back when the game entered this phase survives. The other two
+          // picked a real exit, just not the one that was open.
+          for (const pick of picks) {
+            const outcome = pick.door_number === game.three_doors_winning_door ? "win" : "lose";
+            await tx`
+              update battle_royale.door_picks set resolved_outcome = ${outcome}
+              where game_id = ${game.id} and player_id = ${pick.player_id}
+            `;
+          }
         }
         await tx`
           update battle_royale.games set phase = 'ended' where id = ${game.id}

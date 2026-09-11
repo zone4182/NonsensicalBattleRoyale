@@ -60,7 +60,7 @@
   },
   "threeDoors": {
     "title": "De Drie Deuren",
-    "description": "Drie genummerde deuren, allemaal gelabeld \"Uitgang.\" Kies een uniek nummer. Als twee spelers hetzelfde nummer kiezen, verliest iedereen.",
+    "description": "Drie genummerde deuren, allemaal gelabeld \"Uitgang.\" Kies een deur. Als twee van jullie dezelfde deur kiezen, verliest iedereen. Kiest iedereen een andere deur, dan stond er maar één écht open -- wie die koos is de enige overlevende.",
     "door": "Deur {number}",
     "picked": "Je koos deur {number}. Wachten op de onthulling.",
     "errors": {
@@ -100,7 +100,9 @@
     "noGm": "Geen Game Master.",
     "guests": "Gasten ({count})",
     "noneStanding": "Niemand meer over.",
-    "dead": "Dood ({count})"
+    "dead": "Dood ({count})",
+    "botBadge": "BOT",
+    "botBadgeTitle": "Door een algoritme bestuurde speler"
   },
   "narrationLog": {
     "title": "Verhaal",
@@ -126,6 +128,7 @@
     "voteCast": "Stem uitgebracht",
     "votedFinal": "Je hebt deze ronde je stem uitgebracht -- die staat vast.",
     "votedChangeable": "Je hebt gestemd, maar kunt nog van gedachten veranderen voordat deze ronde wordt afgehandeld.",
+    "votedLocked": "Je hebt je stem voor deze ronde vastgezet -- die staat vast.",
     "help": "Hulp nodig?"
   },
   "powerUse": {
@@ -153,10 +156,15 @@
     "reasonPlaceholder": "Waarom deze stem?",
     "casting": "Bezig met uitbrengen...",
     "confirmVote": "Stem bevestigen",
+    "lockHint": "Klaar met beslissen? Je kunt je stem nu vastzetten zodat die deze ronde niet meer gewijzigd kan worden -- ook al staat dit spel normaal toe dat je van gedachten verandert.",
+    "locking": "Bezig met vastzetten...",
+    "lockVote": "Stem vastzetten",
     "errors": {
       "noOpenRound": "Er is momenteel geen open ronde om op te stemmen.",
       "invalidTarget": "Op deze speler kan niet gestemd worden.",
-      "voteEntitlementExhausted": "Je hebt deze ronde al al je stemmen uitgebracht."
+      "voteEntitlementExhausted": "Je hebt deze ronde al al je stemmen uitgebracht.",
+      "voteLocked": "Je hebt je stem voor deze ronde vastgezet -- die kan niet meer gewijzigd worden.",
+      "noVoteCast": "Breng eerst een stem uit voordat je die vastzet."
     }
   },
   "gmNav": {

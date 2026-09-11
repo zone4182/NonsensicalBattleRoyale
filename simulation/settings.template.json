@@ -1,0 +1,13 @@
+{
+  "name": "MySimulation",
+  "gm_display_name": "AIGM",
+  "round_interval_minutes": 15,
+  "missed_deadline_mode": "no_consequence",
+  "tie_break_mode": "random",
+  "round1_start_mode": "gm_manual",
+  "allow_vote_change": false,
+  "double_vote_enabled": true,
+  "double_vote_floor_rounds": 2,
+  "round_resolution_mode": "manual",
+  "bot_count": 16
+}

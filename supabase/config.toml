@@ -389,6 +389,8 @@ verify_jwt = false
 verify_jwt = false
 [functions.submit-vote]
 verify_jwt = false
+[functions.lock-vote]
+verify_jwt = false
 [functions.use-power]
 verify_jwt = false
 [functions.gm-action]
