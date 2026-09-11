@@ -6,6 +6,7 @@ import { useGameStore } from "../stores/game";
 import { useSessionStore } from "../stores/session";
 import { useApiCall } from "../composables/useApiCall";
 import { usePoll } from "../composables/usePoll";
+import { useGameFinishedRedirect } from "../composables/useGameFinishedRedirect";
 import { callFunction, ApiCallError } from "../lib/api";
 import FullscreenLayout from "../layouts/FullscreenLayout.vue";
 
@@ -19,6 +20,8 @@ const { run } = useApiCall();
 const picked = ref<number | null>(null);
 const pending = ref(false);
 const errorMessage = ref<string | null>(null);
+
+useGameFinishedRedirect();
 
 const DOOR_ERROR_MESSAGES: Record<string, string> = {
   not_three_doors_phase: t("threeDoors.errors.notThreeDoorsPhase"),

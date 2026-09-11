@@ -165,6 +165,10 @@ Deno.serve(async (req) => {
       game_id: ctx.game.id,
       game_name: ctx.game.name,
       phase: ctx.game.phase,
+      // GM's administrative "Finish game" close, independent of phase (see
+      // finish-game/index.ts) -- a player sitting on any screen mid-game needs to know
+      // the GM ended it even if phase itself never reached 'ended' naturally.
+      game_finished: ctx.game.finished_at !== null,
       three_doors: threeDoors,
       round_resolution_mode: ctx.game.round_resolution_mode,
       allow_vote_change: ctx.game.allow_vote_change,

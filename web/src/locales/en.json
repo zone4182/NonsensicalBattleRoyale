@@ -107,6 +107,11 @@
       "gameNotEnded": "Game stats aren't available until the game has ended."
     }
   },
+  "gameFinished": {
+    "title": "This game is finished",
+    "body": "The Game Master has closed this game. Thanks for playing -- you'll be sent back to the front door shortly.",
+    "continue": "Continue"
+  },
   "notFound": {
     "title": "404",
     "body": "There's nothing behind this door."

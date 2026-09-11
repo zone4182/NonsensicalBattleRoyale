@@ -92,6 +92,7 @@ interface GetGameStateResponse {
   game_id: string;
   game_name: string;
   phase: GamePhase;
+  game_finished: boolean;
   three_doors: { deadline_at: string | null; your_pick: number | null } | null;
   round_resolution_mode: RoundResolutionMode;
   allow_vote_change: boolean;
@@ -124,6 +125,7 @@ export const useGameStore = defineStore("game", () => {
   const gameId = ref<string | null>(null);
   const gameName = ref<string | null>(null);
   const phase = ref<GamePhase | null>(null);
+  const gameFinished = ref(false);
   const roundResolutionMode = ref<RoundResolutionMode | null>(null);
   const allowVoteChange = ref(false);
   const currentRound = ref<CurrentRound | null>(null);
@@ -141,6 +143,7 @@ export const useGameStore = defineStore("game", () => {
     gameId.value = raw.game_id;
     gameName.value = raw.game_name;
     phase.value = raw.phase;
+    gameFinished.value = raw.game_finished;
     threeDoors.value = raw.three_doors ? { deadlineAt: raw.three_doors.deadline_at, yourPick: raw.three_doors.your_pick } : null;
     roundResolutionMode.value = raw.round_resolution_mode;
     allowVoteChange.value = raw.allow_vote_change;
@@ -188,6 +191,7 @@ export const useGameStore = defineStore("game", () => {
     gameId,
     gameName,
     phase,
+    gameFinished,
     roundResolutionMode,
     allowVoteChange,
     currentRound,

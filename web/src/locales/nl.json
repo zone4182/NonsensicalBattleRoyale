@@ -107,6 +107,11 @@
       "gameNotEnded": "Spelstatistieken zijn niet beschikbaar totdat het spel is afgelopen."
     }
   },
+  "gameFinished": {
+    "title": "Dit spel is afgelopen",
+    "body": "De Game Master heeft dit spel afgesloten. Bedankt voor het spelen -- je wordt zo teruggestuurd naar de voordeur.",
+    "continue": "Doorgaan"
+  },
   "notFound": {
     "title": "404",
     "body": "Er is niets achter deze deur."

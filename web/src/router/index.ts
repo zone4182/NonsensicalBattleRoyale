@@ -65,6 +65,12 @@ const router = createRouter({
       meta: { auth: "player" },
     },
     {
+      path: "/game-finished",
+      name: "game-finished",
+      component: () => import("../views/GameFinishedView.vue"),
+      meta: { auth: "player" },
+    },
+    {
       path: "/helpline",
       name: "helpline",
       component: () => import("../views/HelplineView.vue"),

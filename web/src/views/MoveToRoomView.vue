@@ -5,6 +5,7 @@ import { useRouter } from "vue-router";
 import { useGameStore, type RoomId } from "../stores/game";
 import { useSessionStore } from "../stores/session";
 import { callFunction, ApiCallError } from "../lib/api";
+import { useGameFinishedRedirect } from "../composables/useGameFinishedRedirect";
 import { ALL_ROOM_IDS, FLOORS_TOP_TO_BOTTOM, ROOMS, validDestinations, type Floor } from "../constants/mansion";
 
 // Own route (not a v-if inside MainRoundView), same reasoning as PrivateVoteModal:
@@ -14,6 +15,8 @@ const { t } = useI18n();
 const router = useRouter();
 const game = useGameStore();
 const session = useSessionStore();
+
+useGameFinishedRedirect();
 
 const showStaircaseHelp = ref(false);
 const selectedMoveTarget = ref<RoomId | null>(null);

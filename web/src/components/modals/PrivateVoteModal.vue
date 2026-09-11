@@ -6,6 +6,7 @@ import { useGameStore } from "../../stores/game";
 import { useSessionStore } from "../../stores/session";
 import { useApiCall } from "../../composables/useApiCall";
 import { usePoll } from "../../composables/usePoll";
+import { useGameFinishedRedirect } from "../../composables/useGameFinishedRedirect";
 import { callFunction, ApiCallError } from "../../lib/api";
 
 const POLL_INTERVAL_MS = 15_000;
@@ -18,6 +19,8 @@ const router = useRouter();
 const game = useGameStore();
 const session = useSessionStore();
 const { run } = useApiCall();
+
+useGameFinishedRedirect();
 
 const candidates = computed(() => game.players.filter((p) => p.role === "player"));
 // null (roster/status not loaded yet, e.g. a direct/bookmarked navigation here before

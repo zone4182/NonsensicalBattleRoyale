@@ -15,6 +15,7 @@ import { useSessionStore } from "../stores/session";
 import { useUiStore } from "../stores/ui";
 import { useApiCall } from "../composables/useApiCall";
 import { usePoll } from "../composables/usePoll";
+import { useGameFinishedRedirect } from "../composables/useGameFinishedRedirect";
 
 // 15s keeps a fast-round game feeling responsive without hammering get-game-state; a
 // background poll never shows the loading spinner (only the initial mount fetch does,
@@ -28,6 +29,8 @@ const session = useSessionStore();
 const ui = useUiStore();
 const { pending, run } = useApiCall();
 const showSettings = ref(false);
+
+useGameFinishedRedirect();
 
 onMounted(() => {
   if (session.token) run(() => game.refresh(session.token as string));
