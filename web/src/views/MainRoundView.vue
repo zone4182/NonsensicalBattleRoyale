@@ -3,7 +3,7 @@ import { computed, onMounted, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import { useRouter } from "vue-router";
 import RoundHeader from "../components/round/RoundHeader.vue";
-import LocaleSwitcher from "../components/LocaleSwitcher.vue";
+import HeaderMenu from "../components/round/HeaderMenu.vue";
 import CinematicViewport from "../components/round/CinematicViewport.vue";
 import PlayerRoster from "../components/round/PlayerRoster.vue";
 import YourStatusPanel from "../components/round/YourStatusPanel.vue";
@@ -84,7 +84,7 @@ watch(
       class="area-header"
     >
       <RoundHeader />
-      <LocaleSwitcher class="header-locale-switcher" />
+      <HeaderMenu @open-settings="showSettings = true" />
     </div>
     <div
       id="round-main-panel"
@@ -115,16 +115,11 @@ watch(
       id="round-hub-panel"
       class="area-hub pixel-frame"
     >
-      <div class="hub-buttons">
+      <div
+        v-if="game.moveToRoom?.enabled && game.yourStatus?.status === 'alive' && !game.currentRound?.isPrologue"
+        class="hub-buttons"
+      >
         <button
-          type="button"
-          class="settings-button"
-          @click="showSettings = true"
-        >
-          {{ t("playerSettings.button") }}
-        </button>
-        <button
-          v-if="game.moveToRoom?.enabled && game.yourStatus?.status === 'alive' && !game.currentRound?.isPrologue"
           type="button"
           class="settings-button"
           @click="router.push({ name: 'move-to-room' })"
@@ -238,6 +233,17 @@ watch(
   display: flex;
   flex-direction: column;
   gap: var(--nbr-space-3);
+}
+
+/* Grows to fill whatever height .area-main ends up with (it stretches to match the
+   hub column via the grid's default align-items: stretch) -- gives the active round
+   component (Prologue Decision/Outcome or the Vote panel) real room to push its own
+   interaction button down to the bottom of the panel instead of sitting right under
+   whatever content precedes it. */
+#round-action-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 .area-hub {
   grid-area: hub;

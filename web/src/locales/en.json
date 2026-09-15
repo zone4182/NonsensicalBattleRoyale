@@ -161,7 +161,10 @@
     "round": "Round {number}",
     "deadline": "Deadline: {deadline}",
     "deadlinePassed": "Deadline passed",
-    "countdown": "{days}d {hours}h {minutes}m {seconds}s"
+    "countdown": "{days}d {hours}h {minutes}m {seconds}s",
+    "menu": {
+      "toggle": "Menu"
+    }
   },
   "playerRoster": {
     "title": "Roster",

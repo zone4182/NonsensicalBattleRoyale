@@ -42,53 +42,61 @@ function next() {
 
 <template>
   <div class="prologue-outcome-gate">
-    <PlaceholderVisual
-      :caption="slides[slideIndex].text"
-      :image="slides[slideIndex].image"
-    />
+    <div class="panel-top">
+      <PlaceholderVisual
+        :caption="slides[slideIndex].text"
+        :image="slides[slideIndex].image"
+      />
+    </div>
 
-    <p
-      v-if="isLastSlide"
-      class="and-so-it-begins"
-    >
-      {{ t("prologueOutcome.andSoItBegins") }}
-    </p>
+    <div class="panel-bottom">
+      <p
+        v-if="isLastSlide"
+        class="and-so-it-begins"
+      >
+        {{ t("prologueOutcome.andSoItBegins") }}
+      </p>
 
-    <button
-      v-if="!isLastSlide"
-      type="button"
-      @click="next"
-    >
-      {{ t("prologueOutcome.next") }}
-    </button>
-    <button
-      v-else
-      type="button"
-      @click="emit('continue')"
-    >
-      {{ t("prologueOutcome.continue") }}
-    </button>
+      <button
+        v-if="!isLastSlide"
+        type="button"
+        @click="next"
+      >
+        {{ t("prologueOutcome.next") }}
+      </button>
+      <button
+        v-else
+        type="button"
+        @click="emit('continue')"
+      >
+        {{ t("prologueOutcome.continue") }}
+      </button>
+    </div>
   </div>
 </template>
 
 <style scoped>
 .prologue-outcome-gate {
+  flex: 1;
   display: flex;
   flex-direction: column;
-  gap: var(--nbr-space-2);
 }
 
 .prologue-outcome-gate p {
   margin: 0;
 }
 
-.and-so-it-begins {
-  margin-top: var(--nbr-space-2);
-  color: var(--nbr-accent);
-  font-style: italic;
+/* Pushed to the bottom via the auto margin -- keeps the slide image/caption at the
+   top and the Next/Continue button anchored to the bottom of the panel. */
+.panel-bottom {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--nbr-space-2);
 }
 
-.prologue-outcome-gate button {
-  margin-top: var(--nbr-space-2);
+.and-so-it-begins {
+  color: var(--nbr-accent);
+  font-style: italic;
 }
 </style>

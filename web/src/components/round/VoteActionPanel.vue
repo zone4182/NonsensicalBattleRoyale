@@ -88,19 +88,17 @@ function openVoteModal() {
         {{ t("voteAction.votedChangeable") }}
       </p>
     </template>
-    <RouterLink
-      :to="{ name: 'helpline' }"
-      class="help-link"
-    >
-      {{ t("voteAction.help") }}
-    </RouterLink>
   </div>
 </template>
 
 <style scoped>
 .vote-action-panel {
+  flex: 1;
   display: flex;
   flex-direction: column;
+  /* No separate "top" narrative content in this panel -- the whole alert/button/status
+     group sits together, anchored to the bottom of the round's main panel. */
+  justify-content: flex-end;
   gap: var(--nbr-space-2);
 }
 
@@ -124,21 +122,5 @@ function openVoteModal() {
 .alarm-icon {
   font-size: 1.1em;
   line-height: 1;
-}
-
-.help-link {
-  display: block;
-  text-align: center;
-  text-decoration: none;
-  background: var(--nbr-bg-raised);
-  color: var(--nbr-muted);
-  border: 1px solid var(--nbr-border);
-  padding: var(--nbr-space-2) var(--nbr-space-3);
-  font-size: 0.85em;
-}
-
-.help-link:hover {
-  color: var(--nbr-fg);
-  border-color: var(--nbr-accent);
 }
 </style>

@@ -161,7 +161,10 @@
     "round": "Ronde {number}",
     "deadline": "Deadline: {deadline}",
     "deadlinePassed": "Deadline verstreken",
-    "countdown": "{days}d {hours}u {minutes}m {seconds}s"
+    "countdown": "{days}d {hours}u {minutes}m {seconds}s",
+    "menu": {
+      "toggle": "Menu"
+    }
   },
   "playerRoster": {
     "title": "Bezetting",

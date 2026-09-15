@@ -47,45 +47,65 @@ async function choose(option: PrologueOption) {
 <template>
   <div class="prologue-decision">
     <template v-if="isGhost">
-      <p class="status-text">
+      <p class="status-text panel-bottom">
         {{ t("voteAction.ghostNotice") }}
       </p>
     </template>
     <template v-else>
-      <PlaceholderVisual :caption="t('prologueDecision.imageCaption')" />
-      <p class="prompt">
-        {{ t("prologueDecision.prompt") }}
-      </p>
-      <div class="options">
-        <button
-          v-for="option in OPTIONS"
-          :key="option"
-          type="button"
-          :class="{ selected: selected === option }"
-          :disabled="pending"
-          @click="choose(option)"
-        >
-          {{ t(`prologueDecision.options.${option}`) }}
-        </button>
+      <div class="panel-top">
+        <PlaceholderVisual :caption="t('prologueDecision.imageCaption')" />
+        <p class="prompt">
+          {{ t("prologueDecision.prompt") }}
+        </p>
       </div>
-      <p
-        v-if="selected"
-        class="status-text"
-      >
-        {{ t("prologueDecision.chosen", { option: t(`prologueDecision.options.${selected}`) }) }}
-      </p>
-      <p
-        v-if="errorMessage"
-        class="error"
-      >
-        {{ errorMessage }}
-      </p>
+      <div class="panel-bottom">
+        <div class="options">
+          <button
+            v-for="option in OPTIONS"
+            :key="option"
+            type="button"
+            :class="{ selected: selected === option }"
+            :disabled="pending"
+            @click="choose(option)"
+          >
+            {{ t(`prologueDecision.options.${option}`) }}
+          </button>
+        </div>
+        <p
+          v-if="selected"
+          class="status-text"
+        >
+          {{ t("prologueDecision.chosen", { option: t(`prologueDecision.options.${selected}`) }) }}
+        </p>
+        <p
+          v-if="errorMessage"
+          class="error"
+        >
+          {{ errorMessage }}
+        </p>
+      </div>
     </template>
   </div>
 </template>
 
 <style scoped>
 .prologue-decision {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.panel-top {
+  display: flex;
+  flex-direction: column;
+  gap: var(--nbr-space-2);
+}
+
+/* Pushed to the bottom of the panel via the auto margin -- keeps the image/prompt at
+   the top and the actual decision buttons anchored to the bottom, however much extra
+   height this panel ends up with. */
+.panel-bottom {
+  margin-top: auto;
   display: flex;
   flex-direction: column;
   gap: var(--nbr-space-2);
