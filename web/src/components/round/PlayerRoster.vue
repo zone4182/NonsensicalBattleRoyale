@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, ref } from "vue";
 import { useI18n } from "vue-i18n";
 import { useGameStore } from "../../stores/game";
 import { useSessionStore } from "../../stores/session";
@@ -23,6 +23,12 @@ const votedForIds = computed(() => new Set((game.yourStatus?.activeVotes ?? []).
 // (see get-game-state/index.ts). Comparing to session.playerId just picks out which
 // roster row is "me" to hang the badge on; it isn't itself the privacy boundary.
 const isDoubleVoteHolder = computed(() => game.yourStatus?.isDoubleVoteHolder ?? false);
+
+// Collapsed by default only for the dead list -- the living roster is what you check
+// most often, the graveyard is reference info you glance at occasionally, so it starts
+// out of the way to save screen space (per explicit request).
+const guestsOpen = ref(true);
+const deadOpen = ref(false);
 </script>
 
 <template>
@@ -41,38 +47,64 @@ const isDoubleVoteHolder = computed(() => game.yourStatus?.isDoubleVoteHolder ??
           <li>{{ host.displayName }}</li>
         </ul>
       </section>
+
       <section class="roster-group">
-        <h3>{{ t("playerRoster.guests", { count: guests.length }) }}</h3>
-        <p v-if="!guests.length">
-          {{ t("playerRoster.noneStanding") }}
-        </p>
-        <ul v-else>
-          <li
-            v-for="player in guests"
-            :key="player.id"
-          >
-            {{ player.displayName }}
-            <span
-              v-if="player.isBot"
-              class="bot-badge"
-              :title="t('playerRoster.botBadgeTitle')"
-            >{{ t("playerRoster.botBadge") }}</span>
-            <span
-              v-if="votedForIds.has(player.id)"
-              class="voted-badge"
-              :title="t('playerRoster.votedBadgeTitle')"
-            >{{ t("playerRoster.votedBadge") }}</span>
-            <span
-              v-if="player.id === session.playerId && isDoubleVoteHolder"
-              class="double-vote-badge"
-              :title="t('playerRoster.doubleVoteBadgeTitle')"
-            >{{ t("playerRoster.doubleVoteBadge") }}</span>
-          </li>
-        </ul>
+        <button
+          type="button"
+          class="roster-group-toggle"
+          :aria-expanded="guestsOpen"
+          @click="guestsOpen = !guestsOpen"
+        >
+          <span
+            class="toggle-arrow"
+            aria-hidden="true"
+          >{{ guestsOpen ? "▾" : "▸" }}</span>
+          <h3>{{ t("playerRoster.guests", { count: guests.length }) }}</h3>
+        </button>
+        <template v-if="guestsOpen">
+          <p v-if="!guests.length">
+            {{ t("playerRoster.noneStanding") }}
+          </p>
+          <ul v-else>
+            <li
+              v-for="player in guests"
+              :key="player.id"
+            >
+              {{ player.displayName }}
+              <span
+                v-if="player.isBot"
+                class="bot-badge"
+                :title="t('playerRoster.botBadgeTitle')"
+              >{{ t("playerRoster.botBadge") }}</span>
+              <span
+                v-if="votedForIds.has(player.id)"
+                class="voted-badge"
+                :title="t('playerRoster.votedBadgeTitle')"
+              >{{ t("playerRoster.votedBadge") }}</span>
+              <span
+                v-if="player.id === session.playerId && isDoubleVoteHolder"
+                class="double-vote-badge"
+                :title="t('playerRoster.doubleVoteBadgeTitle')"
+              >{{ t("playerRoster.doubleVoteBadge") }}</span>
+            </li>
+          </ul>
+        </template>
       </section>
+
       <section class="roster-group">
-        <h3>{{ t("playerRoster.dead", { count: dead.length }) }}</h3>
-        <ul v-if="dead.length">
+        <button
+          type="button"
+          class="roster-group-toggle"
+          :aria-expanded="deadOpen"
+          @click="deadOpen = !deadOpen"
+        >
+          <span
+            class="toggle-arrow"
+            aria-hidden="true"
+          >{{ deadOpen ? "▾" : "▸" }}</span>
+          <h3>{{ t("playerRoster.dead", { count: dead.length }) }}</h3>
+        </button>
+        <ul v-if="deadOpen && dead.length">
           <li
             v-for="player in dead"
             :key="player.id"
@@ -105,6 +137,29 @@ const isDoubleVoteHolder = computed(() => game.yourStatus?.isDoubleVoteHolder ??
   list-style: none;
   padding: 0;
   margin: 0;
+}
+
+.roster-group-toggle {
+  display: flex;
+  align-items: center;
+  gap: var(--nbr-space-1);
+  width: 100%;
+  background: none;
+  border: none;
+  padding: 0;
+  color: inherit;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.roster-group-toggle h3 {
+  margin-bottom: 0;
+}
+
+.toggle-arrow {
+  color: var(--nbr-muted);
+  font-size: 0.75em;
 }
 
 .bot-badge {

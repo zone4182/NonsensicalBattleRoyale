@@ -1,41 +1,23 @@
 <script setup lang="ts">
-import { computed } from "vue";
 import { useI18n } from "vue-i18n";
 import { useRouter } from "vue-router";
-import { useGameStore } from "../../stores/game";
+import { useRoundActions } from "../../composables/useRoundActions";
 
 // Deliberately small and separate from the roster (GAME-DESIGN.md §UI Layout) -- opens
 // the private vote modal as its own route rather than an inline click-to-vote panel.
+// Buttons here only ever appear when the underlying action is actually available --
+// see useRoundActions.ts. What each action's current status IS (can still vote, vote
+// locked, etc.) is surfaced in YourStatusPanel.vue instead, not duplicated here.
 const { t } = useI18n();
 const router = useRouter();
-const game = useGameStore();
-
-const isGhost = computed(() => game.yourStatus?.status === "ghost");
-// game.currentRound (not votesRemainingRaw) is the real signal for "is there anything
-// to vote on right now" -- votesRemainingRaw is null both when there's no open round
-// AND once yourStatus has genuinely loaded with nothing to report, so defaulting it to
-// 0 and reading that as "entitlement exhausted" produced a false "you've cast your
-// vote, it's final" before round 1 even starts (or between rounds), when no vote had
-// been cast at all.
-const hasOpenRound = computed(() => game.currentRound !== null);
-const votesRemainingRaw = computed(() => game.yourStatus?.votesRemainingThisRound ?? null);
-const votesRemaining = computed(() => votesRemainingRaw.value ?? 0);
-// A player can lock their own vote in early (lock-vote), which overrides
-// games.allow_vote_change for them specifically -- see submit-vote/index.ts's matching
-// check. Locked always wins over the game-wide setting.
-const voteLocked = computed(() => game.yourStatus?.voteLockedThisRound ?? false);
-// Entitlement exhausted, but games.allow_vote_change lets a fresh submit-vote call
-// replace the existing cast rather than being rejected -- see submit-vote/index.ts.
-const canChangeVote = computed(() => votesRemainingRaw.value === 0 && game.allowVoteChange && !voteLocked.value);
-const canVote = computed(() => hasOpenRound.value && ((votesRemaining.value > 0 && !voteLocked.value) || canChangeVote.value));
-// This round's entitlement, not "has cast a double vote yet" -- stays true for the
-// whole round (win or lose the badge as votes get cast) so the double-vote holder
-// always knows going in, not just while votesRemaining still happens to read 2.
-const isDoubleVoteHolder = computed(() => game.yourStatus?.isDoubleVoteHolder ?? false);
+const { isGhost, hasOpenRound, canVote, canChangeVote, isDoubleVoteHolder, canMove } = useRoundActions();
 
 function openVoteModal() {
-  if (!canVote.value) return;
   router.push({ name: "private-vote" });
+}
+
+function openMoveToRoom() {
+  router.push({ name: "move-to-room" });
 }
 </script>
 
@@ -62,31 +44,26 @@ function openVoteModal() {
         >⚠</span>
         {{ t("voteAction.doubleVoteAlert") }}
       </p>
-      <button
-        type="button"
-        :disabled="!canVote"
-        @click="openVoteModal"
+      <div
+        v-if="canVote || canMove"
+        class="action-buttons"
       >
-        {{ canChangeVote ? t("voteAction.changeVote") : canVote ? t("voteAction.vote") : t("voteAction.voteCast") }}
-      </button>
-      <p
-        v-if="voteLocked"
-        class="vote-status"
-      >
-        {{ t("voteAction.votedLocked") }}
-      </p>
-      <p
-        v-else-if="!votesRemaining && !canChangeVote"
-        class="vote-status"
-      >
-        {{ t("voteAction.votedFinal") }}
-      </p>
-      <p
-        v-else-if="canChangeVote"
-        class="vote-status"
-      >
-        {{ t("voteAction.votedChangeable") }}
-      </p>
+        <button
+          v-if="canVote"
+          type="button"
+          @click="openVoteModal"
+        >
+          {{ canChangeVote ? t("voteAction.changeVote") : t("voteAction.vote") }}
+        </button>
+        <button
+          v-if="canMove"
+          type="button"
+          class="move-button"
+          @click="openMoveToRoom"
+        >
+          {{ t("moveToRoom.button") }}
+        </button>
+      </div>
     </template>
   </div>
 </template>
@@ -96,7 +73,7 @@ function openVoteModal() {
   flex: 1;
   display: flex;
   flex-direction: column;
-  /* No separate "top" narrative content in this panel -- the whole alert/button/status
+  /* No separate "top" narrative content in this panel -- the whole alert/button
      group sits together, anchored to the bottom of the round's main panel. */
   justify-content: flex-end;
   gap: var(--nbr-space-2);
@@ -106,6 +83,26 @@ function openVoteModal() {
   color: var(--nbr-muted);
   font-size: 0.85em;
   margin-top: var(--nbr-space-1);
+}
+
+.action-buttons {
+  display: flex;
+  gap: var(--nbr-space-2);
+}
+
+.action-buttons button {
+  flex: 1;
+}
+
+.move-button {
+  background: none;
+  color: var(--nbr-muted);
+  border: 1px solid var(--nbr-border);
+}
+
+.move-button:hover {
+  color: var(--nbr-fg);
+  border-color: var(--nbr-accent);
 }
 
 .double-vote-alert {

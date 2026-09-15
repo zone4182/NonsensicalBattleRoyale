@@ -115,20 +115,8 @@ watch(
       id="round-hub-panel"
       class="area-hub pixel-frame"
     >
-      <div
-        v-if="game.moveToRoom?.enabled && game.yourStatus?.status === 'alive' && !game.currentRound?.isPrologue"
-        class="hub-buttons"
-      >
-        <button
-          type="button"
-          class="settings-button"
-          @click="router.push({ name: 'move-to-room' })"
-        >
-          {{ t("moveToRoom.button") }}
-        </button>
-      </div>
-      <PlayerRoster />
       <YourStatusPanel />
+      <PlayerRoster />
     </div>
     <PlayerSettingsModal
       :open="showSettings"
@@ -264,23 +252,4 @@ watch(
   padding: var(--nbr-space-3);
 }
 
-.hub-buttons {
-  display: flex;
-  gap: var(--nbr-space-2);
-  flex-wrap: wrap;
-}
-
-.settings-button {
-  align-self: flex-start;
-  background: none;
-  color: var(--nbr-muted);
-  border: 1px solid var(--nbr-border);
-  padding: var(--nbr-space-1) var(--nbr-space-2);
-  font-size: 0.85em;
-}
-
-.settings-button:hover {
-  color: var(--nbr-fg);
-  border-color: var(--nbr-accent);
-}
 </style>

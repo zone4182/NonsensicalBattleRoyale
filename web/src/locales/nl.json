@@ -189,7 +189,12 @@
     "title": "Jouw status",
     "unknown": "onbekend",
     "points": "Punten: {points}",
-    "noPowers": "Je hebt op dit moment geen krachten of items."
+    "noPowers": "Je hebt op dit moment geen krachten of items.",
+    "canVote": "Je kunt nog stemmen!",
+    "canChangeVote": "Je kunt je stem nog wijzigen!",
+    "voteLocked": "Je stem ligt vast.",
+    "voteFinal": "Je hebt gestemd -- dit is definitief.",
+    "canDoMinigameActions": "Je kunt nog een aantal acties uitvoeren."
   },
   "notifications": {
     "enable": "Meldingen inschakelen",
@@ -205,10 +210,6 @@
     "noOpenRound": "Er is momenteel geen open ronde om op te stemmen.",
     "changeVote": "Stem wijzigen",
     "vote": "Stemmen",
-    "voteCast": "Stem uitgebracht",
-    "votedFinal": "Je hebt deze ronde je stem uitgebracht -- die staat vast.",
-    "votedChangeable": "Je hebt gestemd, maar kunt nog van gedachten veranderen voordat deze ronde wordt afgehandeld.",
-    "votedLocked": "Je hebt je stem voor deze ronde vastgezet -- die staat vast.",
     "doubleVoteAlert": "Je hebt deze ronde een dubbele stem!",
     "help": "Hulp nodig?"
   },

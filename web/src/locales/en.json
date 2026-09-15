@@ -189,7 +189,12 @@
     "title": "Your status",
     "unknown": "unknown",
     "points": "Points: {points}",
-    "noPowers": "You don't hold any powers or items right now."
+    "noPowers": "You don't hold any powers or items right now.",
+    "canVote": "You can still vote!",
+    "canChangeVote": "You can still change your vote!",
+    "voteLocked": "Your vote is locked in.",
+    "voteFinal": "You've cast your vote -- it's final.",
+    "canDoMinigameActions": "You are still able to perform some actions."
   },
   "notifications": {
     "enable": "Enable notifications",
@@ -205,10 +210,6 @@
     "noOpenRound": "No round is open to vote in right now.",
     "changeVote": "Change vote",
     "vote": "Vote",
-    "voteCast": "Vote cast",
-    "votedFinal": "You've cast your vote this round -- it's final.",
-    "votedChangeable": "You've voted, but can still change your mind before this round resolves.",
-    "votedLocked": "You've locked in your vote for this round -- it's final.",
     "doubleVoteAlert": "You have a double vote this round!",
     "help": "Need help?"
   },
