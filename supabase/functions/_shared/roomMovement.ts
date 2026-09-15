@@ -1,7 +1,7 @@
 // Move-to-Room mini-game -- everything that isn't bot-specific (see bots.ts for
-// castBotRoomMoves/castBotRoomGuesses) or pure floor-plan data (see mansion.ts).
+// castBotRoomMoves/castBotRoomGuesses) or pure floor-plan data (see manor.ts).
 import { sql } from "./db.ts";
-import { STARTING_ROOM, type RoomId } from "./mansion.ts";
+import { STARTING_ROOM, type RoomId } from "./manor.ts";
 
 type Exec = ReturnType<typeof sql>;
 

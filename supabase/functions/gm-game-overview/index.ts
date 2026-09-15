@@ -2,7 +2,7 @@ import { errorResponse, jsonResponse, preflightResponse } from "../_shared/http.
 import { authenticate, requireRole } from "../_shared/auth.ts";
 import { countActiveVotesForVoter, revealVotesForGame, sql, type VoteAttribution } from "../_shared/db.ts";
 import { gmName } from "../_shared/names.ts";
-import type { RoomId } from "../_shared/mansion.ts";
+import type { RoomId } from "../_shared/manor.ts";
 import type { Round } from "../_shared/types.ts";
 
 // GM-only. Four things live here that never appear anywhere else:

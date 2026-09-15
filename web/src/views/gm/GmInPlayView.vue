@@ -6,6 +6,7 @@ import { useSessionStore } from "../../stores/session";
 import { useGameStore } from "../../stores/game";
 import { callFunction, ApiCallError } from "../../lib/api";
 import { takeJustCreatedInvites, type JustCreatedInvite } from "../../lib/justCreatedInvites";
+import { ALL_POWER_KEYS } from "../../constants/powers";
 import RoundHeader from "../../components/round/RoundHeader.vue";
 
 interface GmActionResponse {
@@ -102,19 +103,7 @@ interface GmGameOverview {
 }
 
 const ACTION_TYPES = ["tie_break", "grant_power", "narration_edit", "twist"];
-const POWER_KEYS = [
-  "rewind",
-  "whisper",
-  "watcher",
-  "ward",
-  "deflect",
-  "null",
-  "second_voice",
-  "compel",
-  "silence",
-  "swap",
-  "false_flag",
-];
+const POWER_KEYS = ALL_POWER_KEYS;
 
 const { t } = useI18n();
 const router = useRouter();

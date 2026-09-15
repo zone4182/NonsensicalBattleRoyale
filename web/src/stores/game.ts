@@ -61,7 +61,7 @@ export interface YourStatus {
   prologueVote: PrologueOption | null;
 }
 
-// Mirrors supabase/functions/_shared/mansion.ts's RoomId union.
+// Mirrors supabase/functions/_shared/manor.ts's RoomId union.
 export type RoomId =
   | "library"
   | "entrance_hall"

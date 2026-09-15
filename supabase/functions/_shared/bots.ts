@@ -6,7 +6,7 @@
 // questions" #5 for what's deliberately out of scope: powers, Seance).
 import { castVote, sql } from "./db.ts";
 import { generateInviteToken } from "./tokens.ts";
-import { ALL_ROOM_IDS, STARTING_ROOM, validDestinations, type RoomId } from "./mansion.ts";
+import { ALL_ROOM_IDS, STARTING_ROOM, validDestinations, type RoomId } from "./manor.ts";
 import { PROLOGUE_OPTIONS } from "./story.ts";
 
 type Exec = ReturnType<typeof sql>;

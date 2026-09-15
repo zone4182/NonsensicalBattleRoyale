@@ -1,4 +1,4 @@
-import { errorResponse, jsonResponse, preflightResponse, readJsonBody } from "../_shared/http.ts";
+import { errorResponse, HttpError, jsonResponse, preflightResponse, readJsonBody } from "../_shared/http.ts";
 import { requireSetupSecret } from "../_shared/auth.ts";
 import { sql } from "../_shared/db.ts";
 import {
@@ -52,6 +52,23 @@ Deno.serve(async (req) => {
     const moveToRoomEnabled = optionalBoolean(body, "move_to_room_enabled") ?? false;
     const threeDoorsDeadlineMinutes = optionalIntInRange(body, "three_doors_deadline_minutes", 1, 1440) ?? 10;
 
+    // GM-configurable per-power enable/disable (concept: powers_catalogue.default_enabled
+    // is only a fallback now, not the final word). Keys not present here just keep the
+    // catalogue's own default -- see the insert below.
+    const powerSettingsInput = body["power_settings"];
+    const powerOverrides: Record<string, boolean> = {};
+    if (powerSettingsInput !== undefined && powerSettingsInput !== null) {
+      if (typeof powerSettingsInput !== "object" || Array.isArray(powerSettingsInput)) {
+        throw new HttpError(400, "invalid_field", "'power_settings' must be an object of power_key -> boolean.");
+      }
+      for (const [key, value] of Object.entries(powerSettingsInput as Record<string, unknown>)) {
+        if (typeof value !== "boolean") {
+          throw new HttpError(400, "invalid_field", `'power_settings.${key}' must be a boolean.`);
+        }
+        powerOverrides[key] = value;
+      }
+    }
+
     const db = sql();
 
     const result = await db.begin(async (tx) => {
@@ -75,10 +92,16 @@ Deno.serve(async (req) => {
         returning id, token
       `;
 
-      await tx`
-        insert into battle_royale.game_power_settings (game_id, power_key, enabled)
-        select ${game.id}, key, default_enabled from battle_royale.powers_catalogue
+      const catalogue = await tx<{ key: string; default_enabled: boolean }[]>`
+        select key, default_enabled from battle_royale.powers_catalogue
       `;
+      for (const power of catalogue) {
+        const enabled = powerOverrides[power.key] ?? power.default_enabled;
+        await tx`
+          insert into battle_royale.game_power_settings (game_id, power_key, enabled)
+          values (${game.id}, ${power.key}, ${enabled})
+        `;
+      }
 
       if (botCount > 0) {
         await createBotPlayers(tx, game.id, botCount, moveToRoomEnabled);

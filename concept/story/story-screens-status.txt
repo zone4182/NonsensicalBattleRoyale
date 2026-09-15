@@ -1,0 +1,146 @@
+STORY & SCREENS STATUS
+Full in-order game flow, screen by screen, with what each screen currently contains.
+Snapshot of the live code (web/src/views, web/src/components) -- not aspirational.
+
+=========================================================
+PLAYER FLOW
+=========================================================
+
+1. Home / Landing (/)
+   - Title + subtitle ("The question is... who's next?") + tagline blurb
+   - Full-viewport background hero image (Manor at Night.png) with dark gradient overlay
+   - "Host a new game" button (currently hidden per explicit request, still reachable
+     directly at /gm/setup)
+   - "Join a game" button
+   - "Install app" button (Android/desktop) or triggers the iOS Install modal
+   - Footer credit ("A Game by Zone4182")
+
+2. Join / Redeem Invite (/invite/:token?)
+   - Framed header image (The Invitation.png)
+   - Title + subtitle
+   - Invite-token input field
+   - Optional display-name input, with hint that it's shown to others
+   - Submit ("Redeem") button
+   - Error states (invite not found / already redeemed)
+   - Back-to-home link
+
+3. Arrival Prologue (/prologue) -- 3-slide click-through cinematic
+   - Slide 1 (image: Arrival at the Manor.png): travel/arrival narration
+   - Slide 2 (image: Friends Gathered in the Living Room.png): "none of you suspect..." beat
+   - Slide 3 (image: Manor Daytime.png): next-morning discovery of the GM's body,
+     with the GM's real display name substituted in
+   - Slide progress indicator ("2 / 3")
+   - Continue button, or "waiting for the rest of the house to arrive..." if the game
+     hasn't started yet
+
+4. Main Round Screen (/game) -- the core loop, revisited every round
+   - Header: round number, deadline date, live countdown timer
+   - Cinematic viewport (fully built but currently never triggered/populated)
+   - Player hub: Settings button, "Move" button (if the move-to-room mini-game is
+     enabled and the player is alive), player roster (host / alive guests with bot
+     and voted badges / dead guests)
+   - Your status panel: alive/ghost state, any held Hidden Powers with their use
+     controls
+   - Narration log: server-generated round-resolution text (tie-break, clear
+     elimination, vote-saved, no-votes variants)
+   - Action area -- one of:
+     * Round 1 only: Prologue Decision panel (choose call police / get help / drink
+       whisky, with image caption + confirmation)
+     * Once, entering round 2: Prologue Outcome Gate -- 4-slide reveal (outcome
+       acknowledgment w/ The House Is Sealed.png, searching-the-house beat, the-letter
+       beat, the-rules beat w/ The Vote.png), ending in "And so it begins..."
+     * Normal rounds: Vote/action panel (Vote / Change vote / Vote cast button,
+       double-vote alert badge if applicable, lock-status text, Help link)
+   - Player Settings modal (notification toggle)
+
+5. Private Vote Modal (/game/vote)
+   - Title + privacy subtitle
+   - Candidate list (radio buttons, ghosts marked and disabled) -- doubled into two
+     independent columns if the player holds the double-vote power
+   - Optional reason field (100-char limit) per vote
+   - Confirm Vote / Confirm Both Votes button, error states
+   - Lock-in-vote button + hint (once cast, if vote-changing is allowed)
+   - Close button
+
+6. Move-to-Room (/game/move, optional mini-game)
+   - Title, description, points counter
+   - Staircase-help toggle
+   - Grid of rooms per floor (your position marked, legal destinations highlighted,
+     occupancy "heat" shading), Confirm Move button
+   - Guess block (shown once a random target is assigned): room-guess buttons,
+     Confirm Guess button
+   - Close button
+
+7. Seance (/seance, ghosts only -- currently unreachable from any nav link in the UI)
+   - Title, placeholder image, description
+   - 4 alternate-narration-flavor options (Somber/Theatrical/Mysterious/Blunt),
+     confirmation text
+
+8. Three Doors (/three-doors, endgame finale)
+   - Title
+   - Placeholder-tagged prologue cinematic block
+   - Description of the mechanic, countdown timer, deadline warning
+   - 3 door buttons, "you picked door N" confirmation, error states
+
+9. End-of-Game Reveal (/reveal)
+   - Title
+   - Placeholder-tagged epilogue block (win/lose/neutral variant text; the GM sees
+     the neutral variant)
+   - Body text + "Show game stats" button
+
+10. Game Stats (/game-stats)
+    - Title + hint
+    - Per-round blocks: elimination result (+ tie-break note), full votes table
+      (voter/target/vote count/double-vote flag/reason)
+    - Three Doors results table (player/door/outcome), if applicable
+    - Close button (back to reveal)
+
+11. Game Finished (/game-finished, reached when the GM administratively ends the game)
+    - Title, body text, Continue button (auto-redirects home after 6s)
+
+Utility screens reachable anytime:
+   - Helpline (/helpline): disclaimer, compose form, Q&A thread history with the GM
+   - 404 Not Found: "There's nothing behind this door."
+   - Player Settings modal: notification enable/disable toggle
+   - iOS Install modal: 3-step manual install instructions
+
+=========================================================
+GM FLOW (separate role)
+=========================================================
+
+A. GM Setup wizard (/gm/setup) -- 6 steps:
+   1. Access -- setup secret
+   2. Basics -- game name, GM display name
+   3. Rules -- round interval, missed-deadline mode, tie-break mode, round-1 start
+      mode, round-resolution mode, allow-vote-change toggle, three-doors deadline
+   4. Powers -- double-vote toggle + floor rounds, bot-mode toggle + bot count
+   5. Mini-games -- move-to-room toggle
+   6. Invites -- add/list draft invites
+   Then: Create Game
+
+B. GM In Play (/gm/play) -- the live management hub
+   - GM's own token/link, just-created invites list
+   - Live settings table (all the rules chosen at setup)
+   - Current round table, full vote history per round, Three Doors results,
+     Move-to-Room occupancy/guess history
+   - Round controls: Start Round 1 / Resolve Now / Resolve Doors / Export Session /
+     Finish Game
+   - GM Action Log form (grant power / log arbitrary action, per round)
+
+C. GM Helpline Inbox (/gm/helpline)
+   - Per-player filter dropdown
+   - Threads with unanswered questions, reply textarea + send button per thread
+
+=========================================================
+IMAGE STATUS (public/img/)
+=========================================================
+   - Manor at Night.png       -> Home landing page hero background
+   - The Invitation.png       -> Join/Redeem screen header
+   - Arrival at the Manor.png -> Arrival Prologue, slide 1
+   - Friends Gathered in the Living Room.png -> Arrival Prologue, slide 2
+   - Manor Daytime.png        -> Arrival Prologue, slide 3
+   - The House Is Sealed.png  -> Prologue Outcome Gate, slide 1
+   - The Vote.png             -> Prologue Outcome Gate, slide 4
+   - Placeholder.jpeg         -> generic fallback (PlaceholderVisual component),
+     still used on: Prologue Decision panel, Seance, Three Doors prologue,
+     End-of-Game Reveal epilogue, and Prologue Outcome Gate slides 2 & 3

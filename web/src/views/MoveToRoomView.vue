@@ -6,7 +6,7 @@ import { useGameStore, type RoomId } from "../stores/game";
 import { useSessionStore } from "../stores/session";
 import { callFunction, ApiCallError } from "../lib/api";
 import { useGameFinishedRedirect } from "../composables/useGameFinishedRedirect";
-import { ALL_ROOM_IDS, FLOORS_TOP_TO_BOTTOM, ROOMS, validDestinations, type Floor } from "../constants/mansion";
+import { ALL_ROOM_IDS, FLOORS_TOP_TO_BOTTOM, ROOMS, validDestinations, type Floor } from "../constants/manor";
 
 // Own route (not a v-if inside MainRoundView), same reasoning as PrivateVoteModal:
 // moving/guessing is a distinct action with its own select-then-confirm flow, not

@@ -2,7 +2,7 @@
 
 Meta-prompt for ChatGPT (image generation) to produce the full shot list of illustrations
 needed for the-story-2.0.md and the mansion mini-game (mansion.md), matching the existing
-reference images already in `web/public/img/` (`mansion_daytime.png`, `mansion_at_night.png`
+reference images already in `web/public/img/` (`Manor Daytime.png`, `Manor at Night.png`
 — both 1536x1024, painterly SNES-era pixel art of "Blackwood Manor").
 
 Copy everything in the fenced block below into ChatGPT as one message.
@@ -74,7 +74,7 @@ Output this as one list, one concept at a time, so I can generate them individua
 ## Notes for later
 
 - Reference images already exist for the exterior day/night shots (item 3's "manor
-  exterior" reuse) -- `web/public/img/mansion_daytime.png` and `mansion_at_night.png`.
+  exterior" reuse) -- `../../web/public/img/Manor Daytime.png` and `Manor at Night.png`.
   No need to regenerate those two; the meta-prompt still lists them for completeness in
   case a closer variant is wanted.
 - Once generated, drop new images into `web/public/img/` alongside the existing two,

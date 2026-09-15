@@ -5,6 +5,7 @@ import { useRouter } from "vue-router";
 import { callFunction, ApiCallError } from "../../lib/api";
 import { useSessionStore } from "../../stores/session";
 import { JUST_CREATED_INVITES_KEY } from "../../lib/justCreatedInvites";
+import { DEFAULT_ENABLED_POWER_KEYS, POWERS_CATALOGUE, powerSetupBlock } from "../../constants/powers";
 
 const { t } = useI18n();
 const router = useRouter();
@@ -48,6 +49,15 @@ const doubleVoteFloorRounds = ref(2);
 const tieBreakMode = ref<"random" | "no_elimination">("random");
 const moveToRoomEnabled = ref(false);
 const threeDoorsDeadlineMinutes = ref(10);
+
+// GM-configurable per-power enable/disable, seeded from the catalogue's own defaults
+// (mirrors powers_catalogue.default_enabled -- every power on except false_flag).
+// Split into two presentation-only blocks, see constants/powers.ts.
+const powerEnabled = ref<Record<string, boolean>>(
+  Object.fromEntries(POWERS_CATALOGUE.map((p) => [p.key, DEFAULT_ENABLED_POWER_KEYS.has(p.key)])),
+);
+const powersBlockCatalogue = computed(() => POWERS_CATALOGUE.filter((p) => powerSetupBlock(p.category) === "powers"));
+const itemsBlockCatalogue = computed(() => POWERS_CATALOGUE.filter((p) => powerSetupBlock(p.category) === "items"));
 
 const roundResolutionModeHint = computed(() => t(`gmSetup.rules.roundResolutionHints.${roundResolutionMode.value}`));
 const missedDeadlineModeHint = computed(() => t(`gmSetup.rules.missedDeadlineHints.${missedDeadlineMode.value}`));
@@ -134,6 +144,7 @@ async function createGame() {
         double_vote_floor_rounds: doubleVoteEnabled.value ? doubleVoteFloorRounds.value : undefined,
         move_to_room_enabled: moveToRoomEnabled.value,
         three_doors_deadline_minutes: threeDoorsDeadlineMinutes.value,
+        power_settings: powerEnabled.value,
       },
       { extraHeaders: { "x-setup-secret": setupSecret.value } },
     );
@@ -369,6 +380,46 @@ async function createGame() {
           </select>
           <span class="field-hint">{{ t("gmSetup.powers.botCountHint") }}</span>
         </label>
+
+        <hr>
+        <h3>{{ t("gmSetup.powers.catalogueHeading") }}</h3>
+        <p class="field-hint">
+          {{ t("gmSetup.powers.catalogueHint") }}
+        </p>
+        <label
+          v-for="power in powersBlockCatalogue"
+          :key="power.key"
+          class="checkbox-label power-toggle"
+        >
+          <input
+            v-model="powerEnabled[power.key]"
+            type="checkbox"
+          >
+          <span>
+            <strong>{{ t(`gmSetup.powers.catalogue.${power.key}.label`) }}</strong>
+            <span class="field-hint power-description">{{ t(`gmSetup.powers.catalogue.${power.key}.description`) }}</span>
+          </span>
+        </label>
+
+        <hr>
+        <h3>{{ t("gmSetup.powers.itemsHeading") }}</h3>
+        <p class="field-hint">
+          {{ t("gmSetup.powers.itemsHint") }}
+        </p>
+        <label
+          v-for="power in itemsBlockCatalogue"
+          :key="power.key"
+          class="checkbox-label power-toggle"
+        >
+          <input
+            v-model="powerEnabled[power.key]"
+            type="checkbox"
+          >
+          <span>
+            <strong>{{ t(`gmSetup.powers.catalogue.${power.key}.label`) }}</strong>
+            <span class="field-hint power-description">{{ t(`gmSetup.powers.catalogue.${power.key}.description`) }}</span>
+          </span>
+        </label>
       </section>
 
       <section
@@ -546,6 +597,18 @@ async function createGame() {
 
 .field-hint.disclaimer {
   color: var(--nbr-danger);
+}
+
+.power-toggle {
+  align-items: flex-start;
+}
+
+.power-toggle input {
+  margin-top: 0.2em;
+}
+
+.power-description {
+  margin-top: 0;
 }
 
 .error {

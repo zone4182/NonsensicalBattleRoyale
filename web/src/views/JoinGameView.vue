@@ -61,7 +61,7 @@ async function redeem() {
 <template>
   <FullscreenLayout>
     <img
-      src="/img/the_invitation.png"
+      src="/img/The%20Invitation.png"
       alt=""
       class="invitation-image pixel-frame"
     >

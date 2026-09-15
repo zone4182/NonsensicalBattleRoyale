@@ -77,8 +77,8 @@
   "endGameReveal": {
     "title": "End-of-Game Reveal",
     "epilogue": {
-      "win": "A dramatic closing scene for the survivors will go here -- the mansion falls quiet, and you're still standing. Not written yet.",
-      "lose": "A dramatic closing scene for the ones who didn't make it will go here -- the mansion falls quiet, and you're not among the survivors. Not written yet.",
+      "win": "A dramatic closing scene for the survivors will go here -- the manor falls quiet, and you're still standing. Not written yet.",
+      "lose": "A dramatic closing scene for the ones who didn't make it will go here -- the manor falls quiet, and you're not among the survivors. Not written yet.",
       "neutral": "A dramatic closing scene will go here once the game has run its course. Not written yet."
     },
     "showGameStats": "Show game stats",
@@ -119,7 +119,7 @@
   },
   "arrival": {
     "title": "Arrival",
-    "storyPart1a": "Having accepted the invitation, you travel to the mansion mentioned in the letter. On arrival you find your old friends, each one happier to see you than the last. There's laughter, drinks, old stories being retold, and no shortage of arguing over who sleeps where. The catching-up runs deep into the night, until everyone finally goes to bed.",
+    "storyPart1a": "Having accepted the invitation, you travel to the manor mentioned in the letter. On arrival you find your old friends, each one happier to see you than the last. There's laughter, drinks, old stories being retold, and no shortage of arguing over who sleeps where. The catching-up runs deep into the night, until everyone finally goes to bed.",
     "storyPart1b": "None of you suspect that this will be the last night anything still feels normal.",
     "nextMorning": "The Next Morning",
     "storyPart2a": "Slowly, everyone wakes up. One by one, the guests drift into the kitchen -- coffee, hangovers, the usual morning-after murmur. But {gmName} is missing. Their seat at the table stays empty while the rest wonder where they've gotten to.",
@@ -250,7 +250,7 @@
   },
   "moveToRoom": {
     "button": "Move",
-    "title": "Move around the mansion",
+    "title": "Move around the manor",
     "description": "Move one room over, and take a guess at where another guest is hiding. Both are entirely optional.",
     "pointsLabel": "Guess points: {points}",
     "showStaircaseHelp": "How do staircases work?",
@@ -374,12 +374,62 @@
       "botMode": "Bot mode",
       "botModeHint": "Fills the game with algorithm-controlled players (random moves for now) so you can test a full game solo. You still need at least one real player besides yourself -- bots supplement a game, they don't replace it.",
       "botCount": "Number of bots",
-      "botCountHint": "How many bots to add alongside the real players you invite (max 19, and bots + real players together should stay within the 20-player ceiling)."
+      "botCountHint": "How many bots to add alongside the real players you invite (max 19, and bots + real players together should stay within the 20-player ceiling).",
+      "catalogueHeading": "Powers",
+      "catalogueHint": "Informational and defensive powers -- things a player privately learns or uses to protect themselves. Randomly dropped one per round, or earned by algorithmic triggers (near-miss, ghost mode, survival/underdog streaks). Enabled by default.",
+      "itemsHeading": "Items",
+      "itemsHint": "Offensive and chaos powers -- things a player actively deploys against someone else. Granted the same way as the powers above. Not yet usable from the player UI, only via GM grant, so leave these off unless you're testing them.",
+      "catalogue": {
+        "rewind": {
+          "label": "Rewind",
+          "description": "Privately view the full vote breakdown of one already-completed past round."
+        },
+        "whisper": {
+          "label": "Whisper",
+          "description": "Learn (yes/no only) whether you were the top vote target last round."
+        },
+        "watcher": {
+          "label": "Watcher",
+          "description": "Learn who currently holds the double vote, without revealing it to anyone else."
+        },
+        "ward": {
+          "label": "Ward",
+          "description": "Immune to elimination for one round."
+        },
+        "deflect": {
+          "label": "Deflect",
+          "description": "One vote cast against you this round is redirected back onto whoever cast it."
+        },
+        "null": {
+          "label": "Null",
+          "description": "One vote cast against you this round is discarded."
+        },
+        "second_voice": {
+          "label": "Second Voice",
+          "description": "Grants a standalone double-vote effect outside its normal rotation."
+        },
+        "compel": {
+          "label": "Compel",
+          "description": "Force one player to privately reveal one vote they cast this round."
+        },
+        "silence": {
+          "label": "Silence",
+          "description": "Block one other player from using a power this round, anonymously."
+        },
+        "swap": {
+          "label": "Swap",
+          "description": "Exchange two players' cast votes with each other before tallying."
+        },
+        "false_flag": {
+          "label": "False Flag",
+          "description": "Send a private \"tip\" appearing to come from a third party of your choosing."
+        }
+      }
     },
     "miniGames": {
       "heading": "Mini-games",
       "moveToRoomEnabled": "Enable Move-to-Room",
-      "moveToRoomEnabledHint": "Every round, alive players may move one step through the mansion and guess where another player is hiding. Correct guesses earn the guesser a point."
+      "moveToRoomEnabledHint": "Every round, alive players may move one step through the manor and guess where another player is hiding. Correct guesses earn the guesser a point."
     },
     "access": {
       "heading": "Access",

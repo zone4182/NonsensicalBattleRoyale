@@ -26,10 +26,10 @@ const outcomeText = computed(() => {
 });
 
 const slides = computed(() => [
-  outcomeText.value,
-  t("prologueOutcome.searchingHouse"),
-  t("prologueOutcome.theLetter"),
-  t("prologueOutcome.theRules"),
+  { text: outcomeText.value, image: "/img/The House Is Sealed.png" },
+  { text: t("prologueOutcome.searchingHouse") },
+  { text: t("prologueOutcome.theLetter") },
+  { text: t("prologueOutcome.theRules"), image: "/img/The Vote.png" },
 ]);
 
 const slideIndex = ref(0);
@@ -42,7 +42,10 @@ function next() {
 
 <template>
   <div class="prologue-outcome-gate">
-    <PlaceholderVisual :caption="slides[slideIndex]" />
+    <PlaceholderVisual
+      :caption="slides[slideIndex].text"
+      :image="slides[slideIndex].image"
+    />
 
     <p
       v-if="isLastSlide"

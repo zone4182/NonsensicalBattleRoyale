@@ -28,10 +28,13 @@ in/around the kitchen the next morning before the body is found, not starting
 inside the murder room itself.)
 
 After each round, players will see all floor charts, with the color representations, but no labels (needs to be secret where each player is), they only see their own name/icon/label in the cell they are in.
-Players will have the option to move to a different room, adjacent to the room they are currently in, or stay in the same room.
-They can only move 1 space vertically or horizontally, not diagonally -- **with one
-exception: staircase cells**, which let a player move between floors instead. See
-"Floor plans" below for exactly how that works.
+Players will have the option to move to a different room connected by a doorway to
+the room they're currently in, or stay in the same room. **Movement follows the
+manor's actual door layout (see "Doors" under Floor plans below), not plain grid
+adjacency** -- two rooms can sit in neighboring grid cells with no door drawn between
+them, in which case moving directly between them isn't legal -- **with one exception:
+staircase cells**, which let a player move between floors instead. See "Floor plans"
+below for exactly how that works.
 The result all player move will be revealed in the next round, in the updated pixel-frame grid.
 
 ## Floor plans
@@ -75,15 +78,40 @@ Entrance Hall (see "Staircases" below for why). C2 is deliberately left as
 non-explorable structural space rather than forcing a fifth bedroom into existence
 just to fill the grid -- not every cell in a real floor plan is a room.
 
+### Doors
+
+The grid coordinates above place every room, but they don't by themselves decide
+which rooms you can actually walk between -- that's decided by where a door is
+actually drawn. The reference blueprints
+(`concept/story/blueprint-image-prompts.md`, generated from these floor plans) turned
+out more realistic than plain "any two grid-adjacent cells connect," so the game's
+adjacency rules were changed to match the blueprints' door placement instead of the
+grid. The authoritative list (implemented as `ADJACENT_ROOMS` in
+`supabase/functions/_shared/manor.ts` / `web/src/constants/manor.ts`):
+
+- **Ground Floor:** Library -- Entrance Hall -- Living Room, and Entrance Hall --
+  Kitchen -- {Dining Room, Toilet}. Entrance Hall and Kitchen are each a 3-way hub.
+  Library and Living Room are *not* directly connected to Dining Room and Toilet
+  respectively, even though they sit in the same grid column -- there's no door
+  between them.
+- **First Floor:** Guest Bedroom 1 -- Landing -- Master Bedroom, and Landing --
+  Bathroom -- Guest Bedroom 2. Landing is a 3-way hub. Guest Bedroom 1 and Guest
+  Bedroom 2 are *not* directly connected, despite sharing a grid column.
+
+Every other, non-hub room has exactly one door out (back to the hub it's attached
+to). Staying in place is always allowed regardless of doors; staircase cells add one
+further destination on top of their doors, per "Staircases" below.
+
 ### Staircases: how moving between floors actually works
 
 A cell flagged as a staircase cell (Entrance Hall on Ground Floor, Landing on First
 Floor) offers a player standing in it **one additional move option** beyond the
-normal same-floor adjacent cells: moving to the *matching* staircase cell one floor
-up or down. This only works from a staircase cell -- you can't jump floors from an
-ordinary room. Both floors deliberately share the same coordinate grid specifically
-so their staircase cells land on the same coordinate (**B1** in both cases) and the
-connection is spatially obvious, not an arbitrary teleport.
+normal same-floor doorway connections listed above: moving to the *matching*
+staircase cell one floor up or down. This only works from a staircase cell -- you
+can't jump floors from an ordinary room. Both floors deliberately share the same
+coordinate grid specifically so their staircase cells land on the same coordinate
+(**B1** in both cases) and the connection is spatially obvious, not an arbitrary
+teleport.
 
 This also sets the rule for whenever Second Floor, Attic, and Basement get built out
 for real later:

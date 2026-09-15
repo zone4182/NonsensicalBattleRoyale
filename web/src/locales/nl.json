@@ -374,7 +374,57 @@
       "botMode": "Botmodus",
       "botModeHint": "Vult het spel met door algoritmes bestuurde spelers (voorlopig willekeurige zetten) zodat je solo een volledig spel kunt testen. Je hebt nog steeds minstens één echte speler naast jezelf nodig -- bots vullen een spel aan, ze vervangen het niet.",
       "botCount": "Aantal bots",
-      "botCountHint": "Hoeveel bots toe te voegen naast de echte spelers die je uitnodigt (max 19, en bots + echte spelers samen moeten binnen de limiet van 20 spelers blijven)."
+      "botCountHint": "Hoeveel bots toe te voegen naast de echte spelers die je uitnodigt (max 19, en bots + echte spelers samen moeten binnen de limiet van 20 spelers blijven).",
+      "catalogueHeading": "Krachten",
+      "catalogueHint": "Informatieve en defensieve krachten -- dingen die een speler privé te weten komt of gebruikt om zichzelf te beschermen. Willekeurig één per ronde uitgedeeld, of verdiend via algoritmische triggers (net gemist, spookmodus, overlevings-/underdogreeksen). Standaard ingeschakeld.",
+      "itemsHeading": "Items",
+      "itemsHint": "Offensieve en chaotische krachten -- dingen die een speler actief tegen iemand anders inzet. Worden op dezelfde manier toegekend als de krachten hierboven. Nog niet bruikbaar vanuit de spelersinterface, alleen via een GM-toekenning -- laat deze uit tenzij je ze test.",
+      "catalogue": {
+        "rewind": {
+          "label": "Terugspoelen",
+          "description": "Bekijk privé de volledige stemverdeling van een al afgeronde ronde."
+        },
+        "whisper": {
+          "label": "Fluistering",
+          "description": "Kom (alleen ja/nee) te weten of jij vorige ronde het vaakst gestemd doelwit was."
+        },
+        "watcher": {
+          "label": "Waarnemer",
+          "description": "Kom te weten wie momenteel de dubbele stem heeft, zonder dat iemand anders dit ziet."
+        },
+        "ward": {
+          "label": "Bescherming",
+          "description": "Onaantastbaar voor eliminatie gedurende één ronde."
+        },
+        "deflect": {
+          "label": "Afweren",
+          "description": "Eén stem die deze ronde tegen jou wordt uitgebracht, wordt teruggekaatst naar wie hem uitbracht."
+        },
+        "null": {
+          "label": "Neutraliseren",
+          "description": "Eén stem die deze ronde tegen jou wordt uitgebracht, wordt ongeldig gemaakt."
+        },
+        "second_voice": {
+          "label": "Tweede Stem",
+          "description": "Geeft een op zichzelf staand dubbele-stem-effect buiten de normale toewijzing om."
+        },
+        "compel": {
+          "label": "Dwingen",
+          "description": "Dwing een speler om privé één stem die ze deze ronde hebben uitgebracht te onthullen."
+        },
+        "silence": {
+          "label": "Tot Zwijgen Brengen",
+          "description": "Blokkeer anoniem dat een andere speler deze ronde een kracht gebruikt."
+        },
+        "swap": {
+          "label": "Wisselen",
+          "description": "Wissel de uitgebrachte stemmen van twee spelers om, vóór het tellen."
+        },
+        "false_flag": {
+          "label": "Valse Vlag",
+          "description": "Stuur een privé \"tip\" die lijkt te komen van een derde partij naar keuze."
+        }
+      }
     },
     "miniGames": {
       "heading": "Minigames",

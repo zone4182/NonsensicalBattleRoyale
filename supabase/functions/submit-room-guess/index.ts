@@ -2,7 +2,7 @@ import { errorResponse, HttpError, jsonResponse, preflightResponse, readJsonBody
 import { authenticate, requireAlive, requireRole } from "../_shared/auth.ts";
 import { sql } from "../_shared/db.ts";
 import { requireString } from "../_shared/validation.ts";
-import { isValidRoomId } from "../_shared/mansion.ts";
+import { isValidRoomId } from "../_shared/manor.ts";
 import type { Round } from "../_shared/types.ts";
 
 // Move-to-Room mini-game. Deliberately decoupled from submit-room-move -- a player can

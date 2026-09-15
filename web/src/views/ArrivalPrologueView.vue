@@ -35,12 +35,17 @@ interface Slide {
 const slides = computed<Slide[]>(() => [
   {
     heading: t("arrival.title"),
-    image: "/img/arrival-at-the-manor.png",
-    paragraphs: [t("arrival.storyPart1a"), t("arrival.storyPart1b")],
+    image: "/img/Arrival at the Manor.png",
+    paragraphs: [t("arrival.storyPart1a")],
+  },
+  {
+    heading: t("arrival.title"),
+    image: "/img/Friends Gathered in the Living Room.png",
+    paragraphs: [t("arrival.storyPart1b")],
   },
   {
     heading: t("arrival.nextMorning"),
-    image: "/img/mansion_daytime.png",
+    image: "/img/Manor Daytime.png",
     paragraphs: [t("arrival.storyPart2a", { gmName: gmName.value }), t("arrival.storyPart2b")],
   },
 ]);

@@ -85,7 +85,7 @@ const HOST_GAME_VISIBLE = false;
   inset: 0;
   z-index: -1;
   background-image: linear-gradient(to bottom, rgba(13, 13, 13, 0.25) 0%, rgba(13, 13, 13, 0.55) 55%, var(--nbr-bg) 95%),
-    url("/img/mansion_at_night.png");
+    url("/img/Manor at Night.png");
   background-size: cover;
   background-position: center 35%;
   background-repeat: no-repeat;

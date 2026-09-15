@@ -1,18 +1,23 @@
 <script setup lang="ts">
 // Every screen that's meant to eventually show real story artwork but doesn't have one
-// yet uses this -- placeholder.jpeg plus whatever text belongs to that specific beat,
+// yet uses this -- Placeholder.jpg plus whatever text belongs to that specific beat,
 // bound together as one figure/caption pair so it's obvious during testing which visual
 // slot goes with which piece of narration (not just a stray image floating on the
-// page). Swapping in the real image later is a one-line change per call site.
-defineProps<{
-  caption?: string;
-}>();
+// page). Swapping in the real image later is a one-line change per call site: pass
+// `image`, otherwise it falls back to Placeholder.jpg.
+withDefaults(
+  defineProps<{
+    caption?: string;
+    image?: string;
+  }>(),
+  { image: "/img/Placeholder.jpg" },
+);
 </script>
 
 <template>
   <figure class="placeholder-visual">
     <img
-      src="/img/placeholder.jpeg"
+      :src="image"
       alt=""
       class="placeholder-image"
     >

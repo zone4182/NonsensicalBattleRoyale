@@ -22,7 +22,7 @@ request.
 - **Title:** "Nonsensical Battle Royale"
 - **Subtitle:** "The question is... who's next?"
 - **Image(s):**
-  - ✅ Background hero image: `mansion_at_night.png` (fixed full-viewport background
+  - ✅ Background hero image: `Manor at Night.png` (fixed full-viewport background
     behind the whole page, with a dark gradient overlay so text stays legible)
 - **Narration/text:**
   - Tagline: "Where Clue, Diplomacy, Werewolf, Among Us, and Machiavelli meet. An
@@ -41,7 +41,7 @@ request.
 - **Title:** "You've been invited"
 - **Subtitle:** "Enter your personal invite token to arrive at the house."
 - **Image(s):**
-  - ✅ `the_invitation.png` (framed above the heading)
+  - ✅ `The Invitation.png` (framed above the heading)
 - **Narration/text:**
   - Form labels only: invite token field, optional display-name field with hint
     ("Shown to other players as your name in the roster and narration...")
@@ -59,11 +59,11 @@ with separate images.
 
 - **Title:** "Arrival"
 - **Image(s):**
-  - 🖼 `arrival-at-the-manor.png` exists but isn't wired into this screen yet
+  - 🖼 `Arrival at the Manor.png` exists but isn't wired into this screen yet
   - ❌ Planned: a new "driving to the manor" image (mentioned as something you're
     creating) — would pair with the travel beat below, likely *before*
-    `arrival-at-the-manor.png` in sequence (en route → arriving at the gate)
-  - 🖼 `mansion_daytime.png` exists, unused — a plausible fit for the "next morning"
+    `Arrival at the Manor.png` in sequence (en route → arriving at the gate)
+  - 🖼 `Manor Daytime.png` exists, unused — a plausible fit for the "next morning"
     beat below, given it's a daytime scene
 - **Narration/text (Beat 1 — arrival night):**
   - "Having accepted the invitation, you travel to the mansion mentioned in the
@@ -92,7 +92,7 @@ with separate images.
   this beat: `Nonsensical_Battle_Royale_Shot_List_Modern.md` #01 The Invitation, #02
   Arrival at the Gate, #03 Friends Gathered in the Living Room, #04 The Empty Chair.
   None of these appear to be rendered/saved into `public/img/` yet except (possibly)
-  `arrival-at-the-manor.png` for #02.
+  `Arrival at the Manor.png` for #02.
 
 ---
 

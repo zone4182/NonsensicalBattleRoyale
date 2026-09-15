@@ -1,4 +1,4 @@
-// Mirrors supabase/functions/_shared/mansion.ts -- kept as a separate copy since the
+// Mirrors supabase/functions/_shared/manor.ts -- kept as a separate copy since the
 // frontend can't import Deno-targeted backend modules. The server is still the
 // authority (submit-room-move re-validates), this just drives the grid UI and disables
 // illegal cells before a round-trip.
@@ -34,19 +34,28 @@ export const ALL_ROOM_IDS = Object.keys(ROOMS) as RoomId[];
 // resolved "which floor renders on top" design decision.
 export const FLOORS_TOP_TO_BOTTOM: Floor[] = ["first", "ground"];
 
-function sameFloorAdjacent(a: RoomDef, b: RoomDef): boolean {
-  if (a.floor !== b.floor) return false;
-  const colDist = Math.abs(a.col.charCodeAt(0) - b.col.charCodeAt(0));
-  const rowDist = Math.abs(a.row - b.row);
-  return colDist + rowDist === 1;
-}
+// Same-floor doorways, matching the actual door placements drawn in the reference
+// blueprints (concept/story/blueprint-image-prompts.md) rather than plain grid
+// adjacency -- e.g. Library and Dining Room sit in adjacent grid cells but the
+// blueprint draws no door between them, so that move isn't legal. Kitchen and Landing
+// are each a 3-way hub; every other room has exactly one door out.
+const ADJACENT_ROOMS: Record<RoomId, RoomId[]> = {
+  library: ["entrance_hall"],
+  entrance_hall: ["library", "living_room", "kitchen"],
+  living_room: ["entrance_hall"],
+  dining_room: ["kitchen"],
+  kitchen: ["entrance_hall", "dining_room", "toilet"],
+  toilet: ["kitchen"],
+  guest_bedroom_1: ["landing"],
+  landing: ["guest_bedroom_1", "master_bedroom", "bathroom"],
+  master_bedroom: ["landing"],
+  guest_bedroom_2: ["bathroom"],
+  bathroom: ["landing", "guest_bedroom_2"],
+};
 
 export function validDestinations(from: RoomId): RoomId[] {
   const fromDef = ROOMS[from];
-  const destinations = new Set<RoomId>([from]);
-  for (const room of Object.values(ROOMS)) {
-    if (sameFloorAdjacent(fromDef, room)) destinations.add(room.id);
-  }
+  const destinations = new Set<RoomId>([from, ...ADJACENT_ROOMS[from]]);
   if (fromDef.isStaircase) {
     const otherFloor: Floor = fromDef.floor === "ground" ? "first" : "ground";
     const match = Object.values(ROOMS).find(

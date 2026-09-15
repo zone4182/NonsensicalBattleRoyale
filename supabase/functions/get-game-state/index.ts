@@ -2,7 +2,7 @@ import { errorResponse, jsonResponse, preflightResponse } from "../_shared/http.
 import { authenticate } from "../_shared/auth.ts";
 import { countActiveVotesForVoter, getActiveVoteTargetsForVoter, sql } from "../_shared/db.ts";
 import { publicName } from "../_shared/names.ts";
-import { ALL_ROOM_IDS, type RoomId } from "../_shared/mansion.ts";
+import { ALL_ROOM_IDS, type RoomId } from "../_shared/manor.ts";
 import type { Player, PrologueOption, Round } from "../_shared/types.ts";
 
 // Read-only. Queries players/rounds/power_grants/narration_log freely, plus -- via the
