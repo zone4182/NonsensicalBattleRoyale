@@ -3,23 +3,22 @@ import type { Game, Round } from "./types.ts";
 
 type Exec = ReturnType<typeof sql>;
 
-export async function getEnabledPowerKeys(exec: Exec, gameId: string): Promise<string[]> {
+// A bot is only eligible for a power that's both enabled and explicitly marked
+// bot_eligible for this game -- a human player only needs it enabled. See
+// game_power_settings.bot_eligible (GM-configurable at setup, defaults true).
+export async function pickRandomEligiblePower(exec: Exec, gameId: string, playerId: string, isBot: boolean): Promise<string | null> {
   const rows = await exec<{ power_key: string }[]>`
-    select power_key from battle_royale.game_power_settings where game_id = ${gameId} and enabled = true
+    select power_key from battle_royale.game_power_settings
+    where game_id = ${gameId} and enabled = true and (${isBot} = false or bot_eligible = true)
   `;
-  return rows.map((r) => r.power_key);
-}
-
-export async function pickRandomEligiblePower(exec: Exec, gameId: string, playerId: string): Promise<string | null> {
-  const enabled = await getEnabledPowerKeys(exec, gameId);
-  if (enabled.length === 0) return null;
+  if (rows.length === 0) return null;
 
   const held = await exec<{ power_key: string }[]>`
     select power_key from battle_royale.power_grants
     where granted_to_player_id = ${playerId} and used_at is null
   `;
   const heldKeys = new Set(held.map((h) => h.power_key));
-  const eligible = enabled.filter((k) => !heldKeys.has(k));
+  const eligible = rows.map((r) => r.power_key).filter((k) => !heldKeys.has(k));
   if (eligible.length === 0) return null;
 
   return eligible[Math.floor(Math.random() * eligible.length)];
@@ -34,12 +33,15 @@ export async function grantPower(
     playerId: string;
     method: "random" | "earned" | "gm_grant";
     gmActionId?: string;
-    effectDetail?: Record<string, unknown>;
+    // Written once at grant time and never touched again -- see the migration's own
+    // comment on why this is a separate column from effect_detail (which use-power and
+    // resolve-round both overwrite wholesale once the power is armed/used).
+    grantedReason?: Record<string, unknown>;
   },
 ): Promise<void> {
   await exec`
     insert into battle_royale.power_grants
-      (game_id, round_id, power_key, granted_to_player_id, acquisition_method, granted_by_gm_action_id, effect_detail)
+      (game_id, round_id, power_key, granted_to_player_id, acquisition_method, granted_by_gm_action_id, granted_reason)
     values (
       ${params.gameId},
       ${params.roundId},
@@ -47,7 +49,7 @@ export async function grantPower(
       ${params.playerId},
       ${params.method},
       ${params.gmActionId ?? null},
-      ${exec.json(params.effectDetail ?? {})}
+      ${exec.json(params.grantedReason ?? {})}
     )
   `;
 }
@@ -60,13 +62,13 @@ export async function grantRandomDrop(
   exec: Exec,
   gameId: string,
   roundId: string,
-  eligiblePlayerIds: string[],
+  eligiblePlayers: { id: string; isBot: boolean }[],
 ): Promise<void> {
-  if (eligiblePlayerIds.length === 0) return;
-  const playerId = eligiblePlayerIds[Math.floor(Math.random() * eligiblePlayerIds.length)];
-  const powerKey = await pickRandomEligiblePower(exec, gameId, playerId);
+  if (eligiblePlayers.length === 0) return;
+  const player = eligiblePlayers[Math.floor(Math.random() * eligiblePlayers.length)];
+  const powerKey = await pickRandomEligiblePower(exec, gameId, player.id, player.isBot);
   if (!powerKey) return;
-  await grantPower(exec, { gameId, roundId, powerKey, playerId, method: "random" });
+  await grantPower(exec, { gameId, roundId, powerKey, playerId: player.id, method: "random" });
 }
 
 function topTwoDistinctVoteCounts(tally: { targetPlayerId: string; voteCount: number }[]): number[] {
@@ -86,23 +88,23 @@ async function alreadyGrantedForTrigger(
     join battle_royale.rounds r on r.id = pg.round_id
     where pg.granted_to_player_id = ${playerId}
       and pg.acquisition_method = 'earned'
-      and pg.effect_detail ->> 'earn_trigger' = ${triggerKey}
+      and pg.granted_reason ->> 'earn_trigger' = ${triggerKey}
       and r.game_id = ${gameId}
       and r.round_number >= ${sinceRoundNumber}
   `;
   return rows.length > 0;
 }
 
-async function grantEarned(exec: Exec, gameId: string, roundId: string, playerId: string, triggerKey: string) {
-  const powerKey = await pickRandomEligiblePower(exec, gameId, playerId);
+async function grantEarned(exec: Exec, gameId: string, roundId: string, player: { id: string; isBot: boolean }, triggerKey: string) {
+  const powerKey = await pickRandomEligiblePower(exec, gameId, player.id, player.isBot);
   if (!powerKey) return;
   await grantPower(exec, {
     gameId,
     roundId,
     powerKey,
-    playerId,
+    playerId: player.id,
     method: "earned",
-    effectDetail: { earn_trigger: triggerKey },
+    grantedReason: { earn_trigger: triggerKey },
   });
 }
 
@@ -115,25 +117,25 @@ export async function evaluateEarnTriggers(
   game: Game,
   round: Round,
   tally: { targetPlayerId: string; voteCount: number }[],
-  aliveRosterAfterIds: string[],
+  aliveRosterAfter: { id: string; isBot: boolean }[],
   eliminatedIds: Set<string>,
 ): Promise<void> {
   const topValues = topTwoDistinctVoteCounts(tally);
   const countByPlayer = new Map(tally.map((t) => [t.targetPlayerId, t.voteCount]));
 
   // Near-miss: top-two distinct vote-count values, ties intentionally inflate the group.
-  for (const playerId of aliveRosterAfterIds) {
-    const count = countByPlayer.get(playerId);
+  for (const player of aliveRosterAfter) {
+    const count = countByPlayer.get(player.id);
     if (count !== undefined && topValues.includes(count)) {
-      await grantEarned(exec, game.id, round.id, playerId, "near_miss");
+      await grantEarned(exec, game.id, round.id, player, "near_miss");
     }
   }
 
   // Ghost-mode: zero votes this round, and survived (excludes forfeit-eliminated
   // non-voters, who by definition also had zero votes but didn't "survive").
-  for (const playerId of aliveRosterAfterIds) {
-    if (!countByPlayer.has(playerId) && !eliminatedIds.has(playerId)) {
-      await grantEarned(exec, game.id, round.id, playerId, "ghost_mode");
+  for (const player of aliveRosterAfter) {
+    if (!countByPlayer.has(player.id) && !eliminatedIds.has(player.id)) {
+      await grantEarned(exec, game.id, round.id, player, "ghost_mode");
     }
   }
 
@@ -149,18 +151,18 @@ export async function evaluateEarnTriggers(
   }
   const sinceRoundNumber = recentRounds[recentRounds.length - 1].round_number;
 
-  for (const playerId of aliveRosterAfterIds) {
+  for (const player of aliveRosterAfter) {
     const wasTopTargeted = recentRounds.map((r) => {
       const rTally = tallyByRoundId.get(r.id)!;
       const rTopValues = topTwoDistinctVoteCounts(rTally);
-      const rCount = rTally.find((t) => t.targetPlayerId === playerId)?.voteCount;
+      const rCount = rTally.find((t) => t.targetPlayerId === player.id)?.voteCount;
       return rCount !== undefined && rTopValues.includes(rCount);
     });
 
     // Survival-streak: never top-targeted across the last N rounds.
     if (wasTopTargeted.every((v) => !v)) {
-      if (!(await alreadyGrantedForTrigger(exec, playerId, "survival_streak", sinceRoundNumber, game.id))) {
-        await grantEarned(exec, game.id, round.id, playerId, "survival_streak");
+      if (!(await alreadyGrantedForTrigger(exec, player.id, "survival_streak", sinceRoundNumber, game.id))) {
+        await grantEarned(exec, game.id, round.id, player, "survival_streak");
       }
     }
 
@@ -169,8 +171,8 @@ export async function evaluateEarnTriggers(
     // in the bottom-two most-voted" -- the literal safest-player reading doesn't match
     // "underdog" semantics.)
     if (wasTopTargeted.every((v) => v)) {
-      if (!(await alreadyGrantedForTrigger(exec, playerId, "underdog_run", sinceRoundNumber, game.id))) {
-        await grantEarned(exec, game.id, round.id, playerId, "underdog_run");
+      if (!(await alreadyGrantedForTrigger(exec, player.id, "underdog_run", sinceRoundNumber, game.id))) {
+        await grantEarned(exec, game.id, round.id, player, "underdog_run");
       }
     }
   }

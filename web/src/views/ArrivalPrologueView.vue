@@ -76,14 +76,17 @@ function proceed() {
 </script>
 
 <template>
-  <FullscreenLayout>
+  <FullscreenLayout id="arrival-prologue-screen">
     <h1>{{ slides[slideIndex].heading }}</h1>
     <img
       class="slide-image"
       :src="slides[slideIndex].image"
       alt=""
     >
-    <section class="story-block pixel-frame">
+    <section
+      id="arrival-story-panel"
+      class="story-block pixel-frame"
+    >
       <p
         v-for="(paragraph, i) in slides[slideIndex].paragraphs"
         :key="i"

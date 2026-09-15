@@ -21,6 +21,22 @@ const ROUND1_START_MODES: readonly Round1StartMode[] = ["wait_for_all", "gm_manu
 const ROUND_RESOLUTION_MODES: readonly RoundResolutionMode[] = ["automatic", "manual"];
 const TIE_BREAK_MODES: readonly TieBreakMode[] = ["random", "no_elimination"];
 
+function parseBooleanMap(body: Record<string, unknown>, field: string): Record<string, boolean> {
+  const input = body[field];
+  const result: Record<string, boolean> = {};
+  if (input === undefined || input === null) return result;
+  if (typeof input !== "object" || Array.isArray(input)) {
+    throw new HttpError(400, "invalid_field", `'${field}' must be an object of power_key -> boolean.`);
+  }
+  for (const [key, value] of Object.entries(input as Record<string, unknown>)) {
+    if (typeof value !== "boolean") {
+      throw new HttpError(400, "invalid_field", `'${field}.${key}' must be a boolean.`);
+    }
+    result[key] = value;
+  }
+  return result;
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return preflightResponse();
   try {
@@ -52,22 +68,12 @@ Deno.serve(async (req) => {
     const moveToRoomEnabled = optionalBoolean(body, "move_to_room_enabled") ?? false;
     const threeDoorsDeadlineMinutes = optionalIntInRange(body, "three_doors_deadline_minutes", 1, 1440) ?? 10;
 
-    // GM-configurable per-power enable/disable (concept: powers_catalogue.default_enabled
-    // is only a fallback now, not the final word). Keys not present here just keep the
-    // catalogue's own default -- see the insert below.
-    const powerSettingsInput = body["power_settings"];
-    const powerOverrides: Record<string, boolean> = {};
-    if (powerSettingsInput !== undefined && powerSettingsInput !== null) {
-      if (typeof powerSettingsInput !== "object" || Array.isArray(powerSettingsInput)) {
-        throw new HttpError(400, "invalid_field", "'power_settings' must be an object of power_key -> boolean.");
-      }
-      for (const [key, value] of Object.entries(powerSettingsInput as Record<string, unknown>)) {
-        if (typeof value !== "boolean") {
-          throw new HttpError(400, "invalid_field", `'power_settings.${key}' must be a boolean.`);
-        }
-        powerOverrides[key] = value;
-      }
-    }
+    // GM-configurable per-power enable/disable, and per-power "can bots also get this"
+    // (concept: powers_catalogue.default_enabled / game_power_settings.bot_eligible's
+    // own default of true are only fallbacks now, not the final word). Keys not present
+    // in either map just keep their default -- see the insert below.
+    const powerOverrides = parseBooleanMap(body, "power_settings");
+    const powerBotOverrides = parseBooleanMap(body, "power_bot_settings");
 
     const db = sql();
 
@@ -97,9 +103,10 @@ Deno.serve(async (req) => {
       `;
       for (const power of catalogue) {
         const enabled = powerOverrides[power.key] ?? power.default_enabled;
+        const botEligible = powerBotOverrides[power.key] ?? true;
         await tx`
-          insert into battle_royale.game_power_settings (game_id, power_key, enabled)
-          values (${game.id}, ${power.key}, ${enabled})
+          insert into battle_royale.game_power_settings (game_id, power_key, enabled, bot_eligible)
+          values (${game.id}, ${power.key}, ${enabled}, ${botEligible})
         `;
       }
 

@@ -63,6 +63,35 @@ Deno.serve(async (req) => {
     `;
     const nameById = new Map(players.map((p) => [p.id, gmName(p.display_name, p.chosen_display_name)]));
 
+    // Powers/items each player currently holds or has used -- granted_reason (why) is
+    // written once at grant time and never touched again, while effect_detail (what
+    // happened when used) is overwritten by use-power/resolve-round as it resolves. See
+    // _shared/powers.ts's own comment on why those are two separate columns.
+    const powerGrants = await db<
+      {
+        player_id: string;
+        power_key: string;
+        acquisition_method: string;
+        granted_reason: Record<string, unknown>;
+        granted_at: string;
+        used_at: string | null;
+        effect_status: string;
+        effect_detail: Record<string, unknown>;
+      }[]
+    >`
+      select granted_to_player_id as player_id, power_key, acquisition_method, granted_reason, granted_at, used_at,
+        effect_status, effect_detail
+      from battle_royale.power_grants
+      where game_id = ${ctx.game.id}
+      order by granted_at asc
+    `;
+    const powerGrantsByPlayerId = new Map<string, typeof powerGrants>();
+    for (const g of powerGrants) {
+      const list = powerGrantsByPlayerId.get(g.player_id) ?? [];
+      list.push(g);
+      powerGrantsByPlayerId.set(g.player_id, list);
+    }
+
     const votes = await revealVotesForGame(ctx.game.id);
     const votesByRoundId = new Map<string, VoteAttribution[]>();
     for (const vote of votes) {
@@ -164,7 +193,21 @@ Deno.serve(async (req) => {
     }
 
     return jsonResponse({
-      players: players.map((p) => ({ id: p.id, display_name: nameById.get(p.id) ?? p.display_name, status: p.status, role: p.role })),
+      players: players.map((p) => ({
+        id: p.id,
+        display_name: nameById.get(p.id) ?? p.display_name,
+        status: p.status,
+        role: p.role,
+        power_grants: (powerGrantsByPlayerId.get(p.id) ?? []).map((g) => ({
+          power_key: g.power_key,
+          acquisition_method: g.acquisition_method,
+          granted_reason: g.granted_reason,
+          granted_at: g.granted_at,
+          used_at: g.used_at,
+          effect_status: g.effect_status,
+          effect_detail: g.effect_detail,
+        })),
+      })),
       current_round: currentRound,
       move_to_room: moveToRoom,
       game: {

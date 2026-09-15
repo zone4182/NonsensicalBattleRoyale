@@ -70,12 +70,15 @@ async function send() {
 </script>
 
 <template>
-  <FullscreenLayout>
+  <FullscreenLayout id="helpline-screen">
     <h1>{{ t("helpline.title") }}</h1>
     <p class="disclaimer">
       {{ t("helpline.disclaimer") }}
     </p>
-    <section class="panel pixel-frame">
+    <section
+      id="helpline-compose-panel"
+      class="panel pixel-frame"
+    >
       <h2>{{ t("helpline.askNew") }}</h2>
       <form
         class="helpline-form"
@@ -96,36 +99,38 @@ async function send() {
       </form>
     </section>
 
-    <h2>{{ t("helpline.history") }}</h2>
-    <p v-if="!threads.length">
-      {{ t("helpline.noMessages") }}
-    </p>
-    <section
-      v-for="thread in threads"
-      :key="thread.question.id"
-      class="thread pixel-frame"
-    >
-      <p class="message question">
-        <strong>{{ t("helpline.you") }}:</strong> {{ thread.question.body }}
+    <div id="helpline-history-panel">
+      <h2>{{ t("helpline.history") }}</h2>
+      <p v-if="!threads.length">
+        {{ t("helpline.noMessages") }}
       </p>
-      <p class="meta">
-        {{ formatTime(thread.question.created_at) }}
-      </p>
-      <template v-if="thread.reply">
-        <p class="message reply">
-          <strong>{{ t("helpline.gm") }}:</strong> {{ thread.reply.body }}
+      <section
+        v-for="thread in threads"
+        :key="thread.question.id"
+        class="thread pixel-frame"
+      >
+        <p class="message question">
+          <strong>{{ t("helpline.you") }}:</strong> {{ thread.question.body }}
         </p>
         <p class="meta">
-          {{ formatTime(thread.reply.created_at) }}
+          {{ formatTime(thread.question.created_at) }}
         </p>
-      </template>
-      <p
-        v-else
-        class="awaiting"
-      >
-        {{ t("helpline.awaitingReply") }}
-      </p>
-    </section>
+        <template v-if="thread.reply">
+          <p class="message reply">
+            <strong>{{ t("helpline.gm") }}:</strong> {{ thread.reply.body }}
+          </p>
+          <p class="meta">
+            {{ formatTime(thread.reply.created_at) }}
+          </p>
+        </template>
+        <p
+          v-else
+          class="awaiting"
+        >
+          {{ t("helpline.awaitingReply") }}
+        </p>
+      </section>
+    </div>
 
     <p class="back-link">
       <RouterLink :to="{ name: 'main-round' }">

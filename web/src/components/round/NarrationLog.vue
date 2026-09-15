@@ -22,7 +22,7 @@ const game = useGameStore();
 </template>
 
 <style scoped>
-.narration-log {
-  overflow-y: auto;
-}
+/* No overflow/height rules here on purpose -- the scrollable bounds live on the
+   parent .area-narration panel (MainRoundView.vue) that wraps this component, so
+   there's exactly one scroll container, not two nested ones. */
 </style>

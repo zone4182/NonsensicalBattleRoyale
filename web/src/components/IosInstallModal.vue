@@ -15,10 +15,14 @@ const { t } = useI18n();
 <template>
   <div
     v-if="open"
+    id="ios-install-modal-backdrop"
     class="modal-backdrop"
     @click.self="emit('close')"
   >
-    <section class="modal-panel pixel-frame">
+    <section
+      id="ios-install-panel"
+      class="modal-panel pixel-frame"
+    >
       <h2>{{ t("iosInstall.title") }}</h2>
       <ol class="steps">
         <li>{{ t("iosInstall.step1") }}</li>

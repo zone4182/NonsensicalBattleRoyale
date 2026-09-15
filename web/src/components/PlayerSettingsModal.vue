@@ -26,10 +26,14 @@ async function onToggleNotifications(event: Event) {
 <template>
   <div
     v-if="open"
+    id="player-settings-modal-backdrop"
     class="modal-backdrop"
     @click.self="emit('close')"
   >
-    <section class="modal-panel pixel-frame">
+    <section
+      id="player-settings-panel"
+      class="modal-panel pixel-frame"
+    >
       <h2>{{ t("playerSettings.title") }}</h2>
 
       <label

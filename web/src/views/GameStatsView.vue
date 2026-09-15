@@ -55,7 +55,7 @@ function close() {
 </script>
 
 <template>
-  <FullscreenLayout>
+  <FullscreenLayout id="game-stats-screen">
     <h1>{{ t("gameStats.title") }}</h1>
     <p class="field-hint">
       {{ t("gameStats.hint") }}

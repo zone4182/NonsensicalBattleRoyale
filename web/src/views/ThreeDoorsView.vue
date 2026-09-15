@@ -106,7 +106,7 @@ async function pick(doorNumber: number) {
 </script>
 
 <template>
-  <FullscreenLayout>
+  <FullscreenLayout id="three-doors-screen">
     <h1>{{ t("threeDoors.title") }}</h1>
     <!--
       Placeholder prologue -- a short cinematic beat is meant to precede the door
@@ -114,7 +114,10 @@ async function pick(doorNumber: number) {
       narration text isn't written yet. This block exists so the screen's shape and
       pacing (prologue, then countdown, then the choice) is already in place.
     -->
-    <section class="prologue pixel-frame">
+    <section
+      id="three-doors-prologue-panel"
+      class="prologue pixel-frame"
+    >
       <p class="placeholder-tag">
         {{ t("common.placeholder") }}
       </p>
@@ -130,7 +133,10 @@ async function pick(doorNumber: number) {
     <p class="deadline-warning">
       {{ t("threeDoors.deadlineWarning") }}
     </p>
-    <div class="doors">
+    <div
+      id="three-doors-choice-panel"
+      class="doors"
+    >
       <button
         v-for="n in [1, 2, 3]"
         :key="n"

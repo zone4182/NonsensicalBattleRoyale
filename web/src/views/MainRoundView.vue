@@ -75,18 +75,46 @@ watch(
 </script>
 
 <template>
-  <section class="screen round-layout">
-    <div class="area-header">
+  <section
+    id="main-round-screen"
+    class="screen round-layout"
+  >
+    <div
+      id="round-header-panel"
+      class="area-header"
+    >
       <RoundHeader />
       <LocaleSwitcher class="header-locale-switcher" />
     </div>
     <div
-      v-if="ui.cinematicActive"
-      class="area-viewport pixel-frame"
+      id="round-main-panel"
+      class="area-main pixel-frame"
     >
-      <CinematicViewport />
+      <div
+        v-if="ui.cinematicActive"
+        id="round-cinematic-viewport"
+      >
+        <CinematicViewport />
+      </div>
+      <div id="round-action-panel">
+        <PrologueDecisionPanel v-if="game.currentRound?.isPrologue" />
+        <PrologueOutcomeGate
+          v-else-if="showPrologueGate"
+          @continue="continuePastPrologueGate"
+        />
+        <VoteActionPanel v-else />
+        <p
+          v-if="pending"
+          class="loading"
+        >
+          {{ t("common.loading") }}
+        </p>
+      </div>
     </div>
-    <div class="area-hub pixel-frame">
+    <div
+      id="round-hub-panel"
+      class="area-hub pixel-frame"
+    >
       <div class="hub-buttons">
         <button
           type="button"
@@ -111,58 +139,46 @@ watch(
       :open="showSettings"
       @close="showSettings = false"
     />
-    <div class="area-narration pixel-frame">
+    <div
+      id="round-narration-panel"
+      class="area-narration pixel-frame"
+    >
       <NarrationLog />
-    </div>
-    <div class="area-action">
-      <PrologueDecisionPanel v-if="game.currentRound?.isPrologue" />
-      <PrologueOutcomeGate
-        v-else-if="showPrologueGate"
-        @continue="continuePastPrologueGate"
-      />
-      <VoteActionPanel v-else />
-      <p
-        v-if="pending"
-        class="loading"
-      >
-        {{ t("common.loading") }}
-      </p>
     </div>
   </section>
 </template>
 
 <style scoped>
 /*
- * Grid-area based so the two open design questions (whether a cinematic moment
- * replaces vs. sits above the narration log; whether this is desktop-primary with a
- * mobile variant, or mobile-first) can be resolved later by changing
- * grid-template-areas/grid-template-columns without touching component internals.
+ * Grid-area based so the mobile-vs-desktop tiering can be adjusted later by changing
+ * grid-template-areas/grid-template-columns without touching component internals. The
+ * round's actual content -- the cinematic viewport (when active) plus whichever
+ * action panel applies (prologue decision/outcome or the vote panel) -- lives in one
+ * "main" panel, which is the big primary panel next to the hub, not a separate
+ * cramped strip below it.
  *
  * Three tiers:
- * - Desktop (this base, >1024px): viewport+hub share the top row (2fr/1fr),
- *   narration+action share the bottom row.
- * - Tablet (721-1024px, e.g. an iPad in either orientation): there isn't enough
- *   width for that same 2-column split without squeezing the hub -- viewport goes
- *   full-width instead, narration+action stack in the wider left column below it,
- *   hub becomes a full-height column on the right.
+ * - Desktop (this base, >1024px): main+hub share the top rows (2fr/1fr), narration
+ *   spans full width below.
+ * - Tablet (721-1024px, e.g. an iPad in either orientation): main goes full-width,
+ *   narration+hub share the row below it (narration wider).
  * - Mobile (<=720px, phones and small tablets in portrait): single column, fully
- *   stacked. narration+action come before hub -- the per-round story/vote is the
- *   primary task, the roster is reference info you check less often.
+ *   stacked -- main and narration before hub, since the per-round story/vote is the
+ *   primary task and the roster is reference info you check less often.
  */
 .round-layout {
   display: grid;
   grid-template-areas:
     "header header"
-    "viewport hub"
-    "viewport hub"
-    "narration action";
+    "main hub"
+    "main hub"
+    "narration narration";
   grid-template-columns: 2fr 1fr;
   grid-template-rows: auto auto auto 1fr;
   gap: var(--nbr-space-3);
   height: 100%;
   /* Grid's default align-content stretches leftover vertical space (e.g. .screen's
-     min-height:100% exceeding this tier's actual content) into "auto" row tracks --
-     including an empty one (the viewport row when CinematicViewport is inactive),
+     min-height:100% exceeding this tier's actual content) into "auto" row tracks,
      which reads as a large blank gap. Rows should hug their content instead. */
   align-content: start;
 }
@@ -171,11 +187,10 @@ watch(
   .round-layout {
     grid-template-areas:
       "header header"
-      "viewport viewport"
-      "narration hub"
-      "action hub";
+      "main main"
+      "narration hub";
     grid-template-columns: 2fr 1fr;
-    grid-template-rows: auto auto auto auto;
+    grid-template-rows: auto auto auto;
     height: auto;
   }
 
@@ -189,12 +204,11 @@ watch(
   .round-layout {
     grid-template-areas:
       "header"
-      "viewport"
+      "main"
       "narration"
-      "action"
       "hub";
     grid-template-columns: 1fr;
-    grid-template-rows: auto auto auto auto auto;
+    grid-template-rows: auto auto auto auto;
     height: auto;
   }
 
@@ -218,9 +232,12 @@ watch(
   flex: 1;
   min-width: 0;
 }
-.area-viewport {
-  grid-area: viewport;
+.area-main {
+  grid-area: main;
   padding: var(--nbr-space-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--nbr-space-3);
 }
 .area-hub {
   grid-area: hub;
@@ -232,11 +249,13 @@ watch(
 }
 .area-narration {
   grid-area: narration;
-  min-height: 0;
+  /* Explicit bounds + its own scrollbar -- relying on the grid row's implicit "1fr"
+     sizing let long-running games' narration text visually spill past the
+     pixel-frame border once enough rounds had resolved, instead of scrolling. */
+  min-height: 10rem;
+  max-height: 22rem;
+  overflow-y: auto;
   padding: var(--nbr-space-3);
-}
-.area-action {
-  grid-area: action;
 }
 
 .hub-buttons {

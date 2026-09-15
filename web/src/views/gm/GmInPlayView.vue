@@ -6,7 +6,7 @@ import { useSessionStore } from "../../stores/session";
 import { useGameStore } from "../../stores/game";
 import { callFunction, ApiCallError } from "../../lib/api";
 import { takeJustCreatedInvites, type JustCreatedInvite } from "../../lib/justCreatedInvites";
-import { ALL_POWER_KEYS } from "../../constants/powers";
+import { ALL_POWER_KEYS, POWERS_CATALOGUE, powerSetupBlock } from "../../constants/powers";
 import RoundHeader from "../../components/round/RoundHeader.vue";
 
 interface GmActionResponse {
@@ -32,12 +32,23 @@ interface ResolveRoundResponse {
   resolutions: Resolution[];
 }
 
+interface GmPowerGrant {
+  power_key: string;
+  acquisition_method: "random" | "earned" | "gm_grant";
+  granted_reason: Record<string, unknown>;
+  granted_at: string;
+  used_at: string | null;
+  effect_status: "pending" | "resolved" | "expired" | "no_effect";
+  effect_detail: Record<string, unknown>;
+}
+
 interface GmGameOverview {
   players: {
     id: string;
     display_name: string;
     status: string;
     role: string;
+    power_grants: GmPowerGrant[];
   }[];
   current_round: {
     round_number: number;
@@ -130,6 +141,60 @@ onMounted(() => {
   if (session.token) game.refresh(session.token);
   loadOverview();
 });
+
+// Flattened per-grant rows for the "Powers & Items" table -- one row per grant, most
+// recent first, so the GM sees who currently holds what, why, and what happened the
+// moment they used it, without drilling into each player individually.
+interface PowerGrantRow extends GmPowerGrant {
+  player_display_name: string;
+  block: "powers" | "items";
+}
+const powerGrantRows = computed<PowerGrantRow[]>(() => {
+  const rows: PowerGrantRow[] = [];
+  for (const p of overview.value?.players ?? []) {
+    for (const g of p.power_grants) {
+      const catalogueEntry = POWERS_CATALOGUE.find((c) => c.key === g.power_key);
+      rows.push({
+        ...g,
+        player_display_name: p.display_name,
+        block: catalogueEntry ? powerSetupBlock(catalogueEntry.category) : "powers",
+      });
+    }
+  }
+  return rows.sort((a, b) => new Date(b.granted_at).getTime() - new Date(a.granted_at).getTime());
+});
+
+function powerGrantReasonLabel(grant: GmPowerGrant): string {
+  if (grant.acquisition_method === "gm_grant") return t("gmInPlay.powers.reasonGmGrant");
+  if (grant.acquisition_method === "random") return t("gmInPlay.powers.reasonRandom");
+  const trigger = grant.granted_reason["earn_trigger"];
+  return typeof trigger === "string" ? t(`gmInPlay.powers.earnTriggers.${trigger}`) : t("gmInPlay.powers.reasonEarnedUnknown");
+}
+
+// Move-to-Room's guess history comes back flat (one row per guess, any round) --
+// filtered per round here so it can be nested under that round's own vote table
+// instead of living in one big separate table at the bottom of the screen.
+function guessesForRound(roundNumber: number) {
+  return (overview.value?.move_to_room?.guess_history ?? []).filter((g) => g.round_number === roundNumber);
+}
+
+function powerGrantEffectLabel(grant: GmPowerGrant): string {
+  if (!grant.used_at) return t("gmInPlay.powers.notUsedYet");
+  if (grant.effect_status === "pending") return t("gmInPlay.powers.effectPending");
+  if (grant.effect_status === "expired") return t("gmInPlay.powers.effectExpired");
+  if (grant.effect_status === "no_effect") return t("gmInPlay.powers.effectNoEffect");
+  // 'resolved' -- effect_detail's shape varies per power (see resolve-round/use-power),
+  // so this falls back to a compact raw dump for any shape not called out below.
+  const d = grant.effect_detail;
+  if (grant.power_key === "ward") return t("gmInPlay.powers.effectWardSaved");
+  if (grant.power_key === "deflect") return t("gmInPlay.powers.effectDeflectRedirected");
+  if (grant.power_key === "null") return t("gmInPlay.powers.effectNullRevoked");
+  if (grant.power_key === "rewind" && typeof d["viewed_round_number"] === "number") {
+    return t("gmInPlay.powers.effectRewindViewed", { round: d["viewed_round_number"] as number });
+  }
+  if (grant.power_key === "whisper" || grant.power_key === "watcher") return t("gmInPlay.powers.effectChecked");
+  return JSON.stringify(d);
+}
 
 // The GM token IS session.token (invite tokens are the bearer credential itself, no
 // separate JWT -- ARCHITECTURE.md "Auth/identity"), so it's already sitting in the
@@ -340,14 +405,17 @@ async function submit() {
 </script>
 
 <template>
-  <div>
+  <div id="gm-in-play-screen">
     <h1>{{ t("gmInPlay.title") }}</h1>
     <p class="game-identity">
       {{ game.gameName ?? t("gmInPlay.unnamedGame") }}
       <span class="game-id">({{ game.gameId ?? "–" }})</span>
     </p>
 
-    <section class="gm-token-block pixel-frame">
+    <section
+      id="gm-in-play-token-panel"
+      class="gm-token-block pixel-frame"
+    >
       <h2>{{ t("gmInPlay.gmToken.heading") }}</h2>
       <p class="field-hint">
         {{ t("gmInPlay.gmToken.hint") }}
@@ -365,6 +433,7 @@ async function submit() {
 
     <section
       v-if="justCreatedInvites.length > 0"
+      id="gm-in-play-just-created-invites-panel"
       class="just-created-invites pixel-frame"
     >
       <h2>{{ t("gmInPlay.justCreatedInvites.heading") }}</h2>
@@ -387,11 +456,12 @@ async function submit() {
       </ul>
     </section>
 
-    <h2>{{ t("gmInPlay.settings.heading") }}</h2>
-    <div
-      v-if="overview"
-      class="table-scroll"
-    >
+    <div id="gm-in-play-settings-panel">
+      <h2>{{ t("gmInPlay.settings.heading") }}</h2>
+      <div
+        v-if="overview"
+        class="table-scroll"
+      >
       <table class="settings-table">
         <tbody>
           <tr>
@@ -462,8 +532,12 @@ async function submit() {
     <p v-else>
       {{ t("gmInPlay.settings.loading") }}
     </p>
+    </div>
 
-    <template v-if="overview?.current_round">
+    <div
+      v-if="overview?.current_round"
+      id="gm-in-play-current-round-panel"
+    >
       <h2>{{ t("gmInPlay.currentRound.heading", { number: overview.current_round.round_number }) }}</h2>
       <div class="table-scroll">
         <table class="votes-table">
@@ -500,18 +574,19 @@ async function submit() {
           </tbody>
         </table>
       </div>
-    </template>
+    </div>
 
-    <h2>{{ t("gmInPlay.votes.heading") }}</h2>
-    <p class="field-hint">
-      {{ t("gmInPlay.votes.hint") }}
-    </p>
-    <p v-if="overview && overview.rounds.length === 0">
-      {{ t("gmInPlay.votes.none") }}
-    </p>
-    <section
-      v-for="round in overview?.rounds ?? []"
-      :key="round.round_number"
+    <div id="gm-in-play-votes-panel">
+      <h2>{{ t("gmInPlay.votes.heading") }}</h2>
+      <p class="field-hint">
+        {{ t("gmInPlay.votes.hint") }}
+      </p>
+      <p v-if="overview && overview.rounds.length === 0">
+        {{ t("gmInPlay.votes.none") }}
+      </p>
+      <section
+        v-for="round in overview?.rounds ?? []"
+        :key="round.round_number"
       class="round-votes-block"
     >
       <h3>{{ t("gmInPlay.votes.round", { number: round.round_number }) }}</h3>
@@ -573,9 +648,92 @@ async function submit() {
           </table>
         </div>
       </template>
-    </section>
 
-    <template v-if="overview && overview.door_picks.length > 0">
+      <div
+        v-if="overview?.move_to_room?.enabled && guessesForRound(round.round_number).length > 0"
+        class="round-guess-block"
+      >
+        <h4>{{ t("gmInPlay.moveToRoom.guessHistoryHeading") }}</h4>
+        <div class="table-scroll">
+          <table class="votes-table">
+            <thead>
+              <tr>
+                <th>{{ t("gmInPlay.moveToRoom.guesser") }}</th>
+                <th>{{ t("gmInPlay.moveToRoom.target") }}</th>
+                <th>{{ t("gmInPlay.moveToRoom.guessedRoom") }}</th>
+                <th>{{ t("gmInPlay.moveToRoom.correct") }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr
+                v-for="(guess, i) in guessesForRound(round.round_number)"
+                :key="i"
+                :class="{ 'eliminated-row': guess.correct === false }"
+              >
+                <td>{{ guess.guesser_display_name }}</td>
+                <td>{{ guess.target_display_name }}</td>
+                <td>{{ t(`moveToRoom.rooms.${guess.guessed_room_id}`) }}</td>
+                <td>
+                  {{
+                    guess.correct === null
+                      ? t("gmInPlay.moveToRoom.pending")
+                      : guess.correct
+                        ? t("gmInPlay.settings.yes")
+                        : t("gmInPlay.settings.no")
+                  }}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      </section>
+    </div>
+
+    <div id="gm-in-play-powers-panel">
+      <h2>{{ t("gmInPlay.powers.heading") }}</h2>
+      <p class="field-hint">
+        {{ t("gmInPlay.powers.hint") }}
+      </p>
+      <p v-if="powerGrantRows.length === 0">
+        {{ t("gmInPlay.powers.none") }}
+      </p>
+      <div
+        v-else
+        class="table-scroll"
+      >
+      <table class="votes-table">
+        <thead>
+          <tr>
+            <th>{{ t("gmInPlay.powers.player") }}</th>
+            <th>{{ t("gmInPlay.powers.power") }}</th>
+            <th>{{ t("gmInPlay.powers.block") }}</th>
+            <th>{{ t("gmInPlay.powers.reason") }}</th>
+            <th>{{ t("gmInPlay.powers.used") }}</th>
+            <th>{{ t("gmInPlay.powers.effect") }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            v-for="(grant, i) in powerGrantRows"
+            :key="i"
+          >
+            <td>{{ grant.player_display_name }}</td>
+            <td>{{ t(`gmSetup.powers.catalogue.${grant.power_key}.label`) }}</td>
+            <td>{{ grant.block === "powers" ? t("gmSetup.powers.catalogueHeading") : t("gmSetup.powers.itemsHeading") }}</td>
+            <td>{{ powerGrantReasonLabel(grant) }}</td>
+            <td>{{ grant.used_at ? t("gmInPlay.settings.yes") : t("gmInPlay.settings.no") }}</td>
+            <td>{{ powerGrantEffectLabel(grant) }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    </div>
+
+    <div
+      v-if="overview && overview.door_picks.length > 0"
+      id="gm-in-play-three-doors-panel"
+    >
       <h2>{{ t("gmInPlay.threeDoors.heading") }}</h2>
       <div class="table-scroll">
         <table class="votes-table">
@@ -598,9 +756,12 @@ async function submit() {
           </tbody>
         </table>
       </div>
-    </template>
+    </div>
 
-    <template v-if="overview?.move_to_room?.enabled">
+    <div
+      v-if="overview?.move_to_room?.enabled"
+      id="gm-in-play-move-to-room-panel"
+    >
       <h2>{{ t("gmInPlay.moveToRoom.heading") }}</h2>
       <p class="field-hint">
         {{ t("gmInPlay.moveToRoom.positionsHint") }}
@@ -624,55 +785,18 @@ async function submit() {
           </tbody>
         </table>
       </div>
-
-      <h3>{{ t("gmInPlay.moveToRoom.guessHistoryHeading") }}</h3>
-      <p v-if="overview.move_to_room.guess_history.length === 0">
-        {{ t("gmInPlay.moveToRoom.noGuesses") }}
-      </p>
-      <div
-        v-else
-        class="table-scroll"
-      >
-        <table class="votes-table">
-          <thead>
-            <tr>
-              <th>{{ t("gmInPlay.moveToRoom.roundNumber") }}</th>
-              <th>{{ t("gmInPlay.moveToRoom.guesser") }}</th>
-              <th>{{ t("gmInPlay.moveToRoom.target") }}</th>
-              <th>{{ t("gmInPlay.moveToRoom.guessedRoom") }}</th>
-              <th>{{ t("gmInPlay.moveToRoom.correct") }}</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr
-              v-for="(guess, i) in overview.move_to_room.guess_history"
-              :key="i"
-              :class="{ 'eliminated-row': guess.correct === false }"
-            >
-              <td>{{ guess.round_number }}</td>
-              <td>{{ guess.guesser_display_name }}</td>
-              <td>{{ guess.target_display_name }}</td>
-              <td>{{ t(`moveToRoom.rooms.${guess.guessed_room_id}`) }}</td>
-              <td>
-                {{
-                  guess.correct === null
-                    ? t("gmInPlay.moveToRoom.pending")
-                    : guess.correct
-                      ? t("gmInPlay.settings.yes")
-                      : t("gmInPlay.settings.no")
-                }}
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </template>
+      <!-- Per-round guess history now lives nested under each round's vote table
+           above (#gm-in-play-votes-panel), not here as one flat table. -->
+    </div>
 
     <p>{{ t("gmInPlay.gamePhase", { phase: game.phase ?? t("gmInPlay.unknownPhase") }) }}</p>
 
     <RoundHeader v-if="game.currentRound" />
 
-    <section class="round-controls">
+    <section
+      id="gm-in-play-start-round-panel"
+      class="round-controls"
+    >
       <button
         v-if="showStartButton"
         type="button"
@@ -686,7 +810,10 @@ async function submit() {
       </p>
     </section>
 
-    <section class="round-controls">
+    <section
+      id="gm-in-play-resolve-round-panel"
+      class="round-controls"
+    >
       <button
         v-if="showResolveButton"
         type="button"
@@ -700,7 +827,10 @@ async function submit() {
       </p>
     </section>
 
-    <section class="round-controls">
+    <section
+      id="gm-in-play-resolve-doors-panel"
+      class="round-controls"
+    >
       <button
         v-if="showResolveDoorsButton"
         type="button"
@@ -714,7 +844,10 @@ async function submit() {
       </p>
     </section>
 
-    <section class="round-controls">
+    <section
+      id="gm-in-play-export-session-panel"
+      class="round-controls"
+    >
       <button
         type="button"
         :disabled="!overview"
@@ -727,7 +860,10 @@ async function submit() {
       </p>
     </section>
 
-    <section class="round-controls">
+    <section
+      id="gm-in-play-finish-game-panel"
+      class="round-controls"
+    >
       <button
         type="button"
         class="finish-button"
@@ -751,6 +887,7 @@ async function submit() {
 
     <p>{{ t("gmInPlay.actionLog.description") }}</p>
     <form
+      id="gm-in-play-action-log-panel"
       class="action-form"
       @submit.prevent="submit"
     >
@@ -915,6 +1052,16 @@ async function submit() {
 
 .round-votes-block {
   margin-bottom: var(--nbr-space-4);
+}
+
+.round-guess-block {
+  margin-top: var(--nbr-space-3);
+}
+
+.round-guess-block h4 {
+  font-size: 0.9em;
+  color: var(--nbr-muted);
+  margin-bottom: var(--nbr-space-1);
 }
 
 .field-hint {

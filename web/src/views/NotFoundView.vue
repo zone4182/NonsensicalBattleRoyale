@@ -6,7 +6,7 @@ const { t } = useI18n();
 </script>
 
 <template>
-  <FullscreenLayout>
+  <FullscreenLayout id="not-found-screen">
     <h1>{{ t("notFound.title") }}</h1>
     <p>{{ t("notFound.body") }}</p>
   </FullscreenLayout>

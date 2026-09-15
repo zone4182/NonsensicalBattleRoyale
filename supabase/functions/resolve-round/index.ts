@@ -106,8 +106,8 @@ Deno.serve(async (req) => {
         // early-return branch rather than threading "is this the prologue round"
         // through every step of the elimination logic that follows.
         if (round.is_prologue) {
-          const aliveRoster = await tx<{ id: string }[]>`
-            select id from battle_royale.players where game_id = ${game.id} and status = 'alive' and role = 'player'
+          const aliveRoster = await tx<{ id: string; is_bot: boolean }[]>`
+            select id, is_bot from battle_royale.players where game_id = ${game.id} and status = 'alive' and role = 'player'
           `;
           const aliveIds = aliveRoster.map((p) => p.id);
 
@@ -153,7 +153,12 @@ Deno.serve(async (req) => {
             insert into battle_royale.narration_log (game_id, round_id, body)
             values (${game.id}, ${newRound.id}, ${ROUND_TWO_RECAP_NARRATION})
           `;
-          await grantRandomDrop(tx, game.id, newRound.id, aliveIds);
+          await grantRandomDrop(
+            tx,
+            game.id,
+            newRound.id,
+            aliveRoster.map((p) => ({ id: p.id, isBot: p.is_bot })),
+          );
           await castBotVotes(tx, game.id, newRound.id, null);
           if (game.move_to_room_enabled) {
             await assignRoundGuessTargets(tx, game.id, newRound.id);
@@ -334,6 +339,9 @@ Deno.serve(async (req) => {
 
         const aliveIdsAfter = aliveIds.filter((id) => !eliminatedIds.has(id));
         const aliveCountAfter = aliveIdsAfter.length;
+        const aliveRosterAfter = aliveRoster
+          .filter((p) => aliveIdsAfter.includes(p.id))
+          .map((p) => ({ id: p.id, isBot: p.is_bot }));
 
         let newPhase: Game["phase"] = "active";
         if (aliveCountAfter <= 1) {
@@ -367,7 +375,7 @@ Deno.serve(async (req) => {
             )
             returning id
           `;
-          await grantRandomDrop(tx, game.id, newRound.id, aliveIdsAfter);
+          await grantRandomDrop(tx, game.id, newRound.id, aliveRosterAfter);
           await castBotVotes(tx, game.id, newRound.id, doubleVotePlayerId);
           if (game.move_to_room_enabled) {
             await assignRoundGuessTargets(tx, game.id, newRound.id);
@@ -379,7 +387,7 @@ Deno.serve(async (req) => {
 
         // Earn triggers: only when there's still a game left to play for.
         if (aliveCountAfter > 1) {
-          await evaluateEarnTriggers(tx, game, round, tally, aliveIdsAfter, eliminatedIds);
+          await evaluateEarnTriggers(tx, game, round, tally, aliveRosterAfter, eliminatedIds);
         }
 
         return {

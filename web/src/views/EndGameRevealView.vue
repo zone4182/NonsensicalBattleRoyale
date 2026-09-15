@@ -29,7 +29,7 @@ function openGameStats() {
 </script>
 
 <template>
-  <FullscreenLayout>
+  <FullscreenLayout id="end-game-reveal-screen">
     <h1>{{ t("endGameReveal.title") }}</h1>
 
     <!--
@@ -37,14 +37,20 @@ function openGameStats() {
       branching on how the game ended for this viewer (see concept docs for the win/
       lose narrative beats). Not written yet; this establishes the conditional shape.
     -->
-    <section class="epilogue pixel-frame">
+    <section
+      id="end-game-epilogue-panel"
+      class="epilogue pixel-frame"
+    >
       <p class="placeholder-tag">
         {{ t("common.placeholder") }}
       </p>
       <PlaceholderVisual :caption="t(`endGameReveal.epilogue.${epilogueVariant}`)" />
     </section>
 
-    <section class="panel pixel-frame">
+    <section
+      id="end-game-actions-panel"
+      class="panel pixel-frame"
+    >
       <p>{{ t("endGameReveal.body") }}</p>
       <button
         type="button"

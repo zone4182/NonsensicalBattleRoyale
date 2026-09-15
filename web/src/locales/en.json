@@ -184,7 +184,9 @@
   },
   "yourStatus": {
     "title": "Your status",
-    "unknown": "unknown"
+    "unknown": "unknown",
+    "points": "Points: {points}",
+    "noPowers": "You don't hold any powers or items right now."
   },
   "notifications": {
     "enable": "Enable notifications",
@@ -375,6 +377,7 @@
       "botModeHint": "Fills the game with algorithm-controlled players (random moves for now) so you can test a full game solo. You still need at least one real player besides yourself -- bots supplement a game, they don't replace it.",
       "botCount": "Number of bots",
       "botCountHint": "How many bots to add alongside the real players you invite (max 19, and bots + real players together should stay within the 20-player ceiling).",
+      "botEligible": "Bots can also receive this",
       "catalogueHeading": "Powers",
       "catalogueHint": "Informational and defensive powers -- things a player privately learns or uses to protect themselves. Randomly dropped one per round, or earned by algorithmic triggers (near-miss, ghost mode, survival/underdog streaks). Enabled by default.",
       "itemsHeading": "Items",
@@ -533,6 +536,35 @@
       "votesReceived": "Votes received",
       "doubleVote": "Double vote",
       "reason": "Reason"
+    },
+    "powers": {
+      "heading": "Powers & Items",
+      "hint": "Every power/item grant across the game, most recent first -- who has it, why it was granted, whether it's been used, and what happened when it resolved.",
+      "none": "No powers or items have been granted yet.",
+      "player": "Player",
+      "power": "Power / Item",
+      "block": "Type",
+      "reason": "Why granted",
+      "used": "Used?",
+      "effect": "Effect",
+      "reasonRandom": "Random drop",
+      "reasonGmGrant": "Granted by GM",
+      "reasonEarnedUnknown": "Earned (trigger unknown)",
+      "earnTriggers": {
+        "near_miss": "Earned: near-miss (top two vote counts)",
+        "ghost_mode": "Earned: ghost mode (zero votes, survived)",
+        "survival_streak": "Earned: survival streak",
+        "underdog_run": "Earned: underdog run"
+      },
+      "notUsedYet": "Not used yet",
+      "effectPending": "Armed, awaiting round resolution",
+      "effectExpired": "Expired without effect",
+      "effectNoEffect": "Used, no effect",
+      "effectWardSaved": "Saved the holder from elimination",
+      "effectDeflectRedirected": "Redirected a vote back onto its caster",
+      "effectNullRevoked": "Discarded a vote cast against the holder",
+      "effectRewindViewed": "Viewed round {round}'s vote breakdown",
+      "effectChecked": "Checked and answered"
     },
     "threeDoors": {
       "heading": "Three Doors",

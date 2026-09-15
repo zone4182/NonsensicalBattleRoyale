@@ -127,7 +127,10 @@ function close() {
 </script>
 
 <template>
-  <section class="screen move-to-room">
+  <section
+    id="move-to-room-screen"
+    class="screen move-to-room"
+  >
     <h1>{{ t("moveToRoom.title") }}</h1>
     <p>{{ t("moveToRoom.description") }}</p>
     <p class="points">
@@ -148,7 +151,10 @@ function close() {
       {{ t("moveToRoom.staircaseHelp") }}
     </p>
 
-    <div class="floors">
+    <div
+      id="move-to-room-floors-panel"
+      class="floors"
+    >
       <div
         v-for="floor in FLOORS_TOP_TO_BOTTOM"
         :key="floor"
@@ -205,6 +211,7 @@ function close() {
 
     <section
       v-if="guessTarget"
+      id="move-to-room-guess-panel"
       class="guess-block pixel-frame"
     >
       <h2>{{ t("moveToRoom.guess.heading") }}</h2>

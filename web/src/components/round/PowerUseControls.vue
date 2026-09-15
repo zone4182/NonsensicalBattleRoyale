@@ -60,7 +60,8 @@ async function use() {
 
 <template>
   <div class="power-use">
-    <span class="power-name">{{ powerKey }}<template v-if="count > 1"> x{{ count }}</template></span>
+    <span class="power-name">{{ t(`gmSetup.powers.catalogue.${powerKey}.label`) }}<template v-if="count > 1"> x{{ count }}</template></span>
+    <span class="power-description">{{ t(`gmSetup.powers.catalogue.${powerKey}.description`) }}</span>
 
     <template v-if="!IN_SCOPE_POWERS.has(powerKey)">
       <span class="not-implemented">{{ t("powerUse.notUsable") }}</span>
@@ -118,6 +119,13 @@ async function use() {
 
 .power-name {
   font-weight: bold;
+}
+
+.power-description {
+  width: 100%;
+  margin: 0;
+  color: var(--nbr-muted);
+  font-size: 0.85em;
 }
 
 .not-implemented {

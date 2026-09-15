@@ -15,12 +15,16 @@ const HOST_GAME_VISIBLE = false;
 </script>
 
 <template>
-  <FullscreenLayout>
+  <FullscreenLayout id="home-screen">
     <div
+      id="home-hero-bg"
       class="hero-bg"
       aria-hidden="true"
     />
-    <div class="home-content">
+    <div
+      id="home-content-panel"
+      class="home-content"
+    >
       <h1>{{ t("home.title") }}</h1>
       <p class="subtitle">
         {{ t("home.subtitle") }}
@@ -47,7 +51,10 @@ const HOST_GAME_VISIBLE = false;
         </RouterLink>
       </div>
     </div>
-    <footer class="home-footer">
+    <footer
+      id="home-footer-panel"
+      class="home-footer"
+    >
       <button
         v-if="canInstall"
         type="button"

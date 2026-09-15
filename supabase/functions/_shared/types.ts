@@ -93,6 +93,7 @@ export interface PowerGrant {
   granted_to_player_id: string;
   acquisition_method: PowerAcquisitionMethod;
   granted_by_gm_action_id: string | null;
+  granted_reason: Record<string, unknown>;
   granted_at: string;
   used_at: string | null;
   effect_status: "pending" | "resolved" | "expired" | "no_effect";

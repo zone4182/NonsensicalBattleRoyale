@@ -33,9 +33,12 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <FullscreenLayout>
+  <FullscreenLayout id="game-finished-screen">
     <h1>{{ t("gameFinished.title") }}</h1>
-    <section class="panel pixel-frame">
+    <section
+      id="game-finished-panel"
+      class="panel pixel-frame"
+    >
       <p>{{ t("gameFinished.body") }}</p>
       <button
         type="button"

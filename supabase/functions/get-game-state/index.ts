@@ -78,7 +78,7 @@ Deno.serve(async (req) => {
       select id, body, created_at from battle_royale.narration_log
       where game_id = ${ctx.game.id}
       order by created_at desc
-      limit 20
+      limit 50
     `;
 
     // Move-to-Room mini-game. Tiered occupancy only (never an exact per-player
@@ -212,7 +212,11 @@ Deno.serve(async (req) => {
         your_outcome: yourOutcome,
         your_prologue_vote: yourPrologueVote,
       },
-      narration_entries: narration.reverse().map((n) => ({ id: n.id, text: n.body, created_at: n.created_at })),
+      // Newest first -- the narration panel shows the most recent round's outcome at
+      // the top, matching the query's own `order by created_at desc` above (this used
+      // to .reverse() into oldest-first, but the panel is meant to read like a feed,
+      // not a transcript you scroll down to catch up on).
+      narration_entries: narration.map((n) => ({ id: n.id, text: n.body, created_at: n.created_at })),
       move_to_room: moveToRoom,
     });
   } catch (err) {

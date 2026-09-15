@@ -59,7 +59,7 @@ async function redeem() {
 </script>
 
 <template>
-  <FullscreenLayout>
+  <FullscreenLayout id="join-screen">
     <img
       src="/img/The%20Invitation.png"
       alt=""
@@ -67,7 +67,10 @@ async function redeem() {
     >
     <h1>{{ t("join.heading") }}</h1>
     <p>{{ t("join.subheading") }}</p>
-    <section class="panel pixel-frame">
+    <section
+      id="join-redeem-panel"
+      class="panel pixel-frame"
+    >
       <form
         class="redeem-form"
         @submit.prevent="redeem"

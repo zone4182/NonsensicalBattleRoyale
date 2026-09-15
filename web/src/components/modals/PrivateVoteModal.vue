@@ -205,7 +205,10 @@ async function lockVote() {
 </script>
 
 <template>
-  <section class="screen private-vote-modal">
+  <section
+    id="private-vote-screen"
+    class="screen private-vote-modal"
+  >
     <h1>{{ t("privateVote.title") }}</h1>
     <p>{{ t("privateVote.subtitle") }}</p>
 
@@ -219,6 +222,7 @@ async function lockVote() {
       </p>
       <div
         v-if="candidates.length"
+        id="private-vote-double-columns-panel"
         class="double-columns"
       >
         <section class="vote-column">
@@ -374,6 +378,7 @@ async function lockVote() {
 
     <div
       v-if="canOfferLock"
+      id="private-vote-lock-panel"
       class="lock-block"
     >
       <p class="field-hint">

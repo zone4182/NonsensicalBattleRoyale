@@ -56,6 +56,9 @@ const threeDoorsDeadlineMinutes = ref(10);
 const powerEnabled = ref<Record<string, boolean>>(
   Object.fromEntries(POWERS_CATALOGUE.map((p) => [p.key, DEFAULT_ENABLED_POWER_KEYS.has(p.key)])),
 );
+// Whether bots are also allowed to receive each power (random drop or earned
+// trigger) -- on by default, independent of whether the power itself is enabled.
+const powerBotEligible = ref<Record<string, boolean>>(Object.fromEntries(POWERS_CATALOGUE.map((p) => [p.key, true])));
 const powersBlockCatalogue = computed(() => POWERS_CATALOGUE.filter((p) => powerSetupBlock(p.category) === "powers"));
 const itemsBlockCatalogue = computed(() => POWERS_CATALOGUE.filter((p) => powerSetupBlock(p.category) === "items"));
 
@@ -145,6 +148,7 @@ async function createGame() {
         move_to_room_enabled: moveToRoomEnabled.value,
         three_doors_deadline_minutes: threeDoorsDeadlineMinutes.value,
         power_settings: powerEnabled.value,
+        power_bot_settings: powerBotEligible.value,
       },
       { extraHeaders: { "x-setup-secret": setupSecret.value } },
     );
@@ -188,7 +192,7 @@ async function createGame() {
 </script>
 
 <template>
-  <div>
+  <div id="gm-setup-screen">
     <h1>{{ t("gmSetup.title") }}</h1>
     <p>{{ t("gmSetup.description") }}</p>
     <p class="field-hint">
@@ -198,7 +202,10 @@ async function createGame() {
       {{ t("gmSetup.manualResolveHint") }}
     </p>
 
-    <ol class="wizard-steps">
+    <ol
+      id="gm-setup-wizard-steps"
+      class="wizard-steps"
+    >
       <li
         v-for="(step, index) in STEPS"
         :key="step"
@@ -215,6 +222,7 @@ async function createGame() {
     >
       <section
         v-if="currentStep === 'secret'"
+        id="gm-setup-step-secret-panel"
         class="panel pixel-frame"
       >
         <h2>{{ t("gmSetup.access.heading") }}</h2>
@@ -232,6 +240,7 @@ async function createGame() {
 
       <section
         v-else-if="currentStep === 'basics'"
+        id="gm-setup-step-basics-panel"
         class="panel pixel-frame"
       >
         <h2>{{ t("gmSetup.basics.heading") }}</h2>
@@ -257,6 +266,7 @@ async function createGame() {
 
       <section
         v-else-if="currentStep === 'rules'"
+        id="gm-setup-step-rules-panel"
         class="panel pixel-frame"
       >
         <h2>{{ t("gmSetup.rules.heading") }}</h2>
@@ -328,6 +338,7 @@ async function createGame() {
 
       <section
         v-else-if="currentStep === 'powers'"
+        id="gm-setup-step-powers-panel"
         class="panel pixel-frame"
       >
         <h2>{{ t("gmSetup.powers.heading") }}</h2>
@@ -386,44 +397,75 @@ async function createGame() {
         <p class="field-hint">
           {{ t("gmSetup.powers.catalogueHint") }}
         </p>
-        <label
-          v-for="power in powersBlockCatalogue"
-          :key="power.key"
-          class="checkbox-label power-toggle"
+        <div
+          id="gm-setup-powers-block"
+          class="power-block"
         >
-          <input
-            v-model="powerEnabled[power.key]"
-            type="checkbox"
+          <div
+            v-for="power in powersBlockCatalogue"
+            :id="`gm-setup-power-row-${power.key}`"
+            :key="power.key"
+            class="power-row"
           >
-          <span>
-            <strong>{{ t(`gmSetup.powers.catalogue.${power.key}.label`) }}</strong>
-            <span class="field-hint power-description">{{ t(`gmSetup.powers.catalogue.${power.key}.description`) }}</span>
-          </span>
-        </label>
+            <label class="checkbox-label power-toggle">
+              <input
+                v-model="powerEnabled[power.key]"
+                type="checkbox"
+              >
+              <span>
+                <strong>{{ t(`gmSetup.powers.catalogue.${power.key}.label`) }}</strong>
+                <span class="field-hint power-description">{{ t(`gmSetup.powers.catalogue.${power.key}.description`) }}</span>
+              </span>
+            </label>
+            <label class="checkbox-label bot-eligible-toggle">
+              <input
+                v-model="powerBotEligible[power.key]"
+                type="checkbox"
+              >
+              {{ t("gmSetup.powers.botEligible") }}
+            </label>
+          </div>
+        </div>
 
         <hr>
         <h3>{{ t("gmSetup.powers.itemsHeading") }}</h3>
         <p class="field-hint">
           {{ t("gmSetup.powers.itemsHint") }}
         </p>
-        <label
-          v-for="power in itemsBlockCatalogue"
-          :key="power.key"
-          class="checkbox-label power-toggle"
+        <div
+          id="gm-setup-items-block"
+          class="power-block"
         >
-          <input
-            v-model="powerEnabled[power.key]"
-            type="checkbox"
+          <div
+            v-for="power in itemsBlockCatalogue"
+            :id="`gm-setup-power-row-${power.key}`"
+            :key="power.key"
+            class="power-row"
           >
-          <span>
-            <strong>{{ t(`gmSetup.powers.catalogue.${power.key}.label`) }}</strong>
-            <span class="field-hint power-description">{{ t(`gmSetup.powers.catalogue.${power.key}.description`) }}</span>
-          </span>
-        </label>
+            <label class="checkbox-label power-toggle">
+              <input
+                v-model="powerEnabled[power.key]"
+                type="checkbox"
+              >
+              <span>
+                <strong>{{ t(`gmSetup.powers.catalogue.${power.key}.label`) }}</strong>
+                <span class="field-hint power-description">{{ t(`gmSetup.powers.catalogue.${power.key}.description`) }}</span>
+              </span>
+            </label>
+            <label class="checkbox-label bot-eligible-toggle">
+              <input
+                v-model="powerBotEligible[power.key]"
+                type="checkbox"
+              >
+              {{ t("gmSetup.powers.botEligible") }}
+            </label>
+          </div>
+        </div>
       </section>
 
       <section
         v-else-if="currentStep === 'miniGames'"
+        id="gm-setup-step-minigames-panel"
         class="panel pixel-frame"
       >
         <h2>{{ t("gmSetup.miniGames.heading") }}</h2>
@@ -441,6 +483,7 @@ async function createGame() {
 
       <section
         v-else-if="currentStep === 'invites'"
+        id="gm-setup-step-invites-panel"
         class="panel pixel-frame"
       >
         <h2>{{ t("gmSetup.invites.heading") }}</h2>
@@ -599,6 +642,20 @@ async function createGame() {
   color: var(--nbr-danger);
 }
 
+.power-block {
+  display: flex;
+  flex-direction: column;
+  gap: var(--nbr-space-2);
+}
+
+.power-row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--nbr-space-1);
+  padding: var(--nbr-space-2);
+  border: 1px solid var(--nbr-border);
+}
+
 .power-toggle {
   align-items: flex-start;
 }
@@ -609,6 +666,12 @@ async function createGame() {
 
 .power-description {
   margin-top: 0;
+}
+
+.bot-eligible-toggle {
+  margin-left: var(--nbr-space-4);
+  color: var(--nbr-muted);
+  font-size: 0.85em;
 }
 
 .error {

@@ -27,11 +27,14 @@ async function cast(option: string) {
 </script>
 
 <template>
-  <FullscreenLayout>
+  <FullscreenLayout id="seance-screen">
     <h1>{{ t("seance.title") }}</h1>
     <PlaceholderVisual :caption="t('seance.imageCaption')" />
     <p>{{ t("seance.description") }}</p>
-    <section class="panel pixel-frame">
+    <section
+      id="seance-options-panel"
+      class="panel pixel-frame"
+    >
       <ul class="option-list">
         <li
           v-for="option in NARRATION_OPTIONS"

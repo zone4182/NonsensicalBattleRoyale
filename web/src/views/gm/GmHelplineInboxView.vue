@@ -100,14 +100,17 @@ async function sendReply(questionId: string) {
 </script>
 
 <template>
-  <div>
+  <div id="gm-helpline-inbox-screen">
     <h1>{{ t("gmHelplineInbox.title") }}</h1>
     <p>{{ t("gmHelplineInbox.description") }}</p>
 
     <p v-if="!players.length">
       {{ t("gmHelplineInbox.noPlayers") }}
     </p>
-    <template v-else>
+    <div
+      v-else
+      id="gm-helpline-threads-panel"
+    >
       <label class="player-filter">
         {{ t("gmHelplineInbox.playerFilter") }}
         <select v-model="selectedPlayerId">
@@ -166,7 +169,7 @@ async function sendReply(questionId: string) {
           </p>
         </form>
       </section>
-    </template>
+    </div>
   </div>
 </template>
 

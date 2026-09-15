@@ -184,7 +184,9 @@
   },
   "yourStatus": {
     "title": "Jouw status",
-    "unknown": "onbekend"
+    "unknown": "onbekend",
+    "points": "Punten: {points}",
+    "noPowers": "Je hebt op dit moment geen krachten of items."
   },
   "notifications": {
     "enable": "Meldingen inschakelen",
@@ -375,6 +377,7 @@
       "botModeHint": "Vult het spel met door algoritmes bestuurde spelers (voorlopig willekeurige zetten) zodat je solo een volledig spel kunt testen. Je hebt nog steeds minstens één echte speler naast jezelf nodig -- bots vullen een spel aan, ze vervangen het niet.",
       "botCount": "Aantal bots",
       "botCountHint": "Hoeveel bots toe te voegen naast de echte spelers die je uitnodigt (max 19, en bots + echte spelers samen moeten binnen de limiet van 20 spelers blijven).",
+      "botEligible": "Bots kunnen dit ook krijgen",
       "catalogueHeading": "Krachten",
       "catalogueHint": "Informatieve en defensieve krachten -- dingen die een speler privé te weten komt of gebruikt om zichzelf te beschermen. Willekeurig één per ronde uitgedeeld, of verdiend via algoritmische triggers (net gemist, spookmodus, overlevings-/underdogreeksen). Standaard ingeschakeld.",
       "itemsHeading": "Items",
@@ -533,6 +536,35 @@
       "votesReceived": "Ontvangen stemmen",
       "doubleVote": "Dubbele stem",
       "reason": "Reden"
+    },
+    "powers": {
+      "heading": "Krachten & Items",
+      "hint": "Elke toekenning van een kracht/item in het spel, nieuwste eerst -- wie het heeft, waarom het is toegekend, of het al gebruikt is, en wat er gebeurde toen het werd afgehandeld.",
+      "none": "Er zijn nog geen krachten of items toegekend.",
+      "player": "Speler",
+      "power": "Kracht / Item",
+      "block": "Type",
+      "reason": "Waarom toegekend",
+      "used": "Gebruikt?",
+      "effect": "Effect",
+      "reasonRandom": "Willekeurig uitgedeeld",
+      "reasonGmGrant": "Toegekend door GM",
+      "reasonEarnedUnknown": "Verdiend (trigger onbekend)",
+      "earnTriggers": {
+        "near_miss": "Verdiend: net gemist (top twee stemaantallen)",
+        "ghost_mode": "Verdiend: spookmodus (nul stemmen, overleefd)",
+        "survival_streak": "Verdiend: overlevingsreeks",
+        "underdog_run": "Verdiend: underdogreeks"
+      },
+      "notUsedYet": "Nog niet gebruikt",
+      "effectPending": "Ingezet, wacht op afhandeling van de ronde",
+      "effectExpired": "Verlopen zonder effect",
+      "effectNoEffect": "Gebruikt, geen effect",
+      "effectWardSaved": "Redde de houder van eliminatie",
+      "effectDeflectRedirected": "Kaatste een stem terug naar wie hem uitbracht",
+      "effectNullRevoked": "Maakte een tegen de houder uitgebrachte stem ongeldig",
+      "effectRewindViewed": "Bekeek de stemverdeling van ronde {round}",
+      "effectChecked": "Gecontroleerd en beantwoord"
     },
     "threeDoors": {
       "heading": "Drie Deuren",
