@@ -53,6 +53,12 @@ const ADJACENT_ROOMS: Record<RoomId, RoomId[]> = {
   bathroom: ["landing", "guest_bedroom_2"],
 };
 
+// Per-room artwork for the main round screen -- shown in place of the generic
+// placeholder once a room actually has an image. Every value starts undefined (no
+// room images exist yet); fill one in here as art gets produced and it'll pick up
+// automatically wherever ROOM_IMAGES is read (currently VoteActionPanel.vue).
+export const ROOM_IMAGES: Partial<Record<RoomId, string>> = {};
+
 export function validDestinations(from: RoomId): RoomId[] {
   const fromDef = ROOMS[from];
   const destinations = new Set<RoomId>([from, ...ADJACENT_ROOMS[from]]);

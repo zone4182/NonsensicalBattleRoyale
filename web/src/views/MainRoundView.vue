@@ -238,7 +238,7 @@ watch(
   padding: var(--nbr-space-3);
   display: flex;
   flex-direction: column;
-  gap: var(--nbr-space-3);
+  gap: var(--nbr-space-2);
   overflow-y: auto;
 }
 .area-narration {

@@ -112,8 +112,22 @@ const minigameStatusMessage = computed(() => (canMove.value ? t("yourStatus.canD
 </template>
 
 <style scoped>
-.action-status {
+/* Spacing here comes entirely from this gap, not from the (reset-to-near-zero-but-
+   still-present) default heading/paragraph margins -- keeps this panel as compact as
+   the "way smaller" request asked for, without fighting the base.css default. */
+.your-status {
+  display: flex;
+  flex-direction: column;
+  gap: var(--nbr-space-1);
+}
+
+.your-status > h2,
+.your-status h3,
+.your-status > p {
   margin: 0;
+}
+
+.action-status {
   color: var(--nbr-accent);
   font-size: 0.9em;
 }
@@ -124,7 +138,6 @@ const minigameStatusMessage = computed(() => (canMove.value ? t("yourStatus.canD
 }
 
 .your-status h3 {
-  margin-top: var(--nbr-space-3);
   font-size: 0.95em;
   color: var(--nbr-muted);
 }

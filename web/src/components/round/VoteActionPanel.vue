@@ -1,7 +1,11 @@
 <script setup lang="ts">
+import { computed } from "vue";
 import { useI18n } from "vue-i18n";
 import { useRouter } from "vue-router";
+import { useGameStore } from "../../stores/game";
 import { useRoundActions } from "../../composables/useRoundActions";
+import { ROOM_IMAGES } from "../../constants/manor";
+import PlaceholderVisual from "../PlaceholderVisual.vue";
 
 // Deliberately small and separate from the roster (GAME-DESIGN.md §UI Layout) -- opens
 // the private vote modal as its own route rather than an inline click-to-vote panel.
@@ -10,7 +14,14 @@ import { useRoundActions } from "../../composables/useRoundActions";
 // locked, etc.) is surfaced in YourStatusPanel.vue instead, not duplicated here.
 const { t } = useI18n();
 const router = useRouter();
+const game = useGameStore();
 const { isGhost, hasOpenRound, canVote, canChangeVote, isDoubleVoteHolder, canMove } = useRoundActions();
+
+// Falls back to the generic placeholder (PlaceholderVisual's own default) until a
+// given room actually has art -- see ROOM_IMAGES' own comment.
+const currentRoomId = computed(() => game.moveToRoom?.yourRoomId ?? null);
+const roomImage = computed(() => (currentRoomId.value ? ROOM_IMAGES[currentRoomId.value] : undefined));
+const roomCaption = computed(() => (currentRoomId.value ? t(`moveToRoom.rooms.${currentRoomId.value}`) : undefined));
 
 function openVoteModal() {
   router.push({ name: "private-vote" });
@@ -23,48 +34,56 @@ function openMoveToRoom() {
 
 <template>
   <div class="vote-action-panel">
-    <template v-if="isGhost">
-      <p class="vote-status">
-        {{ t("voteAction.ghostNotice") }}
-      </p>
-    </template>
-    <template v-else-if="!hasOpenRound">
-      <p class="vote-status">
-        {{ t("voteAction.noOpenRound") }}
-      </p>
-    </template>
-    <template v-else>
-      <p
-        v-if="isDoubleVoteHolder"
-        class="double-vote-alert"
-      >
-        <span
-          class="alarm-icon"
-          aria-hidden="true"
-        >⚠</span>
-        {{ t("voteAction.doubleVoteAlert") }}
-      </p>
-      <div
-        v-if="canVote || canMove"
-        class="action-buttons"
-      >
-        <button
-          v-if="canVote"
-          type="button"
-          @click="openVoteModal"
+    <div class="panel-top">
+      <PlaceholderVisual
+        :image="roomImage"
+        :caption="roomCaption"
+      />
+    </div>
+    <div class="panel-bottom">
+      <template v-if="isGhost">
+        <p class="vote-status">
+          {{ t("voteAction.ghostNotice") }}
+        </p>
+      </template>
+      <template v-else-if="!hasOpenRound">
+        <p class="vote-status">
+          {{ t("voteAction.noOpenRound") }}
+        </p>
+      </template>
+      <template v-else>
+        <p
+          v-if="isDoubleVoteHolder"
+          class="double-vote-alert"
         >
-          {{ canChangeVote ? t("voteAction.changeVote") : t("voteAction.vote") }}
-        </button>
-        <button
-          v-if="canMove"
-          type="button"
-          class="move-button"
-          @click="openMoveToRoom"
+          <span
+            class="alarm-icon"
+            aria-hidden="true"
+          >⚠</span>
+          {{ t("voteAction.doubleVoteAlert") }}
+        </p>
+        <div
+          v-if="canVote || canMove"
+          class="action-buttons"
         >
-          {{ t("moveToRoom.button") }}
-        </button>
-      </div>
-    </template>
+          <button
+            v-if="canVote"
+            type="button"
+            @click="openVoteModal"
+          >
+            {{ canChangeVote ? t("voteAction.changeVote") : t("voteAction.vote") }}
+          </button>
+          <button
+            v-if="canMove"
+            type="button"
+            class="move-button"
+            @click="openMoveToRoom"
+          >
+            {{ t("moveToRoom.button") }}
+          </button>
+        </div>
+      </template>
+    </div>
   </div>
 </template>
 
@@ -73,16 +92,22 @@ function openMoveToRoom() {
   flex: 1;
   display: flex;
   flex-direction: column;
-  /* No separate "top" narrative content in this panel -- the whole alert/button
-     group sits together, anchored to the bottom of the round's main panel. */
-  justify-content: flex-end;
+}
+
+/* Pushed to the bottom via the auto margin -- keeps the room image at the top and
+   the actual alert/button group anchored to the bottom of the panel, same pattern as
+   PrologueDecisionPanel.vue / PrologueOutcomeGate.vue. */
+.panel-bottom {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
   gap: var(--nbr-space-2);
 }
 
 .vote-status {
   color: var(--nbr-muted);
   font-size: 0.85em;
-  margin-top: var(--nbr-space-1);
+  margin: 0;
 }
 
 .action-buttons {

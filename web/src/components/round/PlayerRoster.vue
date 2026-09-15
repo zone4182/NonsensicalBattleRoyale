@@ -123,8 +123,19 @@ const deadOpen = ref(false);
 </template>
 
 <style scoped>
-.roster-group {
-  margin-bottom: var(--nbr-space-3);
+/* Spacing here comes entirely from this gap, not from the (reset-to-near-zero-but-
+   still-present) default heading/paragraph margins -- keeps this panel as compact as
+   the "way smaller" request asked for, without fighting the base.css default. */
+.player-roster {
+  display: flex;
+  flex-direction: column;
+  gap: var(--nbr-space-1);
+}
+
+.player-roster > h2,
+.player-roster > p,
+.roster-group p {
+  margin: 0;
 }
 
 .roster-group h3 {

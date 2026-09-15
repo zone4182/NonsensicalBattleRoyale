@@ -8,6 +8,14 @@
   box-sizing: border-box;
 }
 
+/* Scales every rem-based size (spacing tokens, button/h1 font-size, and body's own
+   font-size below) down together -- the standard way to shrink an app's type scale
+   while keeping every element's size relative to every other unchanged, rather than
+   hand-tuning each component's font-size individually. */
+html {
+  font-size: 87.5%;
+}
+
 html,
 body,
 #app {
@@ -24,6 +32,26 @@ body {
      terminal/CRT proportions rather than a normal-font baseline. */
   font-size: 1.3rem;
   line-height: 1.35;
+}
+
+/* Browser default heading/paragraph margins are large (~0.8-1em on *both* top and
+   bottom) and, inside the many flex+gap containers this app uses, don't collapse the
+   way they would in normal block flow -- so they stack additively with the
+   container's own gap, producing far more space than any component intended.
+   Trimmed to a single small, consistent bottom-only rhythm instead; a component that
+   wants tighter/looser/no spacing after a given element still overrides this with its
+   own (higher-specificity, scoped) rule. */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+ul,
+ol,
+figure {
+  margin: 0 0 var(--nbr-space-2) 0;
 }
 
 a {
