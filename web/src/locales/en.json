@@ -169,8 +169,6 @@
   "playerRoster": {
     "title": "Roster",
     "noPlayers": "No players loaded yet.",
-    "host": "Host",
-    "noGm": "No Game Master.",
     "guests": "Guests ({count})",
     "noneStanding": "No one left standing.",
     "dead": "Dead ({count})",

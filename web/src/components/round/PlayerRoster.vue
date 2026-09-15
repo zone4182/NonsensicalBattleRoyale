@@ -8,9 +8,15 @@ const { t } = useI18n();
 const game = useGameStore();
 const session = useSessionStore();
 
-const host = computed(() => game.players.find((p) => p.role === "gm") ?? null);
 const guests = computed(() => game.players.filter((p) => p.role === "player" && p.status === "alive"));
-const dead = computed(() => game.players.filter((p) => p.role === "player" && p.status === "ghost"));
+// The host doesn't get their own roster section -- narratively they're the one who
+// was murdered before round 1 even starts (see the-story-2.0.md), so their name
+// belongs in the dead list alongside eliminated players, not shown as still "hosting".
+const dead = computed(() => {
+  const eliminated = game.players.filter((p) => p.role === "player" && p.status === "ghost");
+  const host = game.players.find((p) => p.role === "gm");
+  return host ? [host, ...eliminated] : eliminated;
+});
 
 // game.yourStatus.activeVotes only ever holds the viewing player's own vote(s) --
 // get-game-state never returns another player's target (see getActiveVoteTargetsForVoter
@@ -38,16 +44,6 @@ const deadOpen = ref(false);
       {{ t("playerRoster.noPlayers") }}
     </p>
     <template v-else>
-      <section class="roster-group">
-        <h3>{{ t("playerRoster.host") }}</h3>
-        <p v-if="!host">
-          {{ t("playerRoster.noGm") }}
-        </p>
-        <ul v-else>
-          <li>{{ host.displayName }}</li>
-        </ul>
-      </section>
-
       <section class="roster-group">
         <button
           type="button"

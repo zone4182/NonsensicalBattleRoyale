@@ -169,8 +169,6 @@
   "playerRoster": {
     "title": "Bezetting",
     "noPlayers": "Nog geen spelers geladen.",
-    "host": "Gastheer",
-    "noGm": "Geen Game Master.",
     "guests": "Gasten ({count})",
     "noneStanding": "Niemand meer over.",
     "dead": "Dood ({count})",
