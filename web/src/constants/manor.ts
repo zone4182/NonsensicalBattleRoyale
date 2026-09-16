@@ -57,7 +57,9 @@ const ADJACENT_ROOMS: Record<RoomId, RoomId[]> = {
 // placeholder once a room actually has an image. Every value starts undefined (no
 // room images exist yet); fill one in here as art gets produced and it'll pick up
 // automatically wherever ROOM_IMAGES is read (currently VoteActionPanel.vue).
-export const ROOM_IMAGES: Partial<Record<RoomId, string>> = {};
+export const ROOM_IMAGES: Partial<Record<RoomId, string>> = {
+  entrance_hall: "/img/Entrance Hall.png",
+};
 
 export function validDestinations(from: RoomId): RoomId[] {
   const fromDef = ROOMS[from];

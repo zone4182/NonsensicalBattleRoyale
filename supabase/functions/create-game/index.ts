@@ -14,12 +14,13 @@ import { generateInviteToken } from "../_shared/tokens.ts";
 import { createBotPlayers } from "../_shared/bots.ts";
 import { enforceRateLimit } from "../_shared/rateLimit.ts";
 import { MIN_ROUND_INTERVAL_MINUTES } from "../_shared/constants.ts";
-import type { MissedDeadlineMode, Round1StartMode, RoundResolutionMode, TieBreakMode } from "../_shared/types.ts";
+import type { MaxTiesBehavior, MissedDeadlineMode, Round1StartMode, RoundResolutionMode, TieBreakMode } from "../_shared/types.ts";
 
 const MISSED_DEADLINE_MODES: readonly MissedDeadlineMode[] = ["forfeit_fatal", "no_consequence", "one_round_penalty"];
 const ROUND1_START_MODES: readonly Round1StartMode[] = ["wait_for_all", "gm_manual", "scheduled"];
 const ROUND_RESOLUTION_MODES: readonly RoundResolutionMode[] = ["automatic", "manual"];
 const TIE_BREAK_MODES: readonly TieBreakMode[] = ["random", "no_elimination"];
+const MAX_TIES_BEHAVIORS: readonly MaxTiesBehavior[] = ["coin_flip", "least_votes_dies"];
 
 function parseBooleanMap(body: Record<string, unknown>, field: string): Record<string, boolean> {
   const input = body[field];
@@ -65,6 +66,11 @@ Deno.serve(async (req) => {
     // -- see pickDoubleVoteHolder in _shared/db.ts.
     const doubleVoteFloorRounds = optionalIntInRangeOrSentinel(body, "double_vote_floor_rounds", 1, 20, -1) ?? 2;
     const tieBreakMode = optionalOneOf(body, "tie_break_mode", TIE_BREAK_MODES) ?? "random";
+    // -1 disables the whole mechanic (default) -- only meaningful when tieBreakMode is
+    // 'no_elimination', but harmless to store either way (resolve-round's tie branch
+    // only ever reads it inside that mode).
+    const maxConsecutiveTies = optionalIntInRangeOrSentinel(body, "max_consecutive_ties", 2, 50, -1) ?? -1;
+    const maxTiesBehavior = optionalOneOf(body, "max_ties_behavior", MAX_TIES_BEHAVIORS) ?? "coin_flip";
     const moveToRoomEnabled = optionalBoolean(body, "move_to_room_enabled") ?? false;
     const threeDoorsDeadlineMinutes = optionalIntInRange(body, "three_doors_deadline_minutes", 1, 1440) ?? 10;
 
@@ -81,12 +87,12 @@ Deno.serve(async (req) => {
       const [game] = await tx`
         insert into battle_royale.games
           (name, round_interval_minutes, missed_deadline_mode, round1_start_mode, round_resolution_mode,
-           allow_vote_change, double_vote_enabled, double_vote_floor_rounds, tie_break_mode, move_to_room_enabled,
-           three_doors_deadline_minutes)
+           allow_vote_change, double_vote_enabled, double_vote_floor_rounds, tie_break_mode, max_consecutive_ties,
+           max_ties_behavior, move_to_room_enabled, three_doors_deadline_minutes)
         values (
           ${name}, ${roundIntervalMinutes}, ${missedDeadlineMode}, ${round1StartMode},
           ${roundResolutionMode}, ${allowVoteChange}, ${doubleVoteEnabled}, ${doubleVoteFloorRounds}, ${tieBreakMode},
-          ${moveToRoomEnabled}, ${threeDoorsDeadlineMinutes}
+          ${maxConsecutiveTies}, ${maxTiesBehavior}, ${moveToRoomEnabled}, ${threeDoorsDeadlineMinutes}
         )
         returning id
       `;

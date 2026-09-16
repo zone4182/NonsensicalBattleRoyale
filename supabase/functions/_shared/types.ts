@@ -7,6 +7,7 @@ export type MissedDeadlineMode = "forfeit_fatal" | "no_consequence" | "one_round
 export type Round1StartMode = "wait_for_all" | "gm_manual" | "scheduled";
 export type RoundResolutionMode = "automatic" | "manual";
 export type TieBreakMode = "random" | "no_elimination";
+export type MaxTiesBehavior = "coin_flip" | "least_votes_dies";
 export type PlayerRole = "player" | "gm";
 export type PlayerStatus = "alive" | "ghost";
 export type PowerAcquisitionMethod = "random" | "earned" | "gm_grant";
@@ -27,6 +28,10 @@ export interface Game {
   round_resolution_mode: RoundResolutionMode;
   allow_vote_change: boolean;
   tie_break_mode: TieBreakMode;
+  // -1 disables the whole mechanic (default) -- see the migration's own comment.
+  // Only meaningful when tie_break_mode is 'no_elimination'.
+  max_consecutive_ties: number;
+  max_ties_behavior: MaxTiesBehavior;
   three_doors_winning_door: number | null;
   three_doors_deadline_minutes: number;
   three_doors_phase_started_at: string | null;

@@ -85,6 +85,8 @@ function close() {
           {{ t("gameStats.eliminated", { name: round.eliminated_player_display_name ?? t("gameStats.noOne") }) }}
           <span v-if="round.tie_break_method === 'random'">{{ t("gameStats.randomTieBreak") }}</span>
           <span v-else-if="round.tie_break_method === 'no_elimination'">{{ t("gameStats.noEliminationTieBreak") }}</span>
+          <span v-else-if="round.tie_break_method === 'coin_flip_forced'">{{ t("gameStats.coinFlipForcedTieBreak") }}</span>
+          <span v-else-if="round.tie_break_method === 'least_votes_forced'">{{ t("gameStats.leastVotesForcedTieBreak") }}</span>
         </p>
         <div class="table-scroll">
           <table class="votes-table">

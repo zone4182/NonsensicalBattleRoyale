@@ -2,6 +2,7 @@ import { errorResponse, jsonResponse, preflightResponse, readJsonBody } from "..
 import { requireCronOrGmForGame } from "../_shared/auth.ts";
 import {
   countActiveVotesForVoter,
+  countConsecutiveNoEliminationTies,
   pickDoubleVoteHolder,
   playersWithNoVoteInRound,
   redirectOneVoteAgainstTarget,
@@ -14,14 +15,21 @@ import { castBotDoorPicks, castBotRoomGuesses, castBotRoomMoves, castBotVotes } 
 import { sendPushToPlayers } from "../_shared/push.ts";
 import { publicName } from "../_shared/names.ts";
 import { assignRoundGuessTargets, resolveRoomMovesAndGuesses } from "../_shared/roomMovement.ts";
-import { PROLOGUE_OPTIONS, PROLOGUE_OUTCOME_NARRATION, ROUND_TWO_RECAP_NARRATION } from "../_shared/story.ts";
+import {
+  coinFlipForcedNarration,
+  leastVotesForcedNarration,
+  PROLOGUE_OPTIONS,
+  PROLOGUE_OUTCOME_NARRATION,
+  ROUND_TWO_RECAP_NARRATION,
+  TIE_STREAK_WARNING_NARRATION,
+} from "../_shared/story.ts";
 import type { Game, Player, PowerGrant, PrologueOption, Round } from "../_shared/types.ts";
 
 interface Resolution {
   round_id: string;
   round_number: number;
   eliminated_player_ids: string[];
-  tie_break_method: "none" | "random" | "no_elimination";
+  tie_break_method: "none" | "random" | "no_elimination" | "coin_flip_forced" | "least_votes_forced";
   new_phase: Game["phase"];
 }
 
@@ -228,7 +236,15 @@ Deno.serve(async (req) => {
         const nonVoters = await playersWithNoVoteInRound(round.id, aliveIds);
 
         let eliminatedByVote: string | null = null;
-        let tieBreakMethod: "none" | "random" | "no_elimination" = "none";
+        let tieBreakMethod: "none" | "random" | "no_elimination" | "coin_flip_forced" | "least_votes_forced" = "none";
+        // Only set when this round's elimination came from the max_consecutive_ties
+        // override -- Ward is bypassed for exactly this elimination (see the ward loop
+        // below), matching the in-universe "the house had to get involved" narration.
+        // Deflect/Null are out of scope for now (they mutate the tally itself before
+        // this point, so "bypassing" them here would need to re-run the tally without
+        // their effect -- left as a possible future refinement, not attempted here).
+        let forcedOverrideEliminatedId: string | null = null;
+        let tieStreakWarning = false;
         if (tally.length > 0) {
           const maxVotes = Math.max(...tally.map((t) => t.voteCount));
           const topTargets = tally.filter((t) => t.voteCount === maxVotes).map((t) => t.targetPlayerId);
@@ -236,8 +252,35 @@ Deno.serve(async (req) => {
             eliminatedByVote = topTargets[0];
           } else if (game.tie_break_mode === "no_elimination") {
             // GM-configured alternative to the coin flip below: a tie means no one
-            // dies this round at all, rather than randomly picking among the tied.
-            tieBreakMethod = "no_elimination";
+            // dies this round at all, rather than randomly picking among the tied --
+            // unless games.max_consecutive_ties caps how long that can go on for.
+            const priorStreak =
+              game.max_consecutive_ties === -1
+                ? 0
+                : await countConsecutiveNoEliminationTies(tx, game.id, round.round_number, game.max_consecutive_ties);
+            const currentStreak = priorStreak + 1;
+
+            if (game.max_consecutive_ties !== -1 && currentStreak >= game.max_consecutive_ties) {
+              if (game.max_ties_behavior === "least_votes_dies") {
+                // The "safest" player -- least votes received this round, zero
+                // counting as the safest possible -- dies instead of anyone from the
+                // tied-for-most group. Coin-flipped if multiple share that low.
+                const countByPlayerId = new Map(tally.map((t) => [t.targetPlayerId, t.voteCount]));
+                const minVotes = Math.min(...aliveIds.map((id) => countByPlayerId.get(id) ?? 0));
+                const safestCandidates = aliveIds.filter((id) => (countByPlayerId.get(id) ?? 0) === minVotes);
+                eliminatedByVote = safestCandidates[Math.floor(Math.random() * safestCandidates.length)];
+                tieBreakMethod = "least_votes_forced";
+              } else {
+                eliminatedByVote = topTargets[Math.floor(Math.random() * topTargets.length)];
+                tieBreakMethod = "coin_flip_forced";
+              }
+              forcedOverrideEliminatedId = eliminatedByVote;
+            } else {
+              tieBreakMethod = "no_elimination";
+              // Only the first tie of a fresh streak gets the warning -- not every
+              // tied round on the way to the max.
+              tieStreakWarning = game.max_consecutive_ties !== -1 && currentStreak === 1;
+            }
           } else {
             eliminatedByVote = topTargets[Math.floor(Math.random() * topTargets.length)];
             tieBreakMethod = "random";
@@ -260,10 +303,17 @@ Deno.serve(async (req) => {
 
         // Ward: blanket immunity for one round, covering both vote-based and
         // forfeit-based elimination. Checked after elimination is assembled, before
-        // it's written.
+        // it's written. Deliberately does NOT save whoever the max_consecutive_ties
+        // override picked (forcedOverrideEliminatedId) -- "the house had to get
+        // involved because defensive strategies aren't allowed" is an actual rule
+        // here, not just flavor text (see story.ts's own comment on this).
         const wardSavedIds: string[] = [];
         for (const grant of wardGrants) {
           const playerId = grant.granted_to_player_id;
+          if (playerId === forcedOverrideEliminatedId) {
+            grantOutcomes.set(grant.id, { saved_from_elimination: false, bypassed_by_tie_override: true });
+            continue;
+          }
           if (eliminatedIds.has(playerId)) {
             eliminatedIds.delete(playerId);
             wardSavedIds.push(playerId);
@@ -298,14 +348,18 @@ Deno.serve(async (req) => {
 
         // Narration: flavor text describing what actually happened this round.
         let narration: string;
-        if (eliminatedByVote) {
+        if (eliminatedByVote && tieBreakMethod === "coin_flip_forced") {
+          narration = `Round ${round.round_number} ends in yet another tie.${coinFlipForcedNarration(nameById.get(eliminatedByVote) ?? "someone")}`;
+        } else if (eliminatedByVote && tieBreakMethod === "least_votes_forced") {
+          narration = `Round ${round.round_number} ends in yet another tie.${leastVotesForcedNarration(nameById.get(eliminatedByVote) ?? "someone")}`;
+        } else if (eliminatedByVote) {
           const name = nameById.get(eliminatedByVote) ?? "someone";
           narration =
             tieBreakMethod === "random"
               ? `Round ${round.round_number} ends in a dead-even tie. Fate (and a coin toss) chose ${name} to be eliminated.`
               : `Round ${round.round_number} is over. The house has spoken: ${name} is eliminated.`;
         } else if (tieBreakMethod === "no_elimination") {
-          narration = `Round ${round.round_number} ends in a dead-even tie. Fortunately, everyone lives to see another day.`;
+          narration = `Round ${round.round_number} ends in a dead-even tie. Fortunately, everyone lives to see another day.${tieStreakWarning ? TIE_STREAK_WARNING_NARRATION : ""}`;
         } else if (tally.length > 0) {
           narration = `Round ${round.round_number} is over. The votes are in, but the house's chosen target walks away unharmed.`;
         } else {

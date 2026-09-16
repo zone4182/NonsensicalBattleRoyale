@@ -270,6 +270,32 @@ export async function getRecentResolvedRounds(
   `;
 }
 
+// games.max_consecutive_ties refinement -- counts how many rounds immediately before
+// this one were themselves genuine top-vote ties resolved as 'no_elimination'. Only
+// walks back `maxToCheck` rows (the caller only ever cares whether the streak has
+// reached that many, not the exact total for a much longer one) and stops at the
+// first round that wasn't a plain tie -- a Ward-save, a silent round, or a normal
+// elimination all break the streak, same as an actual elimination would.
+export async function countConsecutiveNoEliminationTies(
+  exec: ReturnType<typeof sql>,
+  gameId: string,
+  beforeRoundNumber: number,
+  maxToCheck: number,
+): Promise<number> {
+  const rows = await exec<{ tie_break_method: string | null }[]>`
+    select tie_break_method from battle_royale.rounds
+    where game_id = ${gameId} and round_number < ${beforeRoundNumber} and resolved_at is not null
+    order by round_number desc
+    limit ${maxToCheck}
+  `;
+  let streak = 0;
+  for (const row of rows) {
+    if (row.tie_break_method !== "no_elimination") break;
+    streak++;
+  }
+  return streak;
+}
+
 // Not vote-table-related. Picks a random alive role='player' player for the next
 // round's double-vote slot, avoiding whoever held it in the last `floorRounds` rounds
 // when an alternative exists (flat random otherwise -- exact cadence numbers are an

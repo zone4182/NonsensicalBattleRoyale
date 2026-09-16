@@ -69,6 +69,8 @@ interface GmGameOverview {
     round_resolution_mode: string;
     allow_vote_change: boolean;
     tie_break_mode: string;
+    max_consecutive_ties: number;
+    max_ties_behavior: string;
     double_vote_enabled: boolean;
     double_vote_floor_rounds: number;
     survival_streak_threshold: number;
@@ -494,6 +496,26 @@ async function submit() {
               }}
             </td>
           </tr>
+          <tr v-if="overview.game.tie_break_mode === 'no_elimination'">
+            <th>{{ t("gmInPlay.settings.maxConsecutiveTies") }}</th>
+            <td>
+              {{
+                overview.game.max_consecutive_ties === -1
+                  ? t("gmInPlay.settings.disabled")
+                  : t("gmInPlay.settings.roundsSuffix", { count: overview.game.max_consecutive_ties })
+              }}
+            </td>
+          </tr>
+          <tr v-if="overview.game.tie_break_mode === 'no_elimination' && overview.game.max_consecutive_ties !== -1">
+            <th>{{ t("gmInPlay.settings.maxTiesBehavior") }}</th>
+            <td>
+              {{
+                overview.game.max_ties_behavior === "least_votes_dies"
+                  ? t("gmSetup.rules.maxTiesBehaviorOptions.leastVotesDies")
+                  : t("gmSetup.rules.maxTiesBehaviorOptions.coinFlip")
+              }}
+            </td>
+          </tr>
           <tr>
             <th>{{ t("gmInPlay.settings.doubleVoteEnabled") }}</th>
             <td>{{ overview.game.double_vote_enabled ? t("gmInPlay.settings.enabled") : t("gmInPlay.settings.disabled") }}</td>
@@ -620,6 +642,8 @@ async function submit() {
           {{ t("gmInPlay.votes.eliminated", { name: round.eliminated_player_display_name ?? t("gmInPlay.votes.noOne") }) }}
           <span v-if="round.tie_break_method === 'random'">{{ t("gmInPlay.votes.randomTieBreak") }}</span>
           <span v-else-if="round.tie_break_method === 'no_elimination'">{{ t("gmInPlay.votes.noEliminationTieBreak") }}</span>
+          <span v-else-if="round.tie_break_method === 'coin_flip_forced'">{{ t("gmInPlay.votes.coinFlipForcedTieBreak") }}</span>
+          <span v-else-if="round.tie_break_method === 'least_votes_forced'">{{ t("gmInPlay.votes.leastVotesForcedTieBreak") }}</span>
         </p>
         <div class="table-scroll">
           <table class="votes-table">

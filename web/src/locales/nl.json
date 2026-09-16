@@ -93,6 +93,8 @@
     "noOne": "niemand",
     "randomTieBreak": "(willekeurige tie-break)",
     "noEliminationTieBreak": "(gelijkspel -- niemand geëlimineerd)",
+    "coinFlipForcedTieBreak": "(max. gelijkspellen bereikt -- gedwongen muntworp)",
+    "leastVotesForcedTieBreak": "(max. gelijkspellen bereikt -- speler met minste stemmen gedwongen uit)",
     "voter": "Stemmer",
     "target": "Doelwit",
     "votesReceived": "Stemmen ontvangen",
@@ -119,11 +121,12 @@
   },
   "arrival": {
     "title": "Aankomst",
-    "storyPart1a": "Na het aanvaarden van de uitnodiging reis je naar het landhuis dat in de brief werd genoemd. Bij aankomst tref je je oude vrienden aan, allemaal blijer je te zien dan de vorige. Er is gelach, drank, oude verhalen die opnieuw verteld worden, en genoeg discussie over wie waar slaapt. Het bijpraten duurt tot diep in de nacht, tot iedereen eindelijk naar bed gaat.",
+    "storyPart1Drive": "Na het aanvaarden van de uitnodiging rijd je naar het landhuis dat in de brief werd genoemd -- velden maken plaats voor heggen, en uiteindelijk doemt de oude poort op aan het einde van een lange, kronkelende weg.",
+    "storyPart1a": "Bij aankomst tref je je oude vrienden aan, allemaal blijer je te zien dan de vorige. Er is gelach, drank, oude verhalen die opnieuw verteld worden, en genoeg discussie over wie waar slaapt. Het bijpraten duurt tot diep in de nacht, tot iedereen eindelijk naar bed gaat.",
     "storyPart1b": "Niemand van jullie vermoedt dat dit de laatste nacht zal zijn dat iets nog normaal aanvoelt.",
     "nextMorning": "De Volgende Ochtend",
-    "storyPart2a": "Langzaam wordt iedereen wakker. Een voor een druppelen de gasten de keuken in -- koffie, kater, het gebruikelijke ochtendgemompel. Maar {gmName} ontbreekt. Hun stoel aan tafel blijft leeg terwijl de rest zich afvraagt waar ze gebleven zijn.",
-    "storyPart2b": "Een van jullie loopt naar het toilet -- en vindt hen daar. Dood. Nog half op de bril, broek rond de enkels. Een diepe steekwond gaapt in hun nek; het bloed heeft zich verspreid tot een brede, donkere plas over de tegels, tot aan de muren en de wastafel. Hun ogen staan wijd open, bevroren in angst. De geur van bloed hangt dik en zoet in de kleine, muffe ruimte. Geen twijfel mogelijk: dit was geen ongeluk -- en wie het ook deed, bevindt zich nog ergens in dit huis.",
+    "storyPart2a": "Langzaam wordt iedereen wakker. Een voor een druppelen de gasten de keuken in -- koffie, kater, het gebruikelijke ochtendgemompel. Maar {gmName} ontbreekt. Diens stoel aan tafel blijft leeg, en niemand kan zeggen waar {gmName} gebleven is.",
+    "storyPart2b": "Een van jullie loopt naar het toilet -- en vindt {gmName} daar. Dood. Nog half op de bril, broek rond de enkels. Een diepe steekwond gaapt in diens nek; het bloed heeft zich verspreid tot een brede, donkere plas over de tegels, tot aan de muren en de wastafel. Diens ogen staan wijd open, bevroren in angst. De geur van bloed hangt dik en zoet in de kleine, muffe ruimte. Geen twijfel mogelijk: dit was geen ongeluk -- en wie het ook deed, bevindt zich nog ergens in dit huis.",
     "gmFallbackName": "de Game Master",
     "continue": "Doorgaan",
     "waiting": "Wachten tot de rest van het huis is aangekomen voordat het spel kan beginnen...",
@@ -341,6 +344,17 @@
         "random": "Willekeurig een van de gelijkstaande spelers wordt geëlimineerd, als een echte muntworp.",
         "no_elimination": "Niemand wordt deze ronde geëlimineerd -- het verhaal meldt dat iedereen geluk had en een dag langer leeft."
       },
+      "maxConsecutiveTies": "Max. gelijkspellen op rij",
+      "maxConsecutiveTiesHint": "Beperkt hoeveel opeenvolgende gelijkspel-rondes (niemand sterft) zijn toegestaan voordat het spel zelf een uitkomst afdwingt in plaats van de patstelling te laten voortduren. Minimaal 2. Zet op -1 om uit te schakelen -- gelijkspellen kunnen dan onbeperkt doorgaan.",
+      "maxTiesBehavior": "Gedrag bij bereiken van max. gelijkspellen",
+      "maxTiesBehaviorOptions": {
+        "coinFlip": "Muntje opgooien",
+        "leastVotesDies": "Speler met minste stemmen sterft"
+      },
+      "maxTiesBehaviorHints": {
+        "coin_flip": "Een willekeurige speler uit de groep met de meeste stemmen wordt geëlimineerd, net als de gewone muntworp-tiebreak -- Bescherming/Afweren/Neutraliseren gelden niet voor deze specifieke eliminatie.",
+        "least_votes_dies": "In plaats van de meest verdachte groep wordt deze ronde juist wie de minste stemmen kreeg (nul telt als minste) geëlimineerd -- bij een gelijke stand wordt gemunt. Bescherming/Afweren/Neutraliseren gelden niet voor deze specifieke eliminatie."
+      },
       "round1StartMode": "Startmodus ronde 1",
       "round1StartOptions": {
         "waitForAll": "Wachten tot iedereen accepteert",
@@ -501,6 +515,8 @@
       "tieBreakMode": "Gedrag bij gelijkspel",
       "tieBreakRandom": "Muntje opgooien",
       "tieBreakNoElimination": "Niemand gaat dood",
+      "maxConsecutiveTies": "Max. gelijkspellen op rij",
+      "maxTiesBehavior": "Gedrag bij bereiken van max.",
       "doubleVoteEnabled": "Willekeurige dubbele stem",
       "enabled": "Aan",
       "disabled": "Uit",
@@ -533,6 +549,8 @@
       "noOne": "niemand",
       "randomTieBreak": "(willekeurige gelijkspelbeslissing)",
       "noEliminationTieBreak": "(gelijkspel -- niemand geëlimineerd)",
+      "coinFlipForcedTieBreak": "(max. gelijkspellen bereikt -- gedwongen muntworp)",
+      "leastVotesForcedTieBreak": "(max. gelijkspellen bereikt -- speler met minste stemmen gedwongen uit)",
       "voter": "Stemmer",
       "target": "Doelwit",
       "votesReceived": "Ontvangen stemmen",

@@ -93,6 +93,8 @@
     "noOne": "no one",
     "randomTieBreak": "(random tie-break)",
     "noEliminationTieBreak": "(tied -- no one eliminated)",
+    "coinFlipForcedTieBreak": "(max ties reached -- forced coin-flip)",
+    "leastVotesForcedTieBreak": "(max ties reached -- least-voted player forced out)",
     "voter": "Voter",
     "target": "Target",
     "votesReceived": "Votes received",
@@ -119,10 +121,11 @@
   },
   "arrival": {
     "title": "Arrival",
-    "storyPart1a": "Having accepted the invitation, you travel to the manor mentioned in the letter. On arrival you find your old friends, each one happier to see you than the last. There's laughter, drinks, old stories being retold, and no shortage of arguing over who sleeps where. The catching-up runs deep into the night, until everyone finally goes to bed.",
+    "storyPart1Drive": "Having accepted the invitation, you make the drive out to the manor mentioned in the letter -- fields give way to hedgerows, and at last, the old gate comes into view at the end of a long, winding road.",
+    "storyPart1a": "On arrival you find your old friends, each one happier to see you than the last. There's laughter, drinks, old stories being retold, and no shortage of arguing over who sleeps where. The catching-up runs deep into the night, until everyone finally goes to bed.",
     "storyPart1b": "None of you suspect that this will be the last night anything still feels normal.",
     "nextMorning": "The Next Morning",
-    "storyPart2a": "Slowly, everyone wakes up. One by one, the guests drift into the kitchen -- coffee, hangovers, the usual morning-after murmur. But {gmName} is missing. Their seat at the table stays empty while the rest wonder where they've gotten to.",
+    "storyPart2a": "Slowly, everyone wakes up. One by one, the guests drift into the kitchen -- coffee, hangovers, the usual morning-after murmur. But {gmName} is missing -- their seat at the table stays empty, and no one can say where they've gone.",
     "storyPart2b": "One of you walks to the toilet -- and finds them there. Dead. Still half on the seat, pants around their ankles. A deep stab wound gapes in their neck; the blood has spread into a wide, dark pool across the tiles, reaching the walls and the sink. Their eyes are wide open, frozen in terror. The smell of blood hangs thick and sweet in the small, airless room. No doubt about it: this was no accident -- and whoever did it is still somewhere in this house.",
     "gmFallbackName": "the Game Master",
     "continue": "Continue",
@@ -341,6 +344,17 @@
         "random": "A random one of the tied players is eliminated, same as a real coin flip.",
         "no_elimination": "No one is eliminated this round -- the narration announces that everyone got lucky and lives to see another day."
       },
+      "maxConsecutiveTies": "Max ties in a row",
+      "maxConsecutiveTiesHint": "Caps how many consecutive tied (no one dies) rounds are allowed before the game forces a resolution instead of letting the stalemate continue. Minimum 2. Set to -1 to disable -- ties can then continue indefinitely.",
+      "maxTiesBehavior": "Behavior when max ties reached",
+      "maxTiesBehaviorOptions": {
+        "coinFlip": "Flip a coin",
+        "leastVotesDies": "Least-voted player dies"
+      },
+      "maxTiesBehaviorHints": {
+        "coin_flip": "A random player from the tied-for-most group is eliminated, same as the regular coin-flip tie-break -- Ward/Deflect/Null don't apply to this specific elimination.",
+        "least_votes_dies": "Instead of the most-targeted group, whoever received the fewest votes this round (zero counts as fewest) is eliminated instead -- coin-flipped if several share the lowest count. Ward/Deflect/Null don't apply to this specific elimination."
+      },
       "round1StartMode": "Round 1 start mode",
       "round1StartOptions": {
         "waitForAll": "Wait until everyone accepts",
@@ -501,6 +515,8 @@
       "tieBreakMode": "Tie-break behavior",
       "tieBreakRandom": "Coin flip",
       "tieBreakNoElimination": "No one dies",
+      "maxConsecutiveTies": "Max ties in a row",
+      "maxTiesBehavior": "Behavior when max reached",
       "doubleVoteEnabled": "Random double vote",
       "enabled": "Enabled",
       "disabled": "Disabled",
@@ -533,6 +549,8 @@
       "noOne": "no one",
       "randomTieBreak": "(random tie-break)",
       "noEliminationTieBreak": "(tied -- no one eliminated)",
+      "coinFlipForcedTieBreak": "(max ties reached -- forced coin-flip)",
+      "leastVotesForcedTieBreak": "(max ties reached -- least-voted player forced out)",
       "voter": "Voter",
       "target": "Target",
       "votesReceived": "Votes received",

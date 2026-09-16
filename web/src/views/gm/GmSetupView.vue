@@ -47,6 +47,11 @@ const doubleVoteFloorRounds = ref(2);
 // behavior; 'no_elimination' is new. More tie-break strategies can be added to this
 // list later without touching anything else here.
 const tieBreakMode = ref<"random" | "no_elimination">("random");
+// Refinement of the 'no_elimination' mode -- caps how many consecutive ties are
+// allowed before the game forces a resolution instead of stalling indefinitely. -1
+// disables it (default); only shown/meaningful when tieBreakMode is 'no_elimination'.
+const maxConsecutiveTies = ref(-1);
+const maxTiesBehavior = ref<"coin_flip" | "least_votes_dies">("coin_flip");
 const moveToRoomEnabled = ref(false);
 const threeDoorsDeadlineMinutes = ref(10);
 
@@ -101,7 +106,10 @@ const currentStep = computed<StepKey>(() => STEPS[currentStepIndex.value]);
 const stepIsValid = computed<Record<StepKey, boolean>>(() => ({
   secret: setupSecret.value.trim().length > 0,
   basics: name.value.trim().length > 0 && gmDisplayName.value.trim().length > 0,
-  rules: roundIntervalMinutes.value >= 10 && threeDoorsDeadlineMinutes.value >= 1,
+  rules:
+    roundIntervalMinutes.value >= 10 &&
+    threeDoorsDeadlineMinutes.value >= 1 &&
+    (maxConsecutiveTies.value === -1 || maxConsecutiveTies.value >= 2),
   powers: !doubleVoteEnabled.value || doubleVoteFloorRounds.value >= -1,
   miniGames: true,
   invites: true,
@@ -143,6 +151,8 @@ async function createGame() {
         round_resolution_mode: roundResolutionMode.value,
         allow_vote_change: allowVoteChange.value,
         tie_break_mode: tieBreakMode.value,
+        max_consecutive_ties: tieBreakMode.value === "no_elimination" ? maxConsecutiveTies.value : undefined,
+        max_ties_behavior: tieBreakMode.value === "no_elimination" ? maxTiesBehavior.value : undefined,
         double_vote_enabled: doubleVoteEnabled.value,
         double_vote_floor_rounds: doubleVoteEnabled.value ? doubleVoteFloorRounds.value : undefined,
         move_to_room_enabled: moveToRoomEnabled.value,
@@ -297,6 +307,26 @@ async function createGame() {
           </select>
           <span class="field-hint">{{ t("gmSetup.rules.tieBreakHintPrefix") }} {{ tieBreakModeHint }}</span>
         </label>
+        <template v-if="tieBreakMode === 'no_elimination'">
+          <label>
+            {{ t("gmSetup.rules.maxConsecutiveTies") }}
+            <input
+              v-model.number="maxConsecutiveTies"
+              type="number"
+              min="-1"
+              required
+            >
+            <span class="field-hint">{{ t("gmSetup.rules.maxConsecutiveTiesHint") }}</span>
+          </label>
+          <label v-if="maxConsecutiveTies !== -1">
+            {{ t("gmSetup.rules.maxTiesBehavior") }}
+            <select v-model="maxTiesBehavior">
+              <option value="coin_flip">{{ t("gmSetup.rules.maxTiesBehaviorOptions.coinFlip") }}</option>
+              <option value="least_votes_dies">{{ t("gmSetup.rules.maxTiesBehaviorOptions.leastVotesDies") }}</option>
+            </select>
+            <span class="field-hint">{{ t(`gmSetup.rules.maxTiesBehaviorHints.${maxTiesBehavior}`) }}</span>
+          </label>
+        </template>
         <label>
           {{ t("gmSetup.rules.round1StartMode") }}
           <select v-model="round1StartMode">

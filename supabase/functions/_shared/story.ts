@@ -23,3 +23,20 @@ export const PROLOGUE_OUTCOME_NARRATION: Record<PrologueOption, string> = {
 // the "rules" letter (rendered client-side, see PrologueOutcomeGate.vue) has been read.
 export const ROUND_TWO_RECAP_NARRATION =
   "The vote is anonymous, but final: whoever receives the most votes when the sun sets is gone from this house, for good. Only one of you will ever walk out the front door again. Choose carefully -- and choose first.";
+
+// games.max_consecutive_ties refinement (see resolve-round/index.ts's tie-handling
+// branch) -- shown the first time a fresh streak of top-vote ties begins, before the
+// max is ever actually reached. Only fires once per streak, not on every tied round.
+export const TIE_STREAK_WARNING_NARRATION =
+  " The manor is not happy with your indecision. If this continues, it will interfere.";
+
+// Fired once games.max_consecutive_ties is reached, per games.max_ties_behavior. Both
+// deliberately bypass Ward (see resolve-round/index.ts) -- the in-universe reasoning
+// for why is baked into the text itself, not left as an unexplained rule change.
+export function coinFlipForcedNarration(name: string): string {
+  return ` The house grows tired of your indecision. It reaches in itself this time -- a coin spins in the dark, because in here, hiding behind careful strategy buys no one safety tonight. ${name} loses the toss.`;
+}
+
+export function leastVotesForcedNarration(name: string): string {
+  return ` The house has had enough of your silence. It turns its eye toward whoever felt safest -- ${name}, barely suspected by anyone, is the one it chooses. Being invisible was never truly safe.`;
+}
