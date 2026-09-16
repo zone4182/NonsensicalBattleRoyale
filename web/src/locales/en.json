@@ -60,6 +60,43 @@
     "gm": "GM",
     "awaitingReply": "Waiting for a reply from the GM..."
   },
+  "endgameTransition": {
+    "title": "Three Remain",
+    "caption": {
+      "three_doors": "The house leads you deeper than anyone has gone all weekend -- and there, waiting, are three doors.",
+      "russian_roulette": "The house leads you back to where the jar once sat by the door. The jar is gone now."
+    },
+    "body": {
+      "three_doors": {
+        "a": "Only three of you are left standing. Whatever's about to happen, it's happening to all three of you, together, at the same time -- click Continue when you're ready.",
+        "b": "One door leads out. The other two don't."
+      },
+      "russian_roulette": {
+        "a": "Only three of you are left standing. In place of the jar sits a revolver, and two bullets. Whatever's about to happen, it's happening to all three of you, together, at the same time -- click Continue when you're ready.",
+        "b": "Six chambers. Two are loaded. No one will say which."
+      }
+    },
+    "continue": "Continue",
+    "continuing": "Continuing...",
+    "waiting": "Waiting for the other two to click Continue..."
+  },
+  "russianRoulette": {
+    "title": "The Revolver",
+    "bulletsRemaining": "Bullets still in play: {count}",
+    "yourTurn": "It's your turn. Choose your target.",
+    "forcedSelfOnly": "You missed a shot at someone else last time -- this turn you can only aim at yourself.",
+    "shootSelf": "Turn it on yourself",
+    "shootOther": "Aim at {name}",
+    "waitingForTurn": "Waiting on {name}...",
+    "countdown": "{minutes}m {seconds}s remaining",
+    "deadlinePassed": "Deadline passed -- waiting for this to resolve.",
+    "turnOrder": "Turn order",
+    "history": "What's happened so far",
+    "historySelfHit": "{name} turned the gun on themselves. It fired.",
+    "historySelfMiss": "{name} turned the gun on themselves. Empty.",
+    "historyOtherHit": "{shooter} aimed at {target}. It fired.",
+    "historyOtherMiss": "{shooter} aimed at {target}. Empty."
+  },
   "threeDoors": {
     "title": "The Three Doors",
     "prologuePlaceholder": "A short cinematic beat will set the scene here before the choice itself -- the corridor, the three doors, the sense that only one way out is real. Not written yet.",
@@ -106,6 +143,13 @@
     "door": "Door",
     "outcome": "Outcome",
     "pending": "pending",
+    "rouletteHeading": "Russian Roulette",
+    "roundColumn": "Round",
+    "shooter": "Shooter",
+    "result": "Result",
+    "self": "(self)",
+    "hit": "hit",
+    "miss": "miss",
     "errors": {
       "gameNotEnded": "Game stats aren't available until the game has ended."
     }
@@ -380,7 +424,20 @@
       "allowVoteChange": "Allow players to change their vote",
       "allowVoteChangeHint": "If off (default), a vote is final the moment it's cast. If on, a player can re-vote as many times as they want before the round resolves -- only their latest vote(s) count.",
       "threeDoorsDeadlineMinutes": "Three Doors deadline (minutes)",
-      "threeDoorsDeadlineMinutesHint": "How long the Three Doors endgame stays open once it starts. If not every remaining player has picked a door by this deadline, everyone still standing loses -- same as a collision."
+      "threeDoorsDeadlineMinutesHint": "How long the Three Doors endgame stays open once it starts. If not every remaining player has picked a door by this deadline, everyone still standing loses -- same as a collision.",
+      "endgameMode": "Endgame",
+      "endgameModeOptions": {
+        "threeDoors": "Three Doors",
+        "russianRoulette": "Russian Roulette"
+      },
+      "endgameModeHints": {
+        "three_doors": "The default endgame: three doors, one is real. Any two matching picks means everyone loses.",
+        "russian_roulette": "A revolver, six chambers, two bullets. Players take turns choosing to shoot themselves or another player until only one is left. See concept/mini-games/russian-roulette-endgame.md for the full rules."
+      },
+      "endgameTransitionDeadlineMinutes": "Endgame transition deadline (minutes)",
+      "endgameTransitionDeadlineMinutesHint": "Once only 3 players remain, everyone sees a short cinematic and must click Continue before the real endgame's clock starts. If not everyone has clicked Continue within this many minutes, the endgame starts anyway.",
+      "rouletteTurnDeadlineMinutes": "Roulette turn deadline (minutes)",
+      "rouletteTurnDeadlineMinutesHint": "Only used if the endgame above is Russian Roulette. How long each individual player's turn stays open before an automatic self-shot happens on their behalf."
     },
     "powers": {
       "heading": "Hidden powers & bots",
@@ -448,7 +505,13 @@
     "miniGames": {
       "heading": "Mini-games",
       "moveToRoomEnabled": "Enable Move-to-Room",
-      "moveToRoomEnabledHint": "Every round, alive players may move one step through the manor and guess where another player is hiding. Correct guesses earn the guesser a point."
+      "moveToRoomEnabledHint": "Every round, alive players may move one step through the manor and guess where another player is hiding. Correct guesses earn the guesser a point.",
+      "quickTestHeading": "Quick test",
+      "quickTestHint": "Skip the rest of this wizard and start a small game right now, with you as an actual player (not just GM) alongside enough bots to reach the mechanic. You'll be redirected to the GM screen, where your own test invite link is waiting to be opened in another tab or device.",
+      "quickTestMoveToRoom": "Test Move-to-Room",
+      "quickTestThreeDoors": "Test Three Doors",
+      "quickTestRussianRoulette": "Test Russian Roulette",
+      "testerInviteName": "You (tester)"
     },
     "access": {
       "heading": "Access",
@@ -527,6 +590,9 @@
       "roundsSuffix": "{count} round(s)",
       "survivalStreakThreshold": "Survival streak threshold",
       "threeDoorsDeadlineMinutes": "Three Doors deadline",
+      "endgameMode": "Endgame",
+      "endgameTransitionDeadlineMinutes": "Endgame transition deadline",
+      "rouletteTurnDeadlineMinutes": "Roulette turn deadline",
       "created": "Created",
       "loadError": "Couldn't load settings: {error}",
       "loading": "Loading settings..."
@@ -586,6 +652,23 @@
       "effectRewindViewed": "Viewed round {round}'s vote breakdown",
       "effectChecked": "Checked and answered"
     },
+    "endgameTransition": {
+      "heading": "Endgame Transition",
+      "acked": "clicked Continue",
+      "waiting": "waiting..."
+    },
+    "roulette": {
+      "heading": "Russian Roulette",
+      "bulletsRemaining": "Bullets still in play: {count}",
+      "currentTurn": "Current turn: {name}",
+      "round": "Round",
+      "shooter": "Shooter",
+      "target": "Target",
+      "result": "Result",
+      "self": "(self)",
+      "hit": "hit",
+      "miss": "miss"
+    },
     "threeDoors": {
       "heading": "Three Doors",
       "player": "Player",
@@ -618,8 +701,14 @@
       "resolveDoors": "Resolve doors",
       "notReadyDoors": "Not ready yet -- not every alive player has picked a door.",
       "doorsResolved": "Doors resolved -- game over.",
+      "resolveTransition": "Resolve endgame transition",
+      "notReadyTransition": "Not ready yet -- the transition deadline hasn't passed and not every finalist has clicked Continue.",
+      "transitionResolved": "Transition resolved -- the real endgame has started.",
+      "resolveRoulette": "Resolve roulette turn timeout",
+      "notReadyRoulette": "Not ready yet -- the current turn's deadline hasn't passed.",
+      "rouletteResolved": "Timeout resolved -- an automatic self-shot was applied.",
       "exportSession": "Export session",
-      "exportSessionHint": "Downloads a JSON file with everything shown on this screen -- settings, full vote breakdown per round, and Three Doors picks.",
+      "exportSessionHint": "Downloads a JSON file with everything shown on this screen -- settings, full vote breakdown per round, Three Doors picks, and the Russian Roulette shot log.",
       "finishing": "Finishing...",
       "finishGame": "Finish game",
       "finishGameHint": "Closes this game out and sends you back to the landing page. Revisiting a finished game isn't built yet -- planned for a later version.",

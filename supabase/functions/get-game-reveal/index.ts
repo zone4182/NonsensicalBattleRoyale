@@ -48,6 +48,15 @@ Deno.serve(async (req) => {
       order by picked_at asc
     `;
 
+    const rouletteShots = await db<
+      { shooter_player_id: string; target_player_id: string; is_self: boolean; hit: boolean; round_number: number; created_at: string }[]
+    >`
+      select shooter_player_id, target_player_id, is_self, hit, round_number, created_at
+      from battle_royale.roulette_shots
+      where game_id = ${ctx.game.id}
+      order by created_at asc
+    `;
+
     return jsonResponse({
       rounds: rounds.map((r) => {
         const roundVotes = votesByRoundId.get(r.id) ?? [];
@@ -75,6 +84,14 @@ Deno.serve(async (req) => {
         door_number: p.door_number,
         resolved_outcome: p.resolved_outcome,
         picked_at: p.picked_at,
+      })),
+      roulette_shots: rouletteShots.map((s) => ({
+        round_number: s.round_number,
+        shooter_display_name: nameById.get(s.shooter_player_id) ?? "unknown",
+        target_display_name: nameById.get(s.target_player_id) ?? "unknown",
+        is_self: s.is_self,
+        hit: s.hit,
+        created_at: s.created_at,
       })),
     });
   } catch (err) {

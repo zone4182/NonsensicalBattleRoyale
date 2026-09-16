@@ -60,6 +60,43 @@
     "gm": "GM",
     "awaitingReply": "Wachten op een antwoord van de GM..."
   },
+  "endgameTransition": {
+    "title": "Nog Met Z'n Drieën",
+    "caption": {
+      "three_doors": "Het huis leidt jullie dieper dan wie dan ook dit hele weekend is geweest -- en daar, wachtend, staan drie deuren.",
+      "russian_roulette": "Het huis leidt jullie terug naar waar de pot ooit bij de deur stond. De pot is nu verdwenen."
+    },
+    "body": {
+      "three_doors": {
+        "a": "Jullie zijn nog maar met z'n drieën. Wat er ook gaat gebeuren, het gebeurt met jullie alle drie tegelijk -- klik op Doorgaan zodra je er klaar voor bent.",
+        "b": "Eén deur leidt naar buiten. De andere twee niet."
+      },
+      "russian_roulette": {
+        "a": "Jullie zijn nog maar met z'n drieën. In plaats van de pot staat er een revolver, met twee kogels. Wat er ook gaat gebeuren, het gebeurt met jullie alle drie tegelijk -- klik op Doorgaan zodra je er klaar voor bent.",
+        "b": "Zes kamers. Twee zijn geladen. Niemand zal zeggen welke."
+      }
+    },
+    "continue": "Doorgaan",
+    "continuing": "Bezig...",
+    "waiting": "Wachten tot de andere twee op Doorgaan hebben geklikt..."
+  },
+  "russianRoulette": {
+    "title": "De Revolver",
+    "bulletsRemaining": "Nog resterende kogels: {count}",
+    "yourTurn": "Jij bent aan de beurt. Kies je doelwit.",
+    "forcedSelfOnly": "Je miste vorige keer een schot op iemand anders -- deze beurt mag je alleen op jezelf richten.",
+    "shootSelf": "Richt op jezelf",
+    "shootOther": "Richt op {name}",
+    "waitingForTurn": "Wachten op {name}...",
+    "countdown": "{minutes}m {seconds}s resterend",
+    "deadlinePassed": "Deadline verstreken -- wachten tot dit wordt afgehandeld.",
+    "turnOrder": "Beurtvolgorde",
+    "history": "Wat er tot nu toe is gebeurd",
+    "historySelfHit": "{name} richtte het wapen op zichzelf. Het ging af.",
+    "historySelfMiss": "{name} richtte het wapen op zichzelf. Leeg.",
+    "historyOtherHit": "{shooter} richtte op {target}. Het ging af.",
+    "historyOtherMiss": "{shooter} richtte op {target}. Leeg."
+  },
   "threeDoors": {
     "title": "De Drie Deuren",
     "prologuePlaceholder": "Hier komt straks een korte filmische scène die de sfeer zet voordat de keuze zelf begint -- de gang, de drie deuren, het gevoel dat maar één uitweg echt is. Nog niet geschreven.",
@@ -106,6 +143,13 @@
     "door": "Deur",
     "outcome": "Uitkomst",
     "pending": "in afwachting",
+    "rouletteHeading": "Russische Roulette",
+    "roundColumn": "Ronde",
+    "shooter": "Schutter",
+    "result": "Resultaat",
+    "self": "(zichzelf)",
+    "hit": "raak",
+    "miss": "mis",
     "errors": {
       "gameNotEnded": "Spelstatistieken zijn niet beschikbaar totdat het spel is afgelopen."
     }
@@ -380,7 +424,20 @@
       "allowVoteChange": "Spelers mogen hun stem wijzigen",
       "allowVoteChangeHint": "Indien uit (standaard), staat een stem vast zodra deze is uitgebracht. Indien aan, kan een speler zo vaak opnieuw stemmen als gewenst voordat de ronde wordt afgehandeld -- alleen de laatste stem(men) telt/tellen.",
       "threeDoorsDeadlineMinutes": "Deadline Drie Deuren (minuten)",
-      "threeDoorsDeadlineMinutesHint": "Hoe lang de eindspel-fase Drie Deuren open blijft zodra die begint. Als niet elke overgebleven speler voor deze deadline een deur heeft gekozen, verliest iedereen die nog over is -- net als bij een botsing."
+      "threeDoorsDeadlineMinutesHint": "Hoe lang de eindspel-fase Drie Deuren open blijft zodra die begint. Als niet elke overgebleven speler voor deze deadline een deur heeft gekozen, verliest iedereen die nog over is -- net als bij een botsing.",
+      "endgameMode": "Eindspel",
+      "endgameModeOptions": {
+        "threeDoors": "Drie Deuren",
+        "russianRoulette": "Russische Roulette"
+      },
+      "endgameModeHints": {
+        "three_doors": "Het standaard eindspel: drie deuren, één is echt. Twee overeenkomende keuzes betekent dat iedereen verliest.",
+        "russian_roulette": "Een revolver, zes kamers, twee kogels. Spelers kiezen om de beurt om zichzelf of een andere speler neer te schieten totdat er nog maar één over is. Zie concept/mini-games/russian-roulette-endgame.md voor de volledige regels."
+      },
+      "endgameTransitionDeadlineMinutes": "Deadline eindspel-overgang (minuten)",
+      "endgameTransitionDeadlineMinutesHint": "Zodra er nog maar 3 spelers over zijn, ziet iedereen een korte cinematische scène en moet op Doorgaan klikken voordat de klok van het echte eindspel begint. Als niet iedereen binnen dit aantal minuten op Doorgaan heeft geklikt, begint het eindspel alsnog.",
+      "rouletteTurnDeadlineMinutes": "Beurtdeadline roulette (minuten)",
+      "rouletteTurnDeadlineMinutesHint": "Wordt alleen gebruikt als het eindspel hierboven Russische Roulette is. Hoe lang de beurt van elke speler open blijft voordat er automatisch namens hen op zichzelf wordt geschoten."
     },
     "powers": {
       "heading": "Verborgen krachten & bots",
@@ -448,7 +505,13 @@
     "miniGames": {
       "heading": "Minigames",
       "moveToRoomEnabled": "Verhuis-naar-kamer inschakelen",
-      "moveToRoomEnabledHint": "Elke ronde mogen levende spelers één stap door het landhuis verplaatsen en raden waar een andere speler zich verstopt. Een juiste gok levert de gokker een punt op."
+      "moveToRoomEnabledHint": "Elke ronde mogen levende spelers één stap door het landhuis verplaatsen en raden waar een andere speler zich verstopt. Een juiste gok levert de gokker een punt op.",
+      "quickTestHeading": "Snel testen",
+      "quickTestHint": "Sla de rest van deze wizard over en start meteen een klein spel, waarbij jij als echte speler meespeelt (niet alleen als GM), samen met genoeg bots om het mechanisme te bereiken. Je wordt doorgestuurd naar het GM-scherm, waar je eigen testuitnodiging klaarstaat om in een ander tabblad of apparaat te openen.",
+      "quickTestMoveToRoom": "Test Verhuis-naar-kamer",
+      "quickTestThreeDoors": "Test Drie Deuren",
+      "quickTestRussianRoulette": "Test Russisch Roulette",
+      "testerInviteName": "Jij (tester)"
     },
     "access": {
       "heading": "Toegang",
@@ -527,6 +590,9 @@
       "roundsSuffix": "{count} ronde(s)",
       "survivalStreakThreshold": "Drempel overlevingsreeks",
       "threeDoorsDeadlineMinutes": "Deadline Drie Deuren",
+      "endgameMode": "Eindspel",
+      "endgameTransitionDeadlineMinutes": "Deadline eindspel-overgang",
+      "rouletteTurnDeadlineMinutes": "Beurtdeadline roulette",
       "created": "Aangemaakt",
       "loadError": "Instellingen konden niet worden geladen: {error}",
       "loading": "Instellingen laden..."
@@ -586,6 +652,23 @@
       "effectRewindViewed": "Bekeek de stemverdeling van ronde {round}",
       "effectChecked": "Gecontroleerd en beantwoord"
     },
+    "endgameTransition": {
+      "heading": "Eindspel-overgang",
+      "acked": "heeft op Doorgaan geklikt",
+      "waiting": "wachten..."
+    },
+    "roulette": {
+      "heading": "Russische Roulette",
+      "bulletsRemaining": "Nog resterende kogels: {count}",
+      "currentTurn": "Huidige beurt: {name}",
+      "round": "Ronde",
+      "shooter": "Schutter",
+      "target": "Doelwit",
+      "result": "Resultaat",
+      "self": "(zichzelf)",
+      "hit": "raak",
+      "miss": "mis"
+    },
     "threeDoors": {
       "heading": "Drie Deuren",
       "player": "Speler",
@@ -618,8 +701,14 @@
       "resolveDoors": "Deuren afhandelen",
       "notReadyDoors": "Nog niet klaar -- niet elke levende speler heeft een deur gekozen.",
       "doorsResolved": "Deuren afgehandeld -- spel voorbij.",
+      "resolveTransition": "Eindspel-overgang afhandelen",
+      "notReadyTransition": "Nog niet klaar -- de overgangsdeadline is nog niet verstreken en niet elke finalist heeft op Doorgaan geklikt.",
+      "transitionResolved": "Overgang afgehandeld -- het echte eindspel is begonnen.",
+      "resolveRoulette": "Roulette-beurttimeout afhandelen",
+      "notReadyRoulette": "Nog niet klaar -- de deadline van de huidige beurt is nog niet verstreken.",
+      "rouletteResolved": "Timeout afgehandeld -- er is automatisch op zichzelf geschoten.",
       "exportSession": "Sessie exporteren",
-      "exportSessionHint": "Downloadt een JSON-bestand met alles wat op dit scherm te zien is -- instellingen, volledige stemverdeling per ronde en de keuzes bij de Drie Deuren.",
+      "exportSessionHint": "Downloadt een JSON-bestand met alles wat op dit scherm te zien is -- instellingen, volledige stemverdeling per ronde, de keuzes bij de Drie Deuren, en het schietlog van Russische Roulette.",
       "finishing": "Bezig met afronden...",
       "finishGame": "Spel afronden",
       "finishGameHint": "Sluit dit spel af en stuurt je terug naar de landingspagina. Een afgerond spel opnieuw bekijken is nog niet gebouwd -- gepland voor een latere versie.",

@@ -2,7 +2,8 @@
 // types` wiring yet (tracked as a follow-up) — keep these in sync with the schema by
 // hand until that's set up.
 
-export type GamePhase = "setup" | "active" | "three_doors" | "ended";
+export type GamePhase = "setup" | "active" | "endgame_transition" | "three_doors" | "russian_roulette" | "ended";
+export type EndgameMode = "three_doors" | "russian_roulette";
 export type MissedDeadlineMode = "forfeit_fatal" | "no_consequence" | "one_round_penalty";
 export type Round1StartMode = "wait_for_all" | "gm_manual" | "scheduled";
 export type RoundResolutionMode = "automatic" | "manual";
@@ -35,6 +36,10 @@ export interface Game {
   three_doors_winning_door: number | null;
   three_doors_deadline_minutes: number;
   three_doors_phase_started_at: string | null;
+  endgame_mode: EndgameMode;
+  endgame_transition_deadline_minutes: number;
+  endgame_transition_started_at: string | null;
+  roulette_turn_deadline_minutes: number;
   move_to_room_enabled: boolean;
   gm_player_id: string | null;
   finished_at: string | null;
@@ -65,6 +70,29 @@ export interface Player {
   vote_locked_for_round_number: number | null;
   is_bot: boolean;
   room_guess_points: number;
+  endgame_transition_acked_at: string | null;
+}
+
+export interface RouletteState {
+  game_id: string;
+  bullets_remaining: number;
+  turn_order: string[];
+  current_turn_index: number;
+  pass_number: number;
+  forced_self_only_player_ids: string[];
+  current_turn_deadline_at: string | null;
+  updated_at: string;
+}
+
+export interface RouletteShot {
+  id: string;
+  game_id: string;
+  round_number: number;
+  shooter_player_id: string;
+  target_player_id: string;
+  is_self: boolean;
+  hit: boolean;
+  created_at: string;
 }
 
 export interface Round {

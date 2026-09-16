@@ -47,9 +47,21 @@ const router = createRouter({
       meta: { auth: "player", requiresGhost: true },
     },
     {
+      path: "/endgame-transition",
+      name: "endgame-transition",
+      component: () => import("../views/EndgameTransitionView.vue"),
+      meta: { auth: "player" },
+    },
+    {
       path: "/three-doors",
       name: "three-doors",
       component: () => import("../views/ThreeDoorsView.vue"),
+      meta: { auth: "player" },
+    },
+    {
+      path: "/russian-roulette",
+      name: "russian-roulette",
+      component: () => import("../views/RussianRouletteView.vue"),
       meta: { auth: "player" },
     },
     {

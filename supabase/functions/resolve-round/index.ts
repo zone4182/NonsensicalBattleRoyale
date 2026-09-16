@@ -11,7 +11,8 @@ import {
   tallyVotesForRound,
 } from "../_shared/db.ts";
 import { evaluateEarnTriggers, grantRandomDrop } from "../_shared/powers.ts";
-import { castBotDoorPicks, castBotRoomGuesses, castBotRoomMoves, castBotVotes } from "../_shared/bots.ts";
+import { castBotRoomGuesses, castBotRoomMoves, castBotVotes } from "../_shared/bots.ts";
+import { beginEndgameTransition } from "../_shared/endgame.ts";
 import { sendPushToPlayers } from "../_shared/push.ts";
 import { publicName } from "../_shared/names.ts";
 import { assignRoundGuessTargets, resolveRoomMovesAndGuesses } from "../_shared/roomMovement.ts";
@@ -402,18 +403,16 @@ Deno.serve(async (req) => {
           newPhase = "ended";
           await tx`update battle_royale.games set phase = 'ended' where id = ${game.id}`;
         } else if (aliveCountAfter === 3) {
-          newPhase = "three_doors";
-          // The one real mechanic: a single door is secretly correct, chosen now and
-          // never exposed anywhere before resolve-doors uses it. All three doors are
-          // labeled "Exit" in the UI specifically so this stays hidden.
-          const winningDoor = 1 + Math.floor(Math.random() * 3);
-          await tx`
-            update battle_royale.games
-            set phase = 'three_doors', three_doors_winning_door = ${winningDoor}, three_doors_phase_started_at = now()
-            where id = ${game.id}
-          `;
-          const aliveBotIdsAfter = aliveRoster.filter((p) => p.is_bot && aliveIdsAfter.includes(p.id)).map((p) => p.id);
-          await castBotDoorPicks(tx, game.id, aliveBotIdsAfter);
+          // Endgame-transition gate (concept/mini-games/russian-roulette-endgame.md)
+          // sits in front of both endgame modes now -- see _shared/endgame.ts. Bots
+          // auto-ack instantly, so if all 3 finalists happen to be bots this call
+          // cascades straight through to (and, for Russian Roulette, all the way
+          // through) the real endgame in one go, same as every other bot decision.
+          newPhase = await beginEndgameTransition(
+            tx,
+            game,
+            aliveRoster.filter((p) => aliveIdsAfter.includes(p.id)).map((p) => ({ id: p.id, isBot: p.is_bot })),
+          );
         } else {
           const doubleVotePlayerId = game.double_vote_enabled
             ? await pickDoubleVoteHolder(tx, game.id, game.double_vote_floor_rounds)

@@ -48,6 +48,7 @@ interface GmGameOverview {
     display_name: string;
     status: string;
     role: string;
+    endgame_transition_acked: boolean;
     power_grants: GmPowerGrant[];
   }[];
   current_round: {
@@ -75,6 +76,9 @@ interface GmGameOverview {
     double_vote_floor_rounds: number;
     survival_streak_threshold: number;
     three_doors_deadline_minutes: number;
+    endgame_mode: string;
+    endgame_transition_deadline_minutes: number;
+    roulette_turn_deadline_minutes: number;
     created_at: string;
     finished_at: string | null;
   };
@@ -111,6 +115,19 @@ interface GmGameOverview {
       target_display_name: string;
       guessed_room_id: string;
       correct: boolean | null;
+    }[];
+  } | null;
+  roulette: {
+    bullets_remaining: number | null;
+    current_player_display_name: string | null;
+    turn_deadline_at: string | null;
+    shots: {
+      round_number: number;
+      shooter_display_name: string;
+      target_display_name: string;
+      is_self: boolean;
+      hit: boolean;
+      created_at: string;
     }[];
   } | null;
 }
@@ -300,9 +317,55 @@ async function resolveDoors() {
   }
 }
 
+// --- Resolve endgame transition (deadline fallback -- normally resolves itself the
+// moment all 3 finalists click Continue, this is only for an AFK one) ---
+const resolveTransitionPending = ref(false);
+const resolveTransitionMessage = ref<string | null>(null);
+
+async function resolveTransition() {
+  if (!session.token) return;
+  resolveTransitionPending.value = true;
+  resolveTransitionMessage.value = null;
+  try {
+    const res = await callFunction<{ resolved_count: number }>("resolve-endgame-transition", {}, { token: session.token });
+    resolveTransitionMessage.value =
+      res.resolved_count === 0 ? t("gmInPlay.controls.notReadyTransition") : t("gmInPlay.controls.transitionResolved");
+    await game.refresh(session.token);
+    await loadOverview();
+  } catch (err) {
+    resolveTransitionMessage.value = err instanceof ApiCallError ? err.message : t("common.somethingWentWrong");
+  } finally {
+    resolveTransitionPending.value = false;
+  }
+}
+
+// --- Resolve roulette turn timeout (deadline fallback -- an AFK player, not a normal
+// human/bot turn, which both resolve themselves) ---
+const resolveRoulettePending = ref(false);
+const resolveRouletteMessage = ref<string | null>(null);
+
+async function resolveRouletteTimeout() {
+  if (!session.token) return;
+  resolveRoulettePending.value = true;
+  resolveRouletteMessage.value = null;
+  try {
+    const res = await callFunction<{ resolved_count: number }>("resolve-roulette-timeouts", {}, { token: session.token });
+    resolveRouletteMessage.value =
+      res.resolved_count === 0 ? t("gmInPlay.controls.notReadyRoulette") : t("gmInPlay.controls.rouletteResolved");
+    await game.refresh(session.token);
+    await loadOverview();
+  } catch (err) {
+    resolveRouletteMessage.value = err instanceof ApiCallError ? err.message : t("common.somethingWentWrong");
+  } finally {
+    resolveRoulettePending.value = false;
+  }
+}
+
 const showStartButton = computed(() => game.phase === "setup" || game.phase === null);
 const showResolveButton = computed(() => game.phase === "active");
 const showResolveDoorsButton = computed(() => game.phase === "three_doors");
+const showResolveTransitionButton = computed(() => game.phase === "endgame_transition");
+const showResolveRouletteButton = computed(() => game.phase === "russian_roulette");
 
 // --- Finish game ---
 // Administrative closure, separate from phase 'ended' (see finish-game/index.ts) --
@@ -346,6 +409,7 @@ function exportSession() {
     rounds: overview.value.rounds,
     door_picks: overview.value.door_picks,
     move_to_room: overview.value.move_to_room,
+    roulette: overview.value.roulette,
   };
 
   const blob = new Blob([JSON.stringify(snapshot, null, 2)], { type: "application/json" });
@@ -537,6 +601,24 @@ async function submit() {
           <tr>
             <th>{{ t("gmInPlay.settings.threeDoorsDeadlineMinutes") }}</th>
             <td>{{ t("gmInPlay.settings.minutesSuffix", { minutes: overview.game.three_doors_deadline_minutes }) }}</td>
+          </tr>
+          <tr>
+            <th>{{ t("gmInPlay.settings.endgameMode") }}</th>
+            <td>
+              {{
+                overview.game.endgame_mode === "russian_roulette"
+                  ? t("gmSetup.rules.endgameModeOptions.russianRoulette")
+                  : t("gmSetup.rules.endgameModeOptions.threeDoors")
+              }}
+            </td>
+          </tr>
+          <tr>
+            <th>{{ t("gmInPlay.settings.endgameTransitionDeadlineMinutes") }}</th>
+            <td>{{ t("gmInPlay.settings.minutesSuffix", { minutes: overview.game.endgame_transition_deadline_minutes }) }}</td>
+          </tr>
+          <tr v-if="overview.game.endgame_mode === 'russian_roulette'">
+            <th>{{ t("gmInPlay.settings.rouletteTurnDeadlineMinutes") }}</th>
+            <td>{{ t("gmInPlay.settings.minutesSuffix", { minutes: overview.game.roulette_turn_deadline_minutes }) }}</td>
           </tr>
           <tr>
             <th>{{ t("gmInPlay.settings.created") }}</th>
@@ -755,6 +837,62 @@ async function submit() {
     </div>
 
     <div
+      v-if="game.phase === 'endgame_transition' && overview"
+      id="gm-in-play-endgame-transition-panel"
+    >
+      <h2>{{ t("gmInPlay.endgameTransition.heading") }}</h2>
+      <ul>
+        <li
+          v-for="p in overview.players.filter((pl) => pl.status === 'alive' && pl.role === 'player')"
+          :key="p.id"
+        >
+          {{ p.display_name }} --
+          {{ p.endgame_transition_acked ? t("gmInPlay.endgameTransition.acked") : t("gmInPlay.endgameTransition.waiting") }}
+        </li>
+      </ul>
+    </div>
+
+    <div
+      v-if="overview?.roulette"
+      id="gm-in-play-roulette-panel"
+    >
+      <h2>{{ t("gmInPlay.roulette.heading") }}</h2>
+      <p v-if="overview.roulette.bullets_remaining !== null">
+        {{ t("gmInPlay.roulette.bulletsRemaining", { count: overview.roulette.bullets_remaining }) }}
+      </p>
+      <p v-if="overview.roulette.current_player_display_name">
+        {{ t("gmInPlay.roulette.currentTurn", { name: overview.roulette.current_player_display_name }) }}
+      </p>
+      <div
+        v-if="overview.roulette.shots.length > 0"
+        class="table-scroll"
+      >
+        <table class="votes-table">
+          <thead>
+            <tr>
+              <th>{{ t("gmInPlay.roulette.round") }}</th>
+              <th>{{ t("gmInPlay.roulette.shooter") }}</th>
+              <th>{{ t("gmInPlay.roulette.target") }}</th>
+              <th>{{ t("gmInPlay.roulette.result") }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              v-for="(shot, i) in overview.roulette.shots"
+              :key="i"
+              :class="{ 'eliminated-row': shot.hit }"
+            >
+              <td>{{ shot.round_number }}</td>
+              <td>{{ shot.shooter_display_name }}</td>
+              <td>{{ shot.is_self ? t("gmInPlay.roulette.self") : shot.target_display_name }}</td>
+              <td>{{ shot.hit ? t("gmInPlay.roulette.hit") : t("gmInPlay.roulette.miss") }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div
       v-if="overview && overview.door_picks.length > 0"
       id="gm-in-play-three-doors-panel"
     >
@@ -865,6 +1003,40 @@ async function submit() {
       </button>
       <p v-if="resolveDoorsMessage">
         {{ resolveDoorsMessage }}
+      </p>
+    </section>
+
+    <section
+      id="gm-in-play-resolve-transition-panel"
+      class="round-controls"
+    >
+      <button
+        v-if="showResolveTransitionButton"
+        type="button"
+        :disabled="resolveTransitionPending"
+        @click="resolveTransition"
+      >
+        {{ resolveTransitionPending ? t("gmInPlay.controls.resolving") : t("gmInPlay.controls.resolveTransition") }}
+      </button>
+      <p v-if="resolveTransitionMessage">
+        {{ resolveTransitionMessage }}
+      </p>
+    </section>
+
+    <section
+      id="gm-in-play-resolve-roulette-panel"
+      class="round-controls"
+    >
+      <button
+        v-if="showResolveRouletteButton"
+        type="button"
+        :disabled="resolveRoulettePending"
+        @click="resolveRouletteTimeout"
+      >
+        {{ resolveRoulettePending ? t("gmInPlay.controls.resolving") : t("gmInPlay.controls.resolveRoulette") }}
+      </button>
+      <p v-if="resolveRouletteMessage">
+        {{ resolveRouletteMessage }}
       </p>
     </section>
 

@@ -27,6 +27,14 @@ interface GameRevealResponse {
     resolved_outcome: "win" | "lose" | "lose_all" | null;
     picked_at: string;
   }[];
+  roulette_shots: {
+    round_number: number;
+    shooter_display_name: string;
+    target_display_name: string;
+    is_self: boolean;
+    hit: boolean;
+    created_at: string;
+  }[];
 }
 
 const { t } = useI18n();
@@ -135,6 +143,34 @@ function close() {
                 <td>{{ pick.player_display_name }}</td>
                 <td>{{ pick.door_number }}</td>
                 <td>{{ pick.resolved_outcome ?? t("gameStats.pending") }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </template>
+
+      <template v-if="reveal.roulette_shots.length > 0">
+        <h2>{{ t("gameStats.rouletteHeading") }}</h2>
+        <div class="table-scroll">
+          <table class="votes-table">
+            <thead>
+              <tr>
+                <th>{{ t("gameStats.roundColumn") }}</th>
+                <th>{{ t("gameStats.shooter") }}</th>
+                <th>{{ t("gameStats.target") }}</th>
+                <th>{{ t("gameStats.result") }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr
+                v-for="(shot, i) in reveal.roulette_shots"
+                :key="i"
+                :class="{ 'eliminated-row': shot.hit }"
+              >
+                <td>{{ shot.round_number }}</td>
+                <td>{{ shot.shooter_display_name }}</td>
+                <td>{{ shot.is_self ? t("gameStats.self") : shot.target_display_name }}</td>
+                <td>{{ shot.hit ? t("gameStats.hit") : t("gameStats.miss") }}</td>
               </tr>
             </tbody>
           </table>

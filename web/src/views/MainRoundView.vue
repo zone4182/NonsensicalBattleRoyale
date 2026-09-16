@@ -67,8 +67,12 @@ watch(
   (phase) => {
     if (phase === "ended") {
       router.push({ name: "end-game-reveal" });
+    } else if (phase === "endgame_transition" && game.yourStatus?.status === "alive") {
+      router.push({ name: "endgame-transition" });
     } else if (phase === "three_doors" && game.yourStatus?.status === "alive") {
       router.push({ name: "three-doors" });
+    } else if (phase === "russian_roulette" && game.yourStatus?.status === "alive") {
+      router.push({ name: "russian-roulette" });
     }
   },
 );

@@ -4,9 +4,10 @@ import { callFunction } from "../lib/api";
 
 // Field names mirror supabase/functions/_shared/types.ts (Game.phase, Player.status)
 // so later milestones can populate real data without renaming.
-export type GamePhase = "setup" | "active" | "three_doors" | "ended";
+export type GamePhase = "setup" | "active" | "endgame_transition" | "three_doors" | "russian_roulette" | "ended";
 export type PlayerStatus = "alive" | "ghost";
 export type RoundResolutionMode = "automatic" | "manual";
+export type EndgameMode = "three_doors" | "russian_roulette";
 
 export type RosterPlayerRole = "player" | "gm";
 
@@ -37,6 +38,36 @@ export type PrologueOption = "call_police" | "get_help" | "drink_whisky";
 export interface ThreeDoorsState {
   deadlineAt: string | null;
   yourPick: number | null;
+}
+
+export interface EndgameTransitionState {
+  acked: boolean;
+  deadlineAt: string | null;
+  endgameMode: EndgameMode;
+}
+
+export interface RouletteTurnPlayer {
+  playerId: string;
+  displayName: string;
+}
+
+export interface RouletteShot {
+  shooterDisplayName: string;
+  targetDisplayName: string;
+  isSelf: boolean;
+  hit: boolean;
+  roundNumber: number;
+  createdAt: string;
+}
+
+export interface RouletteState {
+  bulletsRemaining: number;
+  turnOrder: RouletteTurnPlayer[];
+  currentPlayerId: string | null;
+  isYourTurn: boolean;
+  forcedSelfOnly: boolean;
+  turnDeadlineAt: string | null;
+  shotHistory: RouletteShot[];
 }
 
 export interface HeldPower {
@@ -100,6 +131,23 @@ interface GetGameStateResponse {
   phase: GamePhase;
   game_finished: boolean;
   three_doors: { deadline_at: string | null; your_pick: number | null } | null;
+  endgame_transition: { acked: boolean; deadline_at: string | null; endgame_mode: EndgameMode } | null;
+  roulette: {
+    bullets_remaining: number;
+    turn_order: { player_id: string; display_name: string }[];
+    current_player_id: string | null;
+    is_your_turn: boolean;
+    forced_self_only: boolean;
+    turn_deadline_at: string | null;
+    shot_history: {
+      shooter_display_name: string;
+      target_display_name: string;
+      is_self: boolean;
+      hit: boolean;
+      round_number: number;
+      created_at: string;
+    }[];
+  } | null;
   round_resolution_mode: RoundResolutionMode;
   allow_vote_change: boolean;
   current_round: { round_number: number; voting_deadline_at: string | null; is_prologue: boolean } | null;
@@ -142,6 +190,8 @@ export const useGameStore = defineStore("game", () => {
   const narrationEntries = ref<NarrationEntry[]>([]);
   const moveToRoom = ref<MoveToRoomState | null>(null);
   const threeDoors = ref<ThreeDoorsState | null>(null);
+  const endgameTransition = ref<EndgameTransitionState | null>(null);
+  const roulette = ref<RouletteState | null>(null);
   const previousPrologueOutcome = ref<PrologueOption | null>(null);
 
   // Single source for populating this store -- reused by every screen that needs
@@ -154,6 +204,27 @@ export const useGameStore = defineStore("game", () => {
     phase.value = raw.phase;
     gameFinished.value = raw.game_finished;
     threeDoors.value = raw.three_doors ? { deadlineAt: raw.three_doors.deadline_at, yourPick: raw.three_doors.your_pick } : null;
+    endgameTransition.value = raw.endgame_transition
+      ? { acked: raw.endgame_transition.acked, deadlineAt: raw.endgame_transition.deadline_at, endgameMode: raw.endgame_transition.endgame_mode }
+      : null;
+    roulette.value = raw.roulette
+      ? {
+          bulletsRemaining: raw.roulette.bullets_remaining,
+          turnOrder: raw.roulette.turn_order.map((p) => ({ playerId: p.player_id, displayName: p.display_name })),
+          currentPlayerId: raw.roulette.current_player_id,
+          isYourTurn: raw.roulette.is_your_turn,
+          forcedSelfOnly: raw.roulette.forced_self_only,
+          turnDeadlineAt: raw.roulette.turn_deadline_at,
+          shotHistory: raw.roulette.shot_history.map((s) => ({
+            shooterDisplayName: s.shooter_display_name,
+            targetDisplayName: s.target_display_name,
+            isSelf: s.is_self,
+            hit: s.hit,
+            roundNumber: s.round_number,
+            createdAt: s.created_at,
+          })),
+        }
+      : null;
     roundResolutionMode.value = raw.round_resolution_mode;
     allowVoteChange.value = raw.allow_vote_change;
     currentRound.value = raw.current_round
@@ -215,6 +286,8 @@ export const useGameStore = defineStore("game", () => {
     narrationEntries,
     moveToRoom,
     threeDoors,
+    endgameTransition,
+    roulette,
     previousPrologueOutcome,
     refresh,
   };

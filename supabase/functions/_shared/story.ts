@@ -40,3 +40,39 @@ export function coinFlipForcedNarration(name: string): string {
 export function leastVotesForcedNarration(name: string): string {
   return ` The house has had enough of your silence. It turns its eye toward whoever felt safest -- ${name}, barely suspected by anyone, is the one it chooses. Being invisible was never truly safe.`;
 }
+
+// Endgame transition (concept/mini-games/russian-roulette-endgame.md) -- shown once,
+// the moment alive count drops to 3, before either endgame's own narration begins.
+// Text varies by games.endgame_mode; same beat either way (three are left, one final
+// trial remains before anyone can go home).
+export const ENDGAME_TRANSITION_NARRATION: Record<"three_doors" | "russian_roulette", string> = {
+  three_doors:
+    "Only three of you remain. The house leads you down, deeper than anyone has gone this whole weekend, to a chamber none of you remember from before -- and there, waiting, are three doors.",
+  russian_roulette:
+    "Only three of you remain. The house leads you back to where the jar once sat by the door -- but the jar is gone now. In its place: a revolver, and two bullets.",
+};
+
+// Shown once, right as the Russian Roulette endgame actually begins (after the shared
+// transition screen above) -- explains the mechanic itself, since nothing about it was
+// ever told to players beforehand (same "discover the rules by living them" principle
+// as the double vote and every hidden power).
+export const RUSSIAN_ROULETTE_INTRO_NARRATION =
+  "The revolver holds six chambers. Two carry a bullet; the rest are empty, and no one -- not even the house -- will say which is which. Each of you, in turn, will choose: turn the gun on yourself, or on one of the others left standing. Whoever is still breathing when the chambers finally empty walks out the front door, alone.";
+
+export function rouletteSelfHitNarration(name: string): string {
+  return `The gun does not miss this time. ${name} turns it on themselves -- and the house takes what it's owed.`;
+}
+
+export function rouletteOtherHitNarration(shooterName: string, targetName: string): string {
+  return `${shooterName} aims across the room. ${targetName} doesn't get to argue.`;
+}
+
+export function rouletteMissNarration(shooterName: string, isSelf: boolean, targetName: string): string {
+  return isSelf
+    ? `${shooterName} turns the gun on themselves. Empty. The house isn't finished with anyone yet.`
+    : `${shooterName} aims at ${targetName}. Empty. For now.`;
+}
+
+export function rouletteWinnerNarration(name: string): string {
+  return `The chambers are spent. ${name} is still standing -- and somewhere in the house, a door that was locked all weekend finally clicks open.`;
+}

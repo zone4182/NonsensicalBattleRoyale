@@ -54,6 +54,12 @@ const maxConsecutiveTies = ref(-1);
 const maxTiesBehavior = ref<"coin_flip" | "least_votes_dies">("coin_flip");
 const moveToRoomEnabled = ref(false);
 const threeDoorsDeadlineMinutes = ref(10);
+// concept/mini-games/russian-roulette-endgame.md -- which endgame fires once alive
+// count drops to 3, plus the two deadlines the shared transition gate and (Russian
+// Roulette only) each turn need.
+const endgameMode = ref<"three_doors" | "russian_roulette">("three_doors");
+const endgameTransitionDeadlineMinutes = ref(5);
+const rouletteTurnDeadlineMinutes = ref(5);
 
 // GM-configurable per-power enable/disable, seeded from the catalogue's own defaults
 // (mirrors powers_catalogue.default_enabled -- every power on except false_flag).
@@ -109,6 +115,8 @@ const stepIsValid = computed<Record<StepKey, boolean>>(() => ({
   rules:
     roundIntervalMinutes.value >= 10 &&
     threeDoorsDeadlineMinutes.value >= 1 &&
+    endgameTransitionDeadlineMinutes.value >= 1 &&
+    rouletteTurnDeadlineMinutes.value >= 1 &&
     (maxConsecutiveTies.value === -1 || maxConsecutiveTies.value >= 2),
   powers: !doubleVoteEnabled.value || doubleVoteFloorRounds.value >= -1,
   miniGames: true,
@@ -135,6 +143,28 @@ function jumpTo(index: number) {
 const pending = ref(false);
 const errorMessage = ref<string | null>(null);
 
+// Quick-test launchers (per explicit request) -- each one configures just enough of
+// the wizard's own state to reach that mechanic fast, drafts a single "you, playing"
+// invite alongside the bots, and creates the game immediately, skipping the rest of
+// the wizard entirely. round1_start_mode is forced to 'wait_for_all' specifically so
+// round 1 starts itself the moment the tester redeems that one invite in a second tab
+// -- no separate trip to "Start Round 1" needed. Move-to-Room only needs round 2 to be
+// reachable (1 resolved round); the two endgames need alive count to drop to exactly
+// 3, which needs the true MIN_PLAYERS_TO_START floor (5) to even start round 1 at all,
+// so 4 bots + this 1 tester is the fastest a game can reach either endgame (2
+// eliminations: 5 -> 4 -> 3).
+type QuickTestKind = "move_to_room" | "three_doors" | "russian_roulette";
+
+async function quickTestGame(kind: QuickTestKind) {
+  moveToRoomEnabled.value = kind === "move_to_room";
+  endgameMode.value = kind === "russian_roulette" ? "russian_roulette" : "three_doors";
+  botMode.value = true;
+  botCount.value = 4;
+  round1StartMode.value = "wait_for_all";
+  draftInvites.value = [t("gmSetup.miniGames.testerInviteName")];
+  await createGame();
+}
+
 async function createGame() {
   pending.value = true;
   errorMessage.value = null;
@@ -157,6 +187,9 @@ async function createGame() {
         double_vote_floor_rounds: doubleVoteEnabled.value ? doubleVoteFloorRounds.value : undefined,
         move_to_room_enabled: moveToRoomEnabled.value,
         three_doors_deadline_minutes: threeDoorsDeadlineMinutes.value,
+        endgame_mode: endgameMode.value,
+        endgame_transition_deadline_minutes: endgameTransitionDeadlineMinutes.value,
+        roulette_turn_deadline_minutes: rouletteTurnDeadlineMinutes.value,
         power_settings: powerEnabled.value,
         power_bot_settings: powerBotEligible.value,
       },
@@ -364,6 +397,34 @@ async function createGame() {
           >
           <span class="field-hint">{{ t("gmSetup.rules.threeDoorsDeadlineMinutesHint") }}</span>
         </label>
+        <label>
+          {{ t("gmSetup.rules.endgameMode") }}
+          <select v-model="endgameMode">
+            <option value="three_doors">{{ t("gmSetup.rules.endgameModeOptions.threeDoors") }}</option>
+            <option value="russian_roulette">{{ t("gmSetup.rules.endgameModeOptions.russianRoulette") }}</option>
+          </select>
+          <span class="field-hint">{{ t(`gmSetup.rules.endgameModeHints.${endgameMode}`) }}</span>
+        </label>
+        <label>
+          {{ t("gmSetup.rules.endgameTransitionDeadlineMinutes") }}
+          <input
+            v-model.number="endgameTransitionDeadlineMinutes"
+            type="number"
+            min="1"
+            required
+          >
+          <span class="field-hint">{{ t("gmSetup.rules.endgameTransitionDeadlineMinutesHint") }}</span>
+        </label>
+        <label v-if="endgameMode === 'russian_roulette'">
+          {{ t("gmSetup.rules.rouletteTurnDeadlineMinutes") }}
+          <input
+            v-model.number="rouletteTurnDeadlineMinutes"
+            type="number"
+            min="1"
+            required
+          >
+          <span class="field-hint">{{ t("gmSetup.rules.rouletteTurnDeadlineMinutesHint") }}</span>
+        </label>
       </section>
 
       <section
@@ -509,6 +570,36 @@ async function createGame() {
         <span class="field-hint">
           {{ t("gmSetup.miniGames.moveToRoomEnabledHint") }}
         </span>
+
+        <hr class="divider">
+
+        <h3>{{ t("gmSetup.miniGames.quickTestHeading") }}</h3>
+        <span class="field-hint">
+          {{ t("gmSetup.miniGames.quickTestHint") }}
+        </span>
+        <div class="quick-test-buttons">
+          <button
+            type="button"
+            :disabled="pending"
+            @click="quickTestGame('move_to_room')"
+          >
+            {{ t("gmSetup.miniGames.quickTestMoveToRoom") }}
+          </button>
+          <button
+            type="button"
+            :disabled="pending"
+            @click="quickTestGame('three_doors')"
+          >
+            {{ t("gmSetup.miniGames.quickTestThreeDoors") }}
+          </button>
+          <button
+            type="button"
+            :disabled="pending"
+            @click="quickTestGame('russian_roulette')"
+          >
+            {{ t("gmSetup.miniGames.quickTestRussianRoulette") }}
+          </button>
+        </div>
       </section>
 
       <section
@@ -670,6 +761,23 @@ async function createGame() {
 
 .field-hint.disclaimer {
   color: var(--nbr-danger);
+}
+
+.divider {
+  width: 100%;
+  border: none;
+  border-top: 1px solid var(--nbr-border);
+  margin: var(--nbr-space-2) 0;
+}
+
+.quick-test-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--nbr-space-2);
+}
+
+.quick-test-buttons button {
+  flex: 1 1 auto;
 }
 
 .power-block {

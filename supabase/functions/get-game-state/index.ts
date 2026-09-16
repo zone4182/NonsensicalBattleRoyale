@@ -3,7 +3,7 @@ import { authenticate } from "../_shared/auth.ts";
 import { countActiveVotesForVoter, getActiveVoteTargetsForVoter, sql } from "../_shared/db.ts";
 import { publicName } from "../_shared/names.ts";
 import { ALL_ROOM_IDS, type RoomId } from "../_shared/manor.ts";
-import type { Player, PrologueOption, Round } from "../_shared/types.ts";
+import type { Player, PrologueOption, Round, RouletteState } from "../_shared/types.ts";
 
 // Read-only. Queries players/rounds/power_grants/narration_log freely, plus -- via the
 // sanctioned getActiveVoteTargetsForVoter -- a player's own vote target(s), never
@@ -167,6 +167,57 @@ Deno.serve(async (req) => {
       threeDoors = { deadline_at: deadlineAt, your_pick: yourPick };
     }
 
+    // Endgame-transition gate (concept/mini-games/russian-roulette-endgame.md) -- own
+    // ack status only, same "tell a returning visitor what they already chose"
+    // reasoning as your_active_votes above.
+    let endgameTransition: { acked: boolean; deadline_at: string | null; endgame_mode: string } | null = null;
+    if (ctx.game.phase === "endgame_transition") {
+      const deadlineAt = ctx.game.endgame_transition_started_at
+        ? new Date(
+            new Date(ctx.game.endgame_transition_started_at).getTime() + ctx.game.endgame_transition_deadline_minutes * 60_000,
+          ).toISOString()
+        : null;
+      endgameTransition = {
+        acked: ctx.role === "player" ? ctx.player.endgame_transition_acked_at !== null : false,
+        deadline_at: deadlineAt,
+        endgame_mode: ctx.game.endgame_mode,
+      };
+    }
+
+    // Russian Roulette endgame state -- whose turn it is, whether it's yours, and the
+    // full shot history (never anonymized the way normal-round votes are -- there's no
+    // "who shot whom stays secret" rule here, the whole point is watching it happen).
+    let rouletteState: Record<string, unknown> | null = null;
+    if (ctx.game.phase === "russian_roulette") {
+      const [state] = await db<RouletteState[]>`select * from battle_royale.roulette_state where game_id = ${ctx.game.id}`;
+      if (state) {
+        const nameById = new Map(roster.map((p) => [p.id, publicName(p.display_name, p.chosen_display_name)]));
+        const currentPlayerId = state.turn_order[state.current_turn_index] ?? null;
+        const shots = await db<
+          { shooter_player_id: string; target_player_id: string; is_self: boolean; hit: boolean; round_number: number; created_at: string }[]
+        >`
+          select shooter_player_id, target_player_id, is_self, hit, round_number, created_at
+          from battle_royale.roulette_shots where game_id = ${ctx.game.id} order by created_at asc
+        `;
+        rouletteState = {
+          bullets_remaining: state.bullets_remaining,
+          turn_order: state.turn_order.map((id) => ({ player_id: id, display_name: nameById.get(id) ?? "unknown" })),
+          current_player_id: currentPlayerId,
+          is_your_turn: ctx.role === "player" && currentPlayerId === ctx.player.id,
+          forced_self_only: ctx.role === "player" && state.forced_self_only_player_ids.includes(ctx.player.id),
+          turn_deadline_at: state.current_turn_deadline_at,
+          shot_history: shots.map((s) => ({
+            shooter_display_name: nameById.get(s.shooter_player_id) ?? "unknown",
+            target_display_name: nameById.get(s.target_player_id) ?? "unknown",
+            is_self: s.is_self,
+            hit: s.hit,
+            round_number: s.round_number,
+            created_at: s.created_at,
+          })),
+        };
+      }
+    }
+
     // Drives the epilogue placeholder's win/lose branch once the game has ended. A
     // Three Doors pick's own resolved_outcome is authoritative when one exists
     // (resolve-doors never flips players.status the way resolve-round's vote-off does);
@@ -189,6 +240,8 @@ Deno.serve(async (req) => {
       // the GM ended it even if phase itself never reached 'ended' naturally.
       game_finished: ctx.game.finished_at !== null,
       three_doors: threeDoors,
+      endgame_transition: endgameTransition,
+      roulette: rouletteState,
       round_resolution_mode: ctx.game.round_resolution_mode,
       allow_vote_change: ctx.game.allow_vote_change,
       current_round: openRound

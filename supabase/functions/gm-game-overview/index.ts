@@ -56,9 +56,10 @@ Deno.serve(async (req) => {
         status: string;
         role: string;
         vote_locked_for_round_number: number | null;
+        endgame_transition_acked_at: string | null;
       }[]
     >`
-      select id, display_name, chosen_display_name, status, role, vote_locked_for_round_number
+      select id, display_name, chosen_display_name, status, role, vote_locked_for_round_number, endgame_transition_acked_at
       from battle_royale.players where game_id = ${ctx.game.id}
     `;
     const nameById = new Map(players.map((p) => [p.id, gmName(p.display_name, p.chosen_display_name)]));
@@ -105,6 +106,23 @@ Deno.serve(async (req) => {
       from battle_royale.door_picks
       where game_id = ${ctx.game.id}
       order by picked_at asc
+    `;
+
+    // Russian Roulette endgame (concept/mini-games/russian-roulette-endgame.md) --
+    // live state + full shot log, GM-only visibility mirrors door_picks' role above.
+    const rouletteShots = await db<
+      { shooter_player_id: string; target_player_id: string; is_self: boolean; hit: boolean; round_number: number; created_at: string }[]
+    >`
+      select shooter_player_id, target_player_id, is_self, hit, round_number, created_at
+      from battle_royale.roulette_shots
+      where game_id = ${ctx.game.id}
+      order by created_at asc
+    `;
+    const [rouletteStateRow] = await db<
+      { bullets_remaining: number; turn_order: string[]; current_turn_index: number; current_turn_deadline_at: string | null }[]
+    >`
+      select bullets_remaining, turn_order, current_turn_index, current_turn_deadline_at
+      from battle_royale.roulette_state where game_id = ${ctx.game.id}
     `;
 
     const [openRound] = await db<Round[]>`
@@ -198,6 +216,7 @@ Deno.serve(async (req) => {
         display_name: nameById.get(p.id) ?? p.display_name,
         status: p.status,
         role: p.role,
+        endgame_transition_acked: p.endgame_transition_acked_at !== null,
         power_grants: (powerGrantsByPlayerId.get(p.id) ?? []).map((g) => ({
           power_key: g.power_key,
           acquisition_method: g.acquisition_method,
@@ -223,6 +242,9 @@ Deno.serve(async (req) => {
         double_vote_floor_rounds: ctx.game.double_vote_floor_rounds,
         survival_streak_threshold: ctx.game.survival_streak_threshold,
         three_doors_deadline_minutes: ctx.game.three_doors_deadline_minutes,
+        endgame_mode: ctx.game.endgame_mode,
+        endgame_transition_deadline_minutes: ctx.game.endgame_transition_deadline_minutes,
+        roulette_turn_deadline_minutes: ctx.game.roulette_turn_deadline_minutes,
         created_at: ctx.game.created_at,
         finished_at: ctx.game.finished_at,
       },
@@ -268,6 +290,24 @@ Deno.serve(async (req) => {
         resolved_outcome: p.resolved_outcome,
         picked_at: p.picked_at,
       })),
+      roulette:
+        rouletteShots.length > 0 || rouletteStateRow
+          ? {
+              bullets_remaining: rouletteStateRow?.bullets_remaining ?? null,
+              current_player_display_name: rouletteStateRow
+                ? (nameById.get(rouletteStateRow.turn_order[rouletteStateRow.current_turn_index]) ?? null)
+                : null,
+              turn_deadline_at: rouletteStateRow?.current_turn_deadline_at ?? null,
+              shots: rouletteShots.map((s) => ({
+                round_number: s.round_number,
+                shooter_display_name: nameById.get(s.shooter_player_id) ?? "unknown",
+                target_display_name: nameById.get(s.target_player_id) ?? "unknown",
+                is_self: s.is_self,
+                hit: s.hit,
+                created_at: s.created_at,
+              })),
+            }
+          : null,
     });
   } catch (err) {
     return errorResponse(err);

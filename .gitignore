@@ -1,2 +1,8 @@
 .DS_Store
 *.log
+
+# Local-only bot simulation output -- simulation/README.md and
+# simulation/settings.template.json stay tracked, everything actually generated
+# per-run (session exports, ad-hoc settings files) doesn't.
+/simulation/sessions/
+/simulation/sim-*.json
