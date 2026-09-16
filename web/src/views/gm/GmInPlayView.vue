@@ -528,114 +528,114 @@ async function submit() {
         v-if="overview"
         class="table-scroll"
       >
-      <table class="settings-table">
-        <tbody>
-          <tr>
-            <th>{{ t("gmInPlay.settings.roundInterval") }}</th>
-            <td>{{ t("gmInPlay.settings.minutesSuffix", { minutes: overview.game.round_interval_minutes }) }}</td>
-          </tr>
-          <tr>
-            <th>{{ t("gmInPlay.settings.missedDeadlineMode") }}</th>
-            <td>{{ overview.game.missed_deadline_mode }}</td>
-          </tr>
-          <tr>
-            <th>{{ t("gmInPlay.settings.round1StartMode") }}</th>
-            <td>{{ overview.game.round1_start_mode }}</td>
-          </tr>
-          <tr>
-            <th>{{ t("gmInPlay.settings.roundResolutionMode") }}</th>
-            <td>{{ overview.game.round_resolution_mode }}</td>
-          </tr>
-          <tr>
-            <th>{{ t("gmInPlay.settings.allowVoteChange") }}</th>
-            <td>{{ overview.game.allow_vote_change ? t("gmInPlay.settings.yes") : t("gmInPlay.settings.no") }}</td>
-          </tr>
-          <tr>
-            <th>{{ t("gmInPlay.settings.tieBreakMode") }}</th>
-            <td>
-              {{
-                overview.game.tie_break_mode === "no_elimination"
-                  ? t("gmInPlay.settings.tieBreakNoElimination")
-                  : t("gmInPlay.settings.tieBreakRandom")
-              }}
-            </td>
-          </tr>
-          <tr v-if="overview.game.tie_break_mode === 'no_elimination'">
-            <th>{{ t("gmInPlay.settings.maxConsecutiveTies") }}</th>
-            <td>
-              {{
-                overview.game.max_consecutive_ties === -1
-                  ? t("gmInPlay.settings.disabled")
-                  : t("gmInPlay.settings.roundsSuffix", { count: overview.game.max_consecutive_ties })
-              }}
-            </td>
-          </tr>
-          <tr v-if="overview.game.tie_break_mode === 'no_elimination' && overview.game.max_consecutive_ties !== -1">
-            <th>{{ t("gmInPlay.settings.maxTiesBehavior") }}</th>
-            <td>
-              {{
-                overview.game.max_ties_behavior === "least_votes_dies"
-                  ? t("gmSetup.rules.maxTiesBehaviorOptions.leastVotesDies")
-                  : t("gmSetup.rules.maxTiesBehaviorOptions.coinFlip")
-              }}
-            </td>
-          </tr>
-          <tr>
-            <th>{{ t("gmInPlay.settings.doubleVoteEnabled") }}</th>
-            <td>{{ overview.game.double_vote_enabled ? t("gmInPlay.settings.enabled") : t("gmInPlay.settings.disabled") }}</td>
-          </tr>
-          <tr v-if="overview.game.double_vote_enabled">
-            <th>{{ t("gmInPlay.settings.doubleVoteFloorRounds") }}</th>
-            <td>
-              {{
-                overview.game.double_vote_floor_rounds === -1
-                  ? t("gmInPlay.settings.onceEver")
-                  : t("gmInPlay.settings.roundsSuffix", { count: overview.game.double_vote_floor_rounds })
-              }}
-            </td>
-          </tr>
-          <tr>
-            <th>{{ t("gmInPlay.settings.survivalStreakThreshold") }}</th>
-            <td>{{ overview.game.survival_streak_threshold }}</td>
-          </tr>
-          <tr>
-            <th>{{ t("gmInPlay.settings.threeDoorsDeadlineMinutes") }}</th>
-            <td>{{ t("gmInPlay.settings.minutesSuffix", { minutes: overview.game.three_doors_deadline_minutes }) }}</td>
-          </tr>
-          <tr>
-            <th>{{ t("gmInPlay.settings.endgameMode") }}</th>
-            <td>
-              {{
-                overview.game.endgame_mode === "russian_roulette"
-                  ? t("gmSetup.rules.endgameModeOptions.russianRoulette")
-                  : t("gmSetup.rules.endgameModeOptions.threeDoors")
-              }}
-            </td>
-          </tr>
-          <tr>
-            <th>{{ t("gmInPlay.settings.endgameTransitionDeadlineMinutes") }}</th>
-            <td>{{ t("gmInPlay.settings.minutesSuffix", { minutes: overview.game.endgame_transition_deadline_minutes }) }}</td>
-          </tr>
-          <tr v-if="overview.game.endgame_mode === 'russian_roulette'">
-            <th>{{ t("gmInPlay.settings.rouletteTurnDeadlineMinutes") }}</th>
-            <td>{{ t("gmInPlay.settings.minutesSuffix", { minutes: overview.game.roulette_turn_deadline_minutes }) }}</td>
-          </tr>
-          <tr>
-            <th>{{ t("gmInPlay.settings.created") }}</th>
-            <td>{{ overview.game.created_at }}</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-    <p
-      v-else-if="overviewError"
-      class="error"
-    >
-      {{ t("gmInPlay.settings.loadError", { error: overviewError }) }}
-    </p>
-    <p v-else>
-      {{ t("gmInPlay.settings.loading") }}
-    </p>
+        <table class="settings-table">
+          <tbody>
+            <tr>
+              <th>{{ t("gmInPlay.settings.roundInterval") }}</th>
+              <td>{{ t("gmInPlay.settings.minutesSuffix", { minutes: overview.game.round_interval_minutes }) }}</td>
+            </tr>
+            <tr>
+              <th>{{ t("gmInPlay.settings.missedDeadlineMode") }}</th>
+              <td>{{ overview.game.missed_deadline_mode }}</td>
+            </tr>
+            <tr>
+              <th>{{ t("gmInPlay.settings.round1StartMode") }}</th>
+              <td>{{ overview.game.round1_start_mode }}</td>
+            </tr>
+            <tr>
+              <th>{{ t("gmInPlay.settings.roundResolutionMode") }}</th>
+              <td>{{ overview.game.round_resolution_mode }}</td>
+            </tr>
+            <tr>
+              <th>{{ t("gmInPlay.settings.allowVoteChange") }}</th>
+              <td>{{ overview.game.allow_vote_change ? t("gmInPlay.settings.yes") : t("gmInPlay.settings.no") }}</td>
+            </tr>
+            <tr>
+              <th>{{ t("gmInPlay.settings.tieBreakMode") }}</th>
+              <td>
+                {{
+                  overview.game.tie_break_mode === "no_elimination"
+                    ? t("gmInPlay.settings.tieBreakNoElimination")
+                    : t("gmInPlay.settings.tieBreakRandom")
+                }}
+              </td>
+            </tr>
+            <tr v-if="overview.game.tie_break_mode === 'no_elimination'">
+              <th>{{ t("gmInPlay.settings.maxConsecutiveTies") }}</th>
+              <td>
+                {{
+                  overview.game.max_consecutive_ties === -1
+                    ? t("gmInPlay.settings.disabled")
+                    : t("gmInPlay.settings.roundsSuffix", { count: overview.game.max_consecutive_ties })
+                }}
+              </td>
+            </tr>
+            <tr v-if="overview.game.tie_break_mode === 'no_elimination' && overview.game.max_consecutive_ties !== -1">
+              <th>{{ t("gmInPlay.settings.maxTiesBehavior") }}</th>
+              <td>
+                {{
+                  overview.game.max_ties_behavior === "least_votes_dies"
+                    ? t("gmSetup.rules.maxTiesBehaviorOptions.leastVotesDies")
+                    : t("gmSetup.rules.maxTiesBehaviorOptions.coinFlip")
+                }}
+              </td>
+            </tr>
+            <tr>
+              <th>{{ t("gmInPlay.settings.doubleVoteEnabled") }}</th>
+              <td>{{ overview.game.double_vote_enabled ? t("gmInPlay.settings.enabled") : t("gmInPlay.settings.disabled") }}</td>
+            </tr>
+            <tr v-if="overview.game.double_vote_enabled">
+              <th>{{ t("gmInPlay.settings.doubleVoteFloorRounds") }}</th>
+              <td>
+                {{
+                  overview.game.double_vote_floor_rounds === -1
+                    ? t("gmInPlay.settings.onceEver")
+                    : t("gmInPlay.settings.roundsSuffix", { count: overview.game.double_vote_floor_rounds })
+                }}
+              </td>
+            </tr>
+            <tr>
+              <th>{{ t("gmInPlay.settings.survivalStreakThreshold") }}</th>
+              <td>{{ overview.game.survival_streak_threshold }}</td>
+            </tr>
+            <tr>
+              <th>{{ t("gmInPlay.settings.threeDoorsDeadlineMinutes") }}</th>
+              <td>{{ t("gmInPlay.settings.minutesSuffix", { minutes: overview.game.three_doors_deadline_minutes }) }}</td>
+            </tr>
+            <tr>
+              <th>{{ t("gmInPlay.settings.endgameMode") }}</th>
+              <td>
+                {{
+                  overview.game.endgame_mode === "russian_roulette"
+                    ? t("gmSetup.rules.endgameModeOptions.russianRoulette")
+                    : t("gmSetup.rules.endgameModeOptions.threeDoors")
+                }}
+              </td>
+            </tr>
+            <tr>
+              <th>{{ t("gmInPlay.settings.endgameTransitionDeadlineMinutes") }}</th>
+              <td>{{ t("gmInPlay.settings.minutesSuffix", { minutes: overview.game.endgame_transition_deadline_minutes }) }}</td>
+            </tr>
+            <tr v-if="overview.game.endgame_mode === 'russian_roulette'">
+              <th>{{ t("gmInPlay.settings.rouletteTurnDeadlineMinutes") }}</th>
+              <td>{{ t("gmInPlay.settings.minutesSuffix", { minutes: overview.game.roulette_turn_deadline_minutes }) }}</td>
+            </tr>
+            <tr>
+              <th>{{ t("gmInPlay.settings.created") }}</th>
+              <td>{{ overview.game.created_at }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p
+        v-else-if="overviewError"
+        class="error"
+      >
+        {{ t("gmInPlay.settings.loadError", { error: overviewError }) }}
+      </p>
+      <p v-else>
+        {{ t("gmInPlay.settings.loading") }}
+      </p>
     </div>
 
     <div
@@ -691,108 +691,108 @@ async function submit() {
       <section
         v-for="round in overview?.rounds ?? []"
         :key="round.round_number"
-      class="round-votes-block"
-    >
-      <h3>{{ t("gmInPlay.votes.round", { number: round.round_number }) }}</h3>
-      <template v-if="round.is_prologue">
-        <p>
-          {{ t("gmInPlay.votes.prologueOutcome", { option: round.prologue_outcome ? t(`prologueDecision.options.${round.prologue_outcome}`) : "?" }) }}
-          <span v-if="round.prologue_tie_break">{{ t("gmInPlay.votes.randomTieBreak") }}</span>
-        </p>
-        <div class="table-scroll">
-          <table class="votes-table">
-            <thead>
-              <tr>
-                <th>{{ t("gmInPlay.votes.voter") }}</th>
-                <th>{{ t("gmInPlay.currentRound.prologueOption") }}</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr
-                v-for="(vote, i) in round.prologue_votes"
-                :key="i"
-              >
-                <td>{{ vote.voter_display_name }}</td>
-                <td>{{ t(`prologueDecision.options.${vote.option}`) }}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </template>
-      <template v-else>
-        <p>
-          {{ t("gmInPlay.votes.eliminated", { name: round.eliminated_player_display_name ?? t("gmInPlay.votes.noOne") }) }}
-          <span v-if="round.tie_break_method === 'random'">{{ t("gmInPlay.votes.randomTieBreak") }}</span>
-          <span v-else-if="round.tie_break_method === 'no_elimination'">{{ t("gmInPlay.votes.noEliminationTieBreak") }}</span>
-          <span v-else-if="round.tie_break_method === 'coin_flip_forced'">{{ t("gmInPlay.votes.coinFlipForcedTieBreak") }}</span>
-          <span v-else-if="round.tie_break_method === 'least_votes_forced'">{{ t("gmInPlay.votes.leastVotesForcedTieBreak") }}</span>
-        </p>
-        <div class="table-scroll">
-          <table class="votes-table">
-            <thead>
-              <tr>
-                <th>{{ t("gmInPlay.votes.voter") }}</th>
-                <th>{{ t("gmInPlay.votes.target") }}</th>
-                <th>{{ t("gmInPlay.votes.votesReceived") }}</th>
-                <th>{{ t("gmInPlay.votes.doubleVote") }}</th>
-                <th>{{ t("gmInPlay.votes.reason") }}</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr
-                v-for="(vote, i) in round.votes"
-                :key="i"
-                :class="{ 'eliminated-row': vote.target_display_name === round.eliminated_player_display_name }"
-              >
-                <td>{{ vote.voter_display_name }}</td>
-                <td>{{ vote.target_display_name }}</td>
-                <td>{{ vote.target_vote_count }}</td>
-                <td>{{ vote.is_double_vote ? t("gmInPlay.settings.yes") : "" }}</td>
-                <td>{{ vote.reason ?? "" }}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </template>
-
-      <div
-        v-if="overview?.move_to_room?.enabled && guessesForRound(round.round_number).length > 0"
-        class="round-guess-block"
+        class="round-votes-block"
       >
-        <h4>{{ t("gmInPlay.moveToRoom.guessHistoryHeading") }}</h4>
-        <div class="table-scroll">
-          <table class="votes-table">
-            <thead>
-              <tr>
-                <th>{{ t("gmInPlay.moveToRoom.guesser") }}</th>
-                <th>{{ t("gmInPlay.moveToRoom.target") }}</th>
-                <th>{{ t("gmInPlay.moveToRoom.guessedRoom") }}</th>
-                <th>{{ t("gmInPlay.moveToRoom.correct") }}</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr
-                v-for="(guess, i) in guessesForRound(round.round_number)"
-                :key="i"
-                :class="{ 'eliminated-row': guess.correct === false }"
-              >
-                <td>{{ guess.guesser_display_name }}</td>
-                <td>{{ guess.target_display_name }}</td>
-                <td>{{ t(`moveToRoom.rooms.${guess.guessed_room_id}`) }}</td>
-                <td>
-                  {{
-                    guess.correct === null
-                      ? t("gmInPlay.moveToRoom.pending")
-                      : guess.correct
-                        ? t("gmInPlay.settings.yes")
-                        : t("gmInPlay.settings.no")
-                  }}
-                </td>
-              </tr>
-            </tbody>
-          </table>
+        <h3>{{ t("gmInPlay.votes.round", { number: round.round_number }) }}</h3>
+        <template v-if="round.is_prologue">
+          <p>
+            {{ t("gmInPlay.votes.prologueOutcome", { option: round.prologue_outcome ? t(`prologueDecision.options.${round.prologue_outcome}`) : "?" }) }}
+            <span v-if="round.prologue_tie_break">{{ t("gmInPlay.votes.randomTieBreak") }}</span>
+          </p>
+          <div class="table-scroll">
+            <table class="votes-table">
+              <thead>
+                <tr>
+                  <th>{{ t("gmInPlay.votes.voter") }}</th>
+                  <th>{{ t("gmInPlay.currentRound.prologueOption") }}</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr
+                  v-for="(vote, i) in round.prologue_votes"
+                  :key="i"
+                >
+                  <td>{{ vote.voter_display_name }}</td>
+                  <td>{{ t(`prologueDecision.options.${vote.option}`) }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </template>
+        <template v-else>
+          <p>
+            {{ t("gmInPlay.votes.eliminated", { name: round.eliminated_player_display_name ?? t("gmInPlay.votes.noOne") }) }}
+            <span v-if="round.tie_break_method === 'random'">{{ t("gmInPlay.votes.randomTieBreak") }}</span>
+            <span v-else-if="round.tie_break_method === 'no_elimination'">{{ t("gmInPlay.votes.noEliminationTieBreak") }}</span>
+            <span v-else-if="round.tie_break_method === 'coin_flip_forced'">{{ t("gmInPlay.votes.coinFlipForcedTieBreak") }}</span>
+            <span v-else-if="round.tie_break_method === 'least_votes_forced'">{{ t("gmInPlay.votes.leastVotesForcedTieBreak") }}</span>
+          </p>
+          <div class="table-scroll">
+            <table class="votes-table">
+              <thead>
+                <tr>
+                  <th>{{ t("gmInPlay.votes.voter") }}</th>
+                  <th>{{ t("gmInPlay.votes.target") }}</th>
+                  <th>{{ t("gmInPlay.votes.votesReceived") }}</th>
+                  <th>{{ t("gmInPlay.votes.doubleVote") }}</th>
+                  <th>{{ t("gmInPlay.votes.reason") }}</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr
+                  v-for="(vote, i) in round.votes"
+                  :key="i"
+                  :class="{ 'eliminated-row': vote.target_display_name === round.eliminated_player_display_name }"
+                >
+                  <td>{{ vote.voter_display_name }}</td>
+                  <td>{{ vote.target_display_name }}</td>
+                  <td>{{ vote.target_vote_count }}</td>
+                  <td>{{ vote.is_double_vote ? t("gmInPlay.settings.yes") : "" }}</td>
+                  <td>{{ vote.reason ?? "" }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </template>
+
+        <div
+          v-if="overview?.move_to_room?.enabled && guessesForRound(round.round_number).length > 0"
+          class="round-guess-block"
+        >
+          <h4>{{ t("gmInPlay.moveToRoom.guessHistoryHeading") }}</h4>
+          <div class="table-scroll">
+            <table class="votes-table">
+              <thead>
+                <tr>
+                  <th>{{ t("gmInPlay.moveToRoom.guesser") }}</th>
+                  <th>{{ t("gmInPlay.moveToRoom.target") }}</th>
+                  <th>{{ t("gmInPlay.moveToRoom.guessedRoom") }}</th>
+                  <th>{{ t("gmInPlay.moveToRoom.correct") }}</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr
+                  v-for="(guess, i) in guessesForRound(round.round_number)"
+                  :key="i"
+                  :class="{ 'eliminated-row': guess.correct === false }"
+                >
+                  <td>{{ guess.guesser_display_name }}</td>
+                  <td>{{ guess.target_display_name }}</td>
+                  <td>{{ t(`moveToRoom.rooms.${guess.guessed_room_id}`) }}</td>
+                  <td>
+                    {{
+                      guess.correct === null
+                        ? t("gmInPlay.moveToRoom.pending")
+                        : guess.correct
+                          ? t("gmInPlay.settings.yes")
+                          : t("gmInPlay.settings.no")
+                    }}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
-      </div>
       </section>
     </div>
 
@@ -808,32 +808,32 @@ async function submit() {
         v-else
         class="table-scroll"
       >
-      <table class="votes-table">
-        <thead>
-          <tr>
-            <th>{{ t("gmInPlay.powers.player") }}</th>
-            <th>{{ t("gmInPlay.powers.power") }}</th>
-            <th>{{ t("gmInPlay.powers.block") }}</th>
-            <th>{{ t("gmInPlay.powers.reason") }}</th>
-            <th>{{ t("gmInPlay.powers.used") }}</th>
-            <th>{{ t("gmInPlay.powers.effect") }}</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr
-            v-for="(grant, i) in powerGrantRows"
-            :key="i"
-          >
-            <td>{{ grant.player_display_name }}</td>
-            <td>{{ t(`gmSetup.powers.catalogue.${grant.power_key}.label`) }}</td>
-            <td>{{ grant.block === "powers" ? t("gmSetup.powers.catalogueHeading") : t("gmSetup.powers.itemsHeading") }}</td>
-            <td>{{ powerGrantReasonLabel(grant) }}</td>
-            <td>{{ grant.used_at ? t("gmInPlay.settings.yes") : t("gmInPlay.settings.no") }}</td>
-            <td>{{ powerGrantEffectLabel(grant) }}</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+        <table class="votes-table">
+          <thead>
+            <tr>
+              <th>{{ t("gmInPlay.powers.player") }}</th>
+              <th>{{ t("gmInPlay.powers.power") }}</th>
+              <th>{{ t("gmInPlay.powers.block") }}</th>
+              <th>{{ t("gmInPlay.powers.reason") }}</th>
+              <th>{{ t("gmInPlay.powers.used") }}</th>
+              <th>{{ t("gmInPlay.powers.effect") }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              v-for="(grant, i) in powerGrantRows"
+              :key="i"
+            >
+              <td>{{ grant.player_display_name }}</td>
+              <td>{{ t(`gmSetup.powers.catalogue.${grant.power_key}.label`) }}</td>
+              <td>{{ grant.block === "powers" ? t("gmSetup.powers.catalogueHeading") : t("gmSetup.powers.itemsHeading") }}</td>
+              <td>{{ powerGrantReasonLabel(grant) }}</td>
+              <td>{{ grant.used_at ? t("gmInPlay.settings.yes") : t("gmInPlay.settings.no") }}</td>
+              <td>{{ powerGrantEffectLabel(grant) }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
 
     <div
@@ -962,6 +962,7 @@ async function submit() {
       <button
         v-if="showStartButton"
         type="button"
+        :class="{ 'is-loading': startPending }"
         :disabled="startPending"
         @click="startRound"
       >
@@ -979,6 +980,7 @@ async function submit() {
       <button
         v-if="showResolveButton"
         type="button"
+        :class="{ 'is-loading': resolvePending }"
         :disabled="resolvePending"
         @click="resolveNow"
       >
@@ -996,6 +998,7 @@ async function submit() {
       <button
         v-if="showResolveDoorsButton"
         type="button"
+        :class="{ 'is-loading': resolveDoorsPending }"
         :disabled="resolveDoorsPending"
         @click="resolveDoors"
       >
@@ -1013,6 +1016,7 @@ async function submit() {
       <button
         v-if="showResolveTransitionButton"
         type="button"
+        :class="{ 'is-loading': resolveTransitionPending }"
         :disabled="resolveTransitionPending"
         @click="resolveTransition"
       >
@@ -1030,6 +1034,7 @@ async function submit() {
       <button
         v-if="showResolveRouletteButton"
         type="button"
+        :class="{ 'is-loading': resolveRoulettePending }"
         :disabled="resolveRoulettePending"
         @click="resolveRouletteTimeout"
       >
@@ -1063,6 +1068,7 @@ async function submit() {
       <button
         type="button"
         class="finish-button"
+        :class="{ 'is-loading': finishPending }"
         :disabled="finishPending"
         @click="finishGame"
       >
@@ -1143,6 +1149,7 @@ async function submit() {
       </label>
       <button
         type="submit"
+        :class="{ 'is-loading': pending }"
         :disabled="pending"
       >
         {{ pending ? t("gmInPlay.actionLog.logging") : t("gmInPlay.actionLog.logAction") }}

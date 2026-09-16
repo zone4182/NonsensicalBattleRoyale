@@ -202,6 +202,7 @@ function close() {
     <div class="actions">
       <button
         type="button"
+        :class="{ 'is-loading': movePending }"
         :disabled="!selectedMoveTarget || movePending"
         @click="confirmMove"
       >
@@ -250,6 +251,7 @@ function close() {
       <div class="actions">
         <button
           type="button"
+          :class="{ 'is-loading': guessPending }"
           :disabled="!selectedGuessTarget || guessPending"
           @click="confirmGuess"
         >

@@ -42,6 +42,7 @@ async function cast(option: string) {
         >
           <button
             type="button"
+            :class="{ 'is-loading': pending && selected === option }"
             :disabled="pending || submitted"
             @click="cast(option)"
           >

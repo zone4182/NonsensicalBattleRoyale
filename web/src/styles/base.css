@@ -73,6 +73,47 @@ button:hover {
   border-color: var(--nbr-accent);
 }
 
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* Applied (via :class="{ 'is-loading': pending }") to any button whose click starts an
+   API call -- a disabled button alone reads as "did my click even register?" on a slow
+   connection, so this also paints a spinner over the (still-reserved-width) label
+   instead of just dimming it. Label text is kept in the DOM, not removed, so screen
+   readers/width stay stable; it's only hidden visually while the spinner shows. */
+button.is-loading {
+  position: relative;
+  color: transparent !important;
+}
+
+button.is-loading::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 1em;
+  height: 1em;
+  color: var(--nbr-fg);
+  border: 0.15em solid currentColor;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: nbr-spin 0.6s linear infinite;
+}
+
+@keyframes nbr-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  button.is-loading::after {
+    animation-duration: 1.5s;
+  }
+}
+
 .screen {
   min-height: 100%;
   padding: var(--nbr-space-4);

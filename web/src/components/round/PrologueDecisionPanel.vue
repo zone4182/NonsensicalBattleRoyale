@@ -19,6 +19,7 @@ const session = useSessionStore();
 const OPTIONS: PrologueOption[] = ["call_police", "get_help", "drink_whisky"];
 
 const pending = ref(false);
+const pendingOption = ref<PrologueOption | null>(null);
 const errorMessage = ref<string | null>(null);
 
 const isGhost = computed(() => game.yourStatus?.status === "ghost");
@@ -32,6 +33,7 @@ const ERROR_MESSAGES: Record<string, string> = {
 async function choose(option: PrologueOption) {
   if (!session.token || pending.value || option === selected.value) return;
   pending.value = true;
+  pendingOption.value = option;
   errorMessage.value = null;
   try {
     await callFunction("submit-prologue-vote", { option }, { token: session.token });
@@ -40,6 +42,7 @@ async function choose(option: PrologueOption) {
     errorMessage.value = err instanceof ApiCallError ? (ERROR_MESSAGES[err.code] ?? err.message) : t("common.somethingWentWrong");
   } finally {
     pending.value = false;
+    pendingOption.value = null;
   }
 }
 </script>
@@ -64,7 +67,7 @@ async function choose(option: PrologueOption) {
             v-for="option in OPTIONS"
             :key="option"
             type="button"
-            :class="{ selected: selected === option }"
+            :class="{ selected: selected === option, 'is-loading': pendingOption === option }"
             :disabled="pending"
             @click="choose(option)"
           >

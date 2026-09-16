@@ -69,6 +69,7 @@ async function use() {
     <template v-else-if="ARM_FOR_ROUND_POWERS.has(powerKey)">
       <button
         type="button"
+        :class="{ 'is-loading': pending }"
         :disabled="pending"
         @click="use"
       >
@@ -78,6 +79,7 @@ async function use() {
     <template v-else-if="ASK_POWERS.has(powerKey)">
       <button
         type="button"
+        :class="{ 'is-loading': pending }"
         :disabled="pending"
         @click="use"
       >
@@ -93,6 +95,7 @@ async function use() {
       >
       <button
         type="button"
+        :class="{ 'is-loading': pending }"
         :disabled="pending || !roundNumber"
         @click="use"
       >

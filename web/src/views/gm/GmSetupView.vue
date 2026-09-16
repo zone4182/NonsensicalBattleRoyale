@@ -155,6 +155,8 @@ const errorMessage = ref<string | null>(null);
 // eliminations: 5 -> 4 -> 3).
 type QuickTestKind = "move_to_room" | "three_doors" | "russian_roulette";
 
+const quickTestPending = ref<QuickTestKind | null>(null);
+
 async function quickTestGame(kind: QuickTestKind) {
   moveToRoomEnabled.value = kind === "move_to_room";
   endgameMode.value = kind === "russian_roulette" ? "russian_roulette" : "three_doors";
@@ -162,7 +164,12 @@ async function quickTestGame(kind: QuickTestKind) {
   botCount.value = 4;
   round1StartMode.value = "wait_for_all";
   draftInvites.value = [t("gmSetup.miniGames.testerInviteName")];
-  await createGame();
+  quickTestPending.value = kind;
+  try {
+    await createGame();
+  } finally {
+    quickTestPending.value = null;
+  }
 }
 
 async function createGame() {
@@ -580,6 +587,7 @@ async function createGame() {
         <div class="quick-test-buttons">
           <button
             type="button"
+            :class="{ 'is-loading': quickTestPending === 'move_to_room' }"
             :disabled="pending"
             @click="quickTestGame('move_to_room')"
           >
@@ -587,6 +595,7 @@ async function createGame() {
           </button>
           <button
             type="button"
+            :class="{ 'is-loading': quickTestPending === 'three_doors' }"
             :disabled="pending"
             @click="quickTestGame('three_doors')"
           >
@@ -594,6 +603,7 @@ async function createGame() {
           </button>
           <button
             type="button"
+            :class="{ 'is-loading': quickTestPending === 'russian_roulette' }"
             :disabled="pending"
             @click="quickTestGame('russian_roulette')"
           >
@@ -677,6 +687,7 @@ async function createGame() {
         <button
           v-else
           type="submit"
+          :class="{ 'is-loading': pending }"
           :disabled="pending"
         >
           {{ pending ? t("gmSetup.creating") : t("gmSetup.createGame") }}

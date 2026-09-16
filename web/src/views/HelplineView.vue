@@ -92,6 +92,7 @@ async function send() {
         />
         <button
           type="submit"
+          :class="{ 'is-loading': pending }"
           :disabled="pending || !body.trim()"
         >
           {{ pending ? t("helpline.sending") : t("helpline.send") }}

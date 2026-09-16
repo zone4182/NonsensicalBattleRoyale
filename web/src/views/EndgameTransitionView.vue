@@ -65,6 +65,7 @@ async function continueClick() {
       <button
         v-if="!acked"
         type="button"
+        :class="{ 'is-loading': pending }"
         :disabled="pending"
         @click="continueClick"
       >

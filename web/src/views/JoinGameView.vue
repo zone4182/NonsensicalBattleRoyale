@@ -90,6 +90,7 @@ async function redeem() {
         >
         <button
           type="submit"
+          :class="{ 'is-loading': pending }"
           :disabled="pending || !token.trim()"
         >
           {{ pending ? t("join.redeeming") : t("join.redeemButton") }}

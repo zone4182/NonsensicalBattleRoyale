@@ -157,6 +157,7 @@ async function sendReply(questionId: string) {
           />
           <button
             type="submit"
+            :class="{ 'is-loading': replyPending[thread.question.id] }"
             :disabled="replyPending[thread.question.id] || !(replyDrafts[thread.question.id] ?? '').trim()"
           >
             {{ replyPending[thread.question.id] ? t("gmHelplineInbox.reply.sending") : t("gmHelplineInbox.reply.send") }}

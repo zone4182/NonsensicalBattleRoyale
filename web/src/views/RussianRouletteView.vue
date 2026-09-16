@@ -66,8 +66,12 @@ const currentPlayerName = computed(() => {
   return game.roulette?.turnOrder.find((p) => p.playerId === id)?.displayName ?? null;
 });
 
+const shootingTarget = ref<string | null>(null);
+
 async function shoot(targetPlayerId: string) {
+  shootingTarget.value = targetPlayerId;
   const result = await run(() => callFunction("submit-roulette-shot", { target_player_id: targetPlayerId }, { token: session.token as string }));
+  shootingTarget.value = null;
   if (result) await refresh();
 }
 </script>
@@ -96,6 +100,7 @@ async function shoot(targetPlayerId: string) {
         <div class="targets">
           <button
             type="button"
+            :class="{ 'is-loading': shootingTarget === session.playerId }"
             :disabled="pending"
             @click="shoot(session.playerId as string)"
           >
@@ -105,6 +110,7 @@ async function shoot(targetPlayerId: string) {
             v-for="p in otherAlivePlayers"
             :key="p.playerId"
             type="button"
+            :class="{ 'is-loading': shootingTarget === p.playerId }"
             :disabled="pending || game.roulette.forcedSelfOnly"
             @click="shoot(p.playerId)"
           >
@@ -157,9 +163,9 @@ async function shoot(targetPlayerId: string) {
             shot.isSelf
               ? t(shot.hit ? "russianRoulette.historySelfHit" : "russianRoulette.historySelfMiss", { name: shot.shooterDisplayName })
               : t(shot.hit ? "russianRoulette.historyOtherHit" : "russianRoulette.historyOtherMiss", {
-                  shooter: shot.shooterDisplayName,
-                  target: shot.targetDisplayName,
-                })
+                shooter: shot.shooterDisplayName,
+                target: shot.targetDisplayName,
+              })
           }}
         </li>
       </ul>

@@ -303,6 +303,7 @@ async function lockVote() {
       <div class="actions">
         <button
           type="button"
+          :class="{ 'is-loading': doublePending }"
           :disabled="(!selectedId1 && !selectedId2) || doublePending || !canVote"
           @click="confirmDoubleVote"
         >
@@ -362,6 +363,7 @@ async function lockVote() {
       <div class="actions">
         <button
           type="button"
+          :class="{ 'is-loading': pending }"
           :disabled="!selectedId || pending || !canVote"
           @click="confirmVote"
         >
@@ -387,6 +389,7 @@ async function lockVote() {
       <button
         type="button"
         class="lock-button"
+        :class="{ 'is-loading': lockPending }"
         :disabled="lockPending"
         @click="lockVote"
       >

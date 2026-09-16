@@ -20,6 +20,7 @@ const session = useSessionStore();
 const { run } = useApiCall();
 const picked = ref<number | null>(null);
 const pending = ref(false);
+const pendingDoor = ref<number | null>(null);
 const errorMessage = ref<string | null>(null);
 
 useGameFinishedRedirect();
@@ -93,6 +94,7 @@ const countdown = computed(() => {
 async function pick(doorNumber: number) {
   if (!session.token || pending.value) return;
   pending.value = true;
+  pendingDoor.value = doorNumber;
   errorMessage.value = null;
   try {
     await callFunction("submit-door-pick", { door_number: doorNumber }, { token: session.token });
@@ -101,6 +103,7 @@ async function pick(doorNumber: number) {
     errorMessage.value = err instanceof ApiCallError ? (DOOR_ERROR_MESSAGES[err.code] ?? err.message) : t("common.somethingWentWrong");
   } finally {
     pending.value = false;
+    pendingDoor.value = null;
   }
 }
 </script>
@@ -141,6 +144,7 @@ async function pick(doorNumber: number) {
         v-for="n in [1, 2, 3]"
         :key="n"
         type="button"
+        :class="{ 'is-loading': pendingDoor === n }"
         :disabled="picked !== null || pending"
         @click="pick(n)"
       >
